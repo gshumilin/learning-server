@@ -3,6 +3,8 @@ module Types.User where
 import Data.Time.Calendar (Day)
 import qualified Data.Text as T
 
+data UsersList = UsersList [User]
+
 data User = User
   { name :: T.Text,
     login :: T.Text,
@@ -10,4 +12,4 @@ data User = User
     createDate :: Day,
     isAdmin :: Bool,
     isAbleToCreateNews :: Bool
-  }
+  } deriving Show

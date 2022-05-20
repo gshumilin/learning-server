@@ -25,6 +25,10 @@ dependencies:
 - text
 - wai
 - warp
+- bytestring
+- http-types
+- aeson
+- aeson-pretty
 
 default-extencions:
 - DuplicateRecordFields
