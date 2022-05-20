@@ -1,6 +1,8 @@
-module Lib
-    ( someFunc
-    ) where
+module Lib where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import Types.User
+import Endpoints.User
+import Network.Wai
+
+application :: Application
+application = undefined
