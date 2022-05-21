@@ -26,9 +26,11 @@ source-repository head
 library
   exposed-modules:
       Endpoints.User
-      FromJSON
+      Instances.FromJSON.API.User
+      Instances.FromJSON.User
+      Instances.ToJSON.User
       Routing
-      ToJSON
+      Types.API.User
       Types.User
   other-modules:
       Paths_learning_server

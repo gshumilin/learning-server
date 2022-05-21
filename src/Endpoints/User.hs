@@ -10,7 +10,7 @@ import Data.Time.Calendar
 import Network.HTTP.Types (hContentType, status200)
 import Network.Wai
 import Data.Aeson.Encode.Pretty (encodePretty)
-import ToJSON
+import Instances.ToJSON.User
 
 getUsersList :: Response
 getUsersList =
