@@ -1,16 +1,21 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Endpoints.User where
 
 import Types.User
+import Types.API.User
+import Instances.ToJSON.User
+import Instances.FromJSON.User
+import Instances.FromJSON.API.User
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Char8 as BS
 import Data.Text.Encoding (encodeUtf8)
 import Data.Time.Calendar
 import Network.HTTP.Types (hContentType, status200)
 import Network.Wai
+import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
-import Instances.ToJSON.User
+
 
 getUsersList :: Response
 getUsersList =
@@ -18,13 +23,35 @@ getUsersList =
     where
         renderedUsersList = encodePretty usersList
 
-createUser :: Request -> Response
-createUser req = 
-    responseLBS status200 [(hContentType, "text/plain")] $ fx reqQuery
-    where 
-        reqQuery = rawQueryString req
-        fx :: BS.ByteString -> LBS.ByteString
-        fx rq = undefined
+createUser :: Request -> IO (Response)
+createUser req = do
+    rawJSON <- getRequestBodyChunk req
+    let req = decodeStrict rawJSON :: Maybe CreateUserRequest
+    case req of
+        Nothing -> do 
+            putStrLn "Invalid JSON"
+            return $ responseLBS status200 [(hContentType, "text/plain")] $ "Invalid JSON\n" --позже исправить респонс
+        Just createUserReq -> do
+            putStrLn . show $ rawJSON
+            addUser (makingUser createUserReq)
+            return $ responseLBS status200 [(hContentType, "text/plain")] $ "user added\n" --позже исправить респонс на json
+
+addUser :: User -> IO ()        --позже написать функцию добавления пользователя
+addUser x = putStrLn $ show x
+
+makingUser :: CreateUserRequest -> User
+makingUser CreateUserRequest {..} = 
+    User { name = reqName,
+           login = reqLogin,
+           password = reqPassword,
+           createDate = getToday,
+           isAdmin = getAdminStatus,
+           isAbleToCreateNews = getCreateNewsStatus
+         } 
+    where
+        getToday = fromGregorian 2022 05 22 --позже написать функцию, добавляющую дату
+        getAdminStatus = False              --и это
+        getCreateNewsStatus = False         --и это
 
 usersList = UsersList $
             [   User { name = "Gena Shumilin",

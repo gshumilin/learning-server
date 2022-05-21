@@ -4,7 +4,7 @@ import Data.Time (Day)
 import qualified Data.Text as T
 
 data CreateUserRequest = CreateUserRequest
-  { name :: T.Text,
-    login :: T.Text,
-    password :: T.Text
+  { reqName :: T.Text,
+    reqLogin :: T.Text,
+    reqPassword :: T.Text
   } deriving Show

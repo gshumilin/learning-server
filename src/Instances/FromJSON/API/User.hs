@@ -9,7 +9,7 @@ import Types.API.User
 
 instance FromJSON CreateUserRequest where
     parseJSON (Object inputJSON) = do
-        name <- inputJSON .: "name"
-        login <- inputJSON .: "login"
-        password <- inputJSON .: "password"
+        reqName <- inputJSON .: "name"
+        reqLogin <- inputJSON .: "login"
+        reqPassword <- inputJSON .: "password"
         return $ CreateUserRequest {..}
