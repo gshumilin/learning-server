@@ -9,8 +9,10 @@ import qualified Data.ByteString.Char8 as BS
 
 application :: Application
 application req respond 
-    | reqPath == "getUsersList" = respond $ Endpoints.User.getUsersList
+    | reqPath == "/getUsersList" = respond $ Endpoints.User.getUsersList
+    | reqPath == "/createUser" = respond $ Endpoints.User.createUser req
     | otherwise = undefined
     where
-        reqPath = BS.tail $ rawPathInfo req
+        reqPath = rawPathInfo req
+        reqQuery = rawQueryString req
 

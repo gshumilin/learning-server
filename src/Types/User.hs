@@ -1,6 +1,6 @@
 module Types.User where
 
-import Data.Time.Calendar (Day)
+import Data.Time (Day)
 import qualified Data.Text as T
 
 data UsersList = UsersList [User]
