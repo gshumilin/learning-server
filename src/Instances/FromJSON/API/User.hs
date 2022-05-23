@@ -12,4 +12,6 @@ instance FromJSON CreateUserRequest where
         reqName <- inputJSON .: "name"
         reqLogin <- inputJSON .: "login"
         reqPassword <- inputJSON .: "password"
+        reqIsAdmin <- inputJSON .: "isAdmin"
+        reqIsAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
         return $ CreateUserRequest {..}

@@ -13,7 +13,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Time
 import Data.Time.Calendar
 import Data.Time.Clock
-import Network.HTTP.Types (hContentType, status200)
+import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
@@ -32,12 +32,12 @@ createUser req = do
     case req of
         Nothing -> do 
             putStrLn "Invalid JSON"
-            return $ responseLBS status200 [(hContentType, "text/plain")] $ "Invalid JSON\n" --позже исправить респонс
+            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just createUserReq -> do
             putStrLn . show $ rawJSON
             newUser <- makingUser createUserReq
             addUser (newUser)
-            return $ responseLBS status200 [(hContentType, "text/plain")] $ "user added\n" --позже исправить респонс на json
+            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
 addUser :: User -> IO ()        --позже написать функцию добавления пользователя
 addUser x = putStrLn $ show x
@@ -47,12 +47,12 @@ makingUser CreateUserRequest {..} = do
     currTime <- getCurrentTime
     return $ 
         User { name = reqName,
-            login = reqLogin,
-            password = reqPassword,
-            createDate = currTime,
-            isAdmin = reqIsAdmin,
-            isAbleToCreateNews = reqisAbleToCreateNews
-            }
+               login = reqLogin,
+               password = reqPassword,
+               createDate = currTime,
+               isAdmin = reqIsAdmin,
+               isAbleToCreateNews = reqIsAbleToCreateNews
+             }
 
 usersList = UsersList $
             [   User { name = "Gena Shumilin",

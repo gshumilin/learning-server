@@ -8,5 +8,5 @@ data CreateUserRequest = CreateUserRequest
     reqLogin :: T.Text,
     reqPassword :: T.Text,
     reqIsAdmin :: Bool,
-    reqisAbleToCreateNews :: Bool
+    reqIsAbleToCreateNews :: Bool
   } deriving Show
