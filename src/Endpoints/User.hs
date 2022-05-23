@@ -10,7 +10,9 @@ import Instances.FromJSON.API.User
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Char8 as BS
 import Data.Text.Encoding (encodeUtf8)
+import Data.Time
 import Data.Time.Calendar
+import Data.Time.Clock
 import Network.HTTP.Types (hContentType, status200)
 import Network.Wai
 import Data.Aeson
@@ -33,39 +35,40 @@ createUser req = do
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "Invalid JSON\n" --позже исправить респонс
         Just createUserReq -> do
             putStrLn . show $ rawJSON
-            addUser (makingUser createUserReq)
+            newUser <- makingUser createUserReq
+            addUser (newUser)
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "user added\n" --позже исправить респонс на json
 
 addUser :: User -> IO ()        --позже написать функцию добавления пользователя
 addUser x = putStrLn $ show x
 
-makingUser :: CreateUserRequest -> User
-makingUser CreateUserRequest {..} = 
-    User { name = reqName,
-           login = reqLogin,
-           password = reqPassword,
-           createDate = getToday,
-           isAdmin = getAdminStatus,
-           isAbleToCreateNews = getCreateNewsStatus
-         } 
-    where
-        getToday = fromGregorian 2022 05 22 --позже написать функцию, добавляющую дату
-        getAdminStatus = False              --и это
-        getCreateNewsStatus = False         --и это
+makingUser :: CreateUserRequest -> IO (User)
+makingUser CreateUserRequest {..} = do
+    currTime <- getCurrentTime
+    return $ 
+        User { name = reqName,
+            login = reqLogin,
+            password = reqPassword,
+            createDate = currTime,
+            isAdmin = reqIsAdmin,
+            isAbleToCreateNews = reqisAbleToCreateNews
+            }
 
 usersList = UsersList $
             [   User { name = "Gena Shumilin",
                        login = "1000-7_Geneki_7-1000",
                        password = "pleasedonthackme",
-                       createDate = fromGregorian 2022 05 20,
+                       createDate = UTCTime
+                                        { utctDay = ModifiedJulianDay 59719
+                                        , utctDayTime = 43200
+                                        } ,
                        isAdmin = True,
                        isAbleToCreateNews = True
-                     } 
-                    ,
+                     } ,
                 User { name = "Oleg Romashin",
                        login = "Colossus_Berutorutoleg",
                        password = "pleasedonthackme2",
-                       createDate = fromGregorian 2022 05 20,
+                       createDate = UTCTime (ModifiedJulianDay 59719) 43201,
                        isAdmin = False,
                        isAbleToCreateNews = True
                      }
