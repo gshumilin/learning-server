@@ -7,7 +7,7 @@ import Types.API.User
 import Instances.ToJSON.User
 import Instances.FromJSON.User
 import Instances.FromJSON.API.User
-import DataBaseQueries (parseUsersList)
+import DataBaseQueries (parseUsersList, writeUser)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Char8 as BS
 import Data.Text.Encoding (encodeUtf8)
@@ -21,7 +21,7 @@ import Data.Aeson.Encode.Pretty (encodePretty)
 
 getUsersList :: IO (Response)
 getUsersList = do 
-    usersList <- parseUsersList
+    usersList <- DataBaseQueries.parseUsersList
     let jsonUsersList = encodePretty usersList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonUsersList
 
@@ -35,15 +35,12 @@ createUser req = do
             return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just createUserReq -> do
             putStrLn . show $ rawJSON
-            newUser <- makingUser createUserReq
-            addUser (newUser)
+            newUser <- apiUserTransform createUserReq
+            DataBaseQueries.writeUser newUser
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
-addUser :: User -> IO ()        --позже написать функцию добавления пользователя
-addUser x = putStrLn $ show x
-
-makingUser :: CreateUserRequest -> IO (User)
-makingUser CreateUserRequest {..} = do
+apiUserTransform :: CreateUserRequest -> IO (User)
+apiUserTransform CreateUserRequest {..} = do
     currTime <- getCurrentTime
     return $ 
         User { name = reqName,
