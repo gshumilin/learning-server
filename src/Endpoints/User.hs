@@ -7,6 +7,7 @@ import Types.API.User
 import Instances.ToJSON.User
 import Instances.FromJSON.User
 import Instances.FromJSON.API.User
+import DataBaseQueries (parseUsersList)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Char8 as BS
 import Data.Text.Encoding (encodeUtf8)
@@ -18,12 +19,11 @@ import Network.Wai
 import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 
-
-getUsersList :: Response
-getUsersList =
-    responseLBS status200 [(hContentType, "text/plain")] $ renderedUsersList
-    where
-        renderedUsersList = encodePretty usersList
+getUsersList :: IO (Response)
+getUsersList = do 
+    usersList <- parseUsersList
+    let jsonUsersList = encodePretty usersList
+    return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonUsersList
 
 createUser :: Request -> IO (Response)
 createUser req = do
@@ -53,23 +53,3 @@ makingUser CreateUserRequest {..} = do
                isAdmin = reqIsAdmin,
                isAbleToCreateNews = reqIsAbleToCreateNews
              }
-
-usersList = UsersList $
-            [   User { name = "Gena Shumilin",
-                       login = "1000-7_Geneki_7-1000",
-                       password = "pleasedonthackme",
-                       createDate = UTCTime
-                                        { utctDay = ModifiedJulianDay 59719
-                                        , utctDayTime = 43200
-                                        } ,
-                       isAdmin = True,
-                       isAbleToCreateNews = True
-                     } ,
-                User { name = "Oleg Romashin",
-                       login = "Colossus_Berutorutoleg",
-                       password = "pleasedonthackme2",
-                       createDate = UTCTime (ModifiedJulianDay 59719) 43201,
-                       isAdmin = False,
-                       isAbleToCreateNews = True
-                     }
-            ]

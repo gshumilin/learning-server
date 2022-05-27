@@ -25,9 +25,11 @@ source-repository head
 
 library
   exposed-modules:
+      DataBaseQueries
       Endpoints.User
       Instances.FromJSON.API.User
       Instances.FromJSON.User
+      Instances.FromRow.User
       Instances.ToJSON.User
       Routing
       Types.API.User
@@ -42,6 +44,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , http-types
+    , postgresql-simple
     , text
     , time
     , wai
@@ -62,6 +65,7 @@ executable learning-server-exe
     , bytestring
     , http-types
     , learning-server
+    , postgresql-simple
     , text
     , time
     , wai
@@ -83,6 +87,7 @@ test-suite learning-server-test
     , bytestring
     , http-types
     , learning-server
+    , postgresql-simple
     , text
     , time
     , wai

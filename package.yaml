@@ -29,6 +29,7 @@ dependencies:
 - http-types
 - aeson
 - aeson-pretty
+- postgresql-simple
 
 default-extencions:
 - DuplicateRecordFields
