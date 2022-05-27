@@ -31,7 +31,9 @@ dependencies:
 - aeson-pretty
 - postgresql-simple
 
-default-extencions:
+default-extensions:
+- OverloadedStrings
+- RecordWildCards
 - DuplicateRecordFields
 
 library:

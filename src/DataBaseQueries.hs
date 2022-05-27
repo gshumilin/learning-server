@@ -1,9 +1,6 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-
 module DataBaseQueries where
 
 import Types.User
-import Instances.FromRow.User
 import Database.PostgreSQL.Simple
 import Data.Int (Int64)
 

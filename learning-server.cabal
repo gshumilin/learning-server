@@ -27,10 +27,6 @@ library
   exposed-modules:
       DataBaseQueries
       Endpoints.User
-      Instances.FromJSON.API.User
-      Instances.FromJSON.User
-      Instances.FromRow.User
-      Instances.ToJSON.User
       Routing
       Types.API.User
       Types.User
@@ -38,6 +34,10 @@ library
       Paths_learning_server
   hs-source-dirs:
       src
+  default-extensions:
+      OverloadedStrings
+      RecordWildCards
+      DuplicateRecordFields
   build-depends:
       aeson
     , aeson-pretty
@@ -57,6 +57,10 @@ executable learning-server-exe
       Paths_learning_server
   hs-source-dirs:
       app
+  default-extensions:
+      OverloadedStrings
+      RecordWildCards
+      DuplicateRecordFields
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -79,6 +83,10 @@ test-suite learning-server-test
       Paths_learning_server
   hs-source-dirs:
       test
+  default-extensions:
+      OverloadedStrings
+      RecordWildCards
+      DuplicateRecordFields
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

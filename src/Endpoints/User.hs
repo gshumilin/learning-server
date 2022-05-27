@@ -1,12 +1,7 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-
 module Endpoints.User where
 
 import Types.User
 import Types.API.User
-import Instances.ToJSON.User
-import Instances.FromJSON.User
-import Instances.FromJSON.API.User
 import DataBaseQueries (parseUsersList, writeUser)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Char8 as BS
