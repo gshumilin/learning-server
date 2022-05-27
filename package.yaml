@@ -21,6 +21,20 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- time
+- text
+- wai
+- warp
+- bytestring
+- http-types
+- aeson
+- aeson-pretty
+- postgresql-simple
+
+default-extensions:
+- OverloadedStrings
+- RecordWildCards
+- DuplicateRecordFields
 
 library:
   source-dirs: src
