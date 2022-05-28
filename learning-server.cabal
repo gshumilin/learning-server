@@ -29,7 +29,10 @@ library
       Endpoints.User
       Routing
       Types.API.User
+      Types.Category
       Types.Environment
+      Types.News
+      Types.Picture
       Types.User
   other-modules:
       Paths_learning_server
