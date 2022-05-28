@@ -30,6 +30,7 @@ dependencies:
 - aeson
 - aeson-pretty
 - postgresql-simple
+- mtl
 
 default-extensions:
 - OverloadedStrings

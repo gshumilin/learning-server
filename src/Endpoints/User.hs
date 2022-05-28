@@ -2,6 +2,8 @@ module Endpoints.User where
 
 import Types.User
 import Types.API.User
+import Types.Environment
+import Database.PostgreSQL.Simple (Connection)
 import DataBaseQueries (parseUsersList, writeUser)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Char8 as BS
@@ -13,25 +15,28 @@ import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
+import Control.Monad.Reader
 
-getUsersList :: IO (Response)
-getUsersList = do 
-    usersList <- DataBaseQueries.parseUsersList
+getUsersList :: ReaderT Environment IO (Response)
+getUsersList = do
+    conn <- asks dbConnection
+    usersList <- lift $ DataBaseQueries.parseUsersList conn
     let jsonUsersList = encodePretty usersList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonUsersList
 
-createUser :: Request -> IO (Response)
+createUser :: Request -> ReaderT Environment IO (Response)
 createUser req = do
-    rawJSON <- getRequestBodyChunk req
+    conn <- asks dbConnection
+    rawJSON <- lift $ getRequestBodyChunk req
     let req = decodeStrict rawJSON :: Maybe CreateUserRequest
     case req of
         Nothing -> do 
-            putStrLn "Invalid JSON"
+            lift $ putStrLn "Invalid JSON"
             return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just createUserReq -> do
-            putStrLn . show $ rawJSON
-            newUser <- apiUserTransform createUserReq
-            DataBaseQueries.writeUser newUser
+            lift . putStrLn . show $ rawJSON
+            newUser <- lift $ apiUserTransform createUserReq
+            lift $ DataBaseQueries.writeUser conn newUser
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
 apiUserTransform :: CreateUserRequest -> IO (User)

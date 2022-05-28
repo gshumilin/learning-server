@@ -29,6 +29,7 @@ library
       Endpoints.User
       Routing
       Types.API.User
+      Types.Environment
       Types.User
   other-modules:
       Paths_learning_server
@@ -44,6 +45,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , http-types
+    , mtl
     , postgresql-simple
     , text
     , time
@@ -69,6 +71,7 @@ executable learning-server-exe
     , bytestring
     , http-types
     , learning-server
+    , mtl
     , postgresql-simple
     , text
     , time
@@ -95,6 +98,7 @@ test-suite learning-server-test
     , bytestring
     , http-types
     , learning-server
+    , mtl
     , postgresql-simple
     , text
     , time
