@@ -9,7 +9,11 @@ data Picture = Picture
     }
 
 instance FromJSON Picture where 
-    parseJSON (Object inputJSON) = undefined
+    parseJSON (Object inputJSON) = do
+        base64 <- inputJSON .: "base64"
+        return Picture {..}
 
 instance ToJSON Picture where
-    toJSON = undefined
+    toJSON Picture {..} = 
+        object  [ "base64" .= base64
+                ]
