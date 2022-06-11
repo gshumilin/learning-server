@@ -12,9 +12,9 @@ data News = News
     { header :: T.Text,
       createDate :: UTCTime,
       creator :: User,
-      categogy :: Category T.Text,
+      category :: Category T.Text,
       textContent :: T.Text,
-      picturesArray :: [Picture],
+      picturesArray :: PicturesArray,
       isPublished :: Bool
     }
 
@@ -23,7 +23,7 @@ instance FromJSON News where
         header <- inputJSON .: "header"
         createDate <- inputJSON .: "createDate"
         creator <- inputJSON .: "creator"
-        categogy <- inputJSON .: "categogy"
+        category <- inputJSON .: "category"
         textContent <- inputJSON .: "textContent"
         picturesArray <- inputJSON .: "picturesArray"
         isPublished <- inputJSON .: "isPublished"
@@ -34,7 +34,7 @@ instance ToJSON News where
         object [ "header" .= header
                , "createDate" .= createDate
                , "creator" .= creator
-               , "categogy" .= categogy
+               , "category" .= category
                , "textContent" .= textContent
                , "picturesArray" .= picturesArray
                , "isPublished" .= isPublished
