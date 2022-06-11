@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 module Types.API.User where
 
 import Data.Time (Day)
