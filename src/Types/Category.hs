@@ -19,5 +19,8 @@ instance ToJSON (Category a) where
     toJSON Empty = undefined
     toJSON (CatName x y) = undefined
 
+instance FromRow (Category a) where
+    fromRow = undefined
+
 instance ToField (Category a) where
     toField = undefined

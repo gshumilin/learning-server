@@ -16,9 +16,14 @@ writeUser conn User {..} = do
                     (name, login, password, createDate, isAdmin, isAbleToCreateNews)
     return ()
 
+parseNewsList :: Connection -> IO [(News)]
+parseNewsList conn = do
+    res <- query_ conn "SELECT header, createDate, creator, category, textContent, picturesArray, isPublished FROM userslist"
+    return res
+
 writeNews :: Connection -> News -> IO ()
 writeNews conn News {..} = do
-    execute conn "insert into newsList (name,login,password,createDate,isAdmin,isAbleToCreateNews) values (?,?,?,?,?,?)"
+    execute conn "insert into newsList (header, createDate, creator, category, textContent, picturesArray, isPublished) values (?,?,?,?,?,?)"
                     (header, createDate, creator, category, textContent, picturesArray, isPublished)
     return ()
 

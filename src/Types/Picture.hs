@@ -33,6 +33,9 @@ instance ToJSON PicturesArray where
         object  [ "picturesArray" .= arr
                 ]
 
+instance FromRow PicturesArray where
+    fromRow = undefined
+
 instance ToField Picture where
     toField = undefined
 

@@ -7,6 +7,8 @@ import Data.Time.Clock
 import qualified Data.Text as T
 import Data.Aeson
 import Data.Aeson.Types
+import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromRow
 
 data News = News
     { header :: T.Text,
@@ -40,3 +42,13 @@ instance ToJSON News where
                , "isPublished" .= isPublished
                ]
 
+instance FromRow News where
+    fromRow = do
+        header <- field
+        createDate <- field
+        creator <- fromRow
+        category <- fromRow
+        textContent <- field
+        picturesArray <- fromRow
+        isPublished <- field
+        return News {..}
