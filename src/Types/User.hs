@@ -6,6 +6,7 @@ import Data.Aeson
 import Data.Aeson.Types
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
+import Database.PostgreSQL.Simple.ToField
 
 data UsersList = UsersList [User]
 
@@ -45,3 +46,6 @@ instance ToJSON User where
 
 instance FromRow User where
     fromRow = User <$> field <*> field <*> field <*> field <*> field <*> field
+
+instance ToField User where
+    toField = undefined

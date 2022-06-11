@@ -26,7 +26,7 @@ routing req respond = do
             res <- Endpoints.User.createUser req
             lift $ respond res
         "/createNews"   -> do
-            res <- Endpoints.News.createNews
+            res <- Endpoints.News.createNews req
             lift $ respond res
         "/getNewsList"  -> do
             res <- Endpoints.News.getNewsList

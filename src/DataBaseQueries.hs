@@ -1,6 +1,8 @@
 module DataBaseQueries where
 
 import Types.User
+import Types.News
+import Types.Picture
 import Database.PostgreSQL.Simple
 
 parseUsersList :: Connection -> IO [(User)]
@@ -14,6 +16,11 @@ writeUser conn User {..} = do
                     (name, login, password, createDate, isAdmin, isAbleToCreateNews)
     return ()
 
+writeNews :: Connection -> News -> IO ()
+writeNews conn News {..} = do
+    execute conn "insert into newsList (name,login,password,createDate,isAdmin,isAbleToCreateNews) values (?,?,?,?,?,?)"
+                    (header, createDate, creator, category, textContent, picturesArray, isPublished)
+    return ()
 
 getConnection :: IO Connection
 getConnection = connectPostgreSQL "host='localhost' port=5432 dbname='learning_server_db' user='learning_server_user' password='pleasedonthackme'" 
