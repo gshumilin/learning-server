@@ -10,11 +10,18 @@ import Data.Aeson.Types
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 
+data NewsList = NewsList [News]
+
+instance ToJSON NewsList where
+    toJSON (NewsList list) = 
+        object  [ "newsList" .= list
+                ]
+
 data News = News
     { header :: T.Text,
       createDate :: UTCTime,
       creator :: User,
-      category :: Category T.Text,
+      category :: Category,
       textContent :: T.Text,
       picturesArray :: PicturesArray,
       isPublished :: Bool

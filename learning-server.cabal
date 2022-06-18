@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       DataBaseQueries
+      Endpoints.Categories
       Endpoints.News
       Endpoints.User
       Routing

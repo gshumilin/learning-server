@@ -7,20 +7,17 @@ import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 
-data Category a = Empty | CatName a (Category a) deriving Show
+type CatName = T.Text
+data Category = Empty | CatName (Category) deriving Show
 
-exCategory :: Category String
-exCategory = CatName "Anime" (CatName "Action/dramma" (CatName "Titan Attack" Empty))
-
-instance FromJSON (Category a) where
+instance FromJSON Category where
     parseJSON (Object inputJSON) = undefined
 
-instance ToJSON (Category a) where
-    toJSON Empty = undefined
-    toJSON (CatName x y) = undefined
+instance ToJSON Category where
+    toJSON cat = undefined
 
-instance FromRow (Category a) where
+instance FromRow Category where
     fromRow = undefined
 
-instance ToField (Category a) where
+instance ToField Category where
     toField = undefined

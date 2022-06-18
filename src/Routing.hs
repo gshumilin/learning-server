@@ -4,6 +4,7 @@ import Types.User
 import Types.Environment
 import qualified Endpoints.User
 import qualified Endpoints.News
+import Endpoints.Categories
 import Network.Wai
 import qualified Data.ByteString.Char8 as BS
 import Control.Monad.Reader
@@ -25,14 +26,20 @@ routing req respond = do
         "/createUser"   -> do
             res <- Endpoints.User.createUser req
             lift $ respond res
-        "/createNews"   -> do
-            res <- Endpoints.News.createNews req
-            lift $ respond res
         "/getNewsList"  -> do
             res <- Endpoints.News.getNewsList
             lift $ respond res
+        "/createNews"   -> do
+            res <- Endpoints.News.createNews req
+            lift $ respond res    
         "/editNews"     -> do
             res <- Endpoints.News.editNews
+            lift $ respond res
+        "/getCategoriesList" -> do
+            res <- Endpoints.Categories.getCategoriesList    
+            lift $ respond res
+        "/createCategory" -> do
+            res <- Endpoints.Categories.createCategory
             lift $ respond res
         _               -> error "Unknown method"
 
