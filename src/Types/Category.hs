@@ -7,17 +7,21 @@ import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 
-type CatName = T.Text
-data Category = Empty | CatName (Category) deriving Show
+data Category = Category
+    { id :: Integer,
+      title :: T.Text,
+      parent :: Maybe Category
+    } deriving Show
 
 instance FromJSON Category where
     parseJSON (Object inputJSON) = undefined
 
 instance ToJSON Category where
-    toJSON cat = undefined
-
-instance FromRow Category where
-    fromRow = undefined
+    toJSON Category {..} = do
+        object [ "id" .= id
+               , "title" .= title
+               , "parent" .= parent
+               ]
 
 instance ToField Category where
     toField = undefined

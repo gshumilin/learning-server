@@ -32,6 +32,8 @@ library
       Routing
       Types.API.User
       Types.Category
+      Types.Database.Category
+      Types.Database.News
       Types.Environment
       Types.News
       Types.Picture

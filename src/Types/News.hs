@@ -3,6 +3,7 @@ module Types.News where
 import Types.User
 import Types.Picture
 import Types.Category
+import qualified Types.Database.Category as DBType
 import Data.Time.Clock
 import qualified Data.Text as T
 import Data.Aeson
@@ -18,7 +19,7 @@ instance ToJSON NewsList where
                 ]
 
 data News = News
-    { header :: T.Text,
+    { title :: T.Text,
       createDate :: UTCTime,
       creator :: User,
       category :: Category,
@@ -29,7 +30,7 @@ data News = News
 
 instance FromJSON News where
     parseJSON (Object inputJSON) = do
-        header <- inputJSON .: "header"
+        title <- inputJSON .: "title"
         createDate <- inputJSON .: "createDate"
         creator <- inputJSON .: "creator"
         category <- inputJSON .: "category"
@@ -40,7 +41,7 @@ instance FromJSON News where
 
 instance ToJSON News where
     toJSON News {..} = 
-        object [ "header" .= header
+        object [ "title" .= title
                , "createDate" .= createDate
                , "creator" .= creator
                , "category" .= category
@@ -49,13 +50,3 @@ instance ToJSON News where
                , "isPublished" .= isPublished
                ]
 
-instance FromRow News where
-    fromRow = do
-        header <- field
-        createDate <- field
-        creator <- fromRow
-        category <- fromRow
-        textContent <- field
-        picturesArray <- fromRow
-        isPublished <- field
-        return News {..}
