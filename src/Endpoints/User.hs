@@ -21,7 +21,7 @@ getUsersList :: ReaderT Environment IO (Response)
 getUsersList = do
     conn <- asks dbConnection
     usersList <- lift $ parseUsersList conn
-    let jsonUsersList = encodePretty usersList
+    let jsonUsersList = encodePretty (UsersList usersList)
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonUsersList
 
 createUser :: Request -> ReaderT Environment IO (Response)

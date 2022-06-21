@@ -10,6 +10,11 @@ import Database.PostgreSQL.Simple.ToField
 
 data UsersList = UsersList [User]
 
+instance ToJSON UsersList where
+    toJSON (UsersList list) = 
+        object  [ "usersList" .= list
+                ]
+                
 data User = User
   { name :: T.Text,
     login :: T.Text,
@@ -28,11 +33,6 @@ instance FromJSON User where
         isAdmin <- inputJSON .: "isAdmin"
         isAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
         return $ User {..}
-
-instance ToJSON UsersList where
-    toJSON (UsersList list) = 
-        object  [ "usersList" .= list
-                ]
 
 instance ToJSON User where
     toJSON User {..} =
