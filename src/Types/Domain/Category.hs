@@ -8,7 +8,7 @@ import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 
 data Category = Category
-    { id :: Integer,
+    { categoryID :: Integer,
       title :: T.Text,
       parent :: Maybe Category
     } deriving Show
@@ -18,7 +18,7 @@ instance FromJSON Category where
 
 instance ToJSON Category where
     toJSON Category {..} = do
-        object [ "id" .= id
+        object [ "categoryID" .= categoryID
                , "title" .= title
                , "parent" .= parent
                ]

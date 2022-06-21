@@ -13,3 +13,6 @@ writeUser conn User {..} = do
     execute conn "insert into users (name,login,password,create_date,is_admin,is_able_to_create_news) values (?,?,?,?,?,?)"
                     (name, login, password, createDate, isAdmin, isAbleToCreateNews)
     return ()
+
+findUser :: Connection -> Integer -> IO (User)
+findUser = undefined

@@ -14,7 +14,7 @@ import Database.PostgreSQL.Simple.FromRow
 data NewsList = NewsList [News]
 
 data News = News
-    { id :: Integer,
+    { newsID :: Integer,
       title :: T.Text,
       createDate :: UTCTime,
       creatorID :: Integer,
@@ -25,7 +25,7 @@ data News = News
 
 instance FromRow News where
     fromRow = do
-        id <- field
+        newsID <- field
         title <- field
         createDate <- field
         creatorID <- field

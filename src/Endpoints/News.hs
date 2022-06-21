@@ -5,10 +5,12 @@ import Types.Domain.Environment
 import Types.API.User
 import qualified Types.Domain.News as Domain
 import Types.Domain.Picture
-import qualified Types.Database.News as DBType
+import qualified Types.Database.News as Database
 import Endpoints.Categories (dbCategoryTransform)
 import Database.PostgreSQL.Simple (Connection)
 import DataBaseQueries.News (writeNews, parseNewsList)
+import DataBaseQueries.User (findUser)
+import DataBaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Data.Aeson
@@ -17,17 +19,19 @@ import Control.Monad (mapM)
 import Control.Monad.Reader
 import Data.Time
 
-dbNewsTransform :: DBType.News -> ReaderT Environment IO Domain.News
-dbNewsTransform DBType.News {..} = do 
-    transformedCat <- dbCategoryTransform categoryID
-    currTime <- lift $ getCurrentTime
+dbNewsTransform :: Database.News -> ReaderT Environment IO Domain.News
+dbNewsTransform Database.News {..} = do 
+    conn <- asks dbConnection
+    newsCategory <- dbCategoryTransform categoryID             --refactoring!
+    newsCreator <- lift $ findUser conn creatorID              --undefined
+    newsPicturesArray <- lift $ findPicturesArray conn newsID  --undefined
     return $ Domain.News {
             title = title,
             createDate = createDate,
-            creator = (User "nam" "log" "pas" currTime True True),
-            category = transformedCat,
+            creator = newsCreator,
+            category = newsCategory,
             textContent = textContent,
-            picturesArray = PicturesArray [],
+            picturesArray = newsPicturesArray,
             isPublished = isPublished }
 
 getNewsList :: ReaderT Environment IO (Response)
@@ -35,7 +39,7 @@ getNewsList = do
     conn <- asks dbConnection
     bdNewsList <- lift $ parseNewsList conn
     newsList <- mapM dbNewsTransform bdNewsList
-    let jsonNewsList = encodePretty newsList
+    let jsonNewsList = encodePretty $ Domain.NewsList newsList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
 
 createNews :: Request -> ReaderT Environment IO (Response)

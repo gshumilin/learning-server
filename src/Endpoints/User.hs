@@ -3,11 +3,7 @@ module Endpoints.User where
 import Types.Domain.User
 import Types.Domain.Environment
 import Types.API.User
-import Database.PostgreSQL.Simple (Connection)
 import DataBaseQueries.User (parseUsersList, writeUser)
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Char8 as BS
-import Data.Text.Encoding (encodeUtf8)
 import Data.Time
 import Data.Time.Calendar
 import Data.Time.Clock
