@@ -4,7 +4,7 @@ import Types.User
 import Types.API.User
 import Types.Environment
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries (parseUsersList, writeUser)
+import DataBaseQueries.User (parseUsersList, writeUser)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Char8 as BS
 import Data.Text.Encoding (encodeUtf8)
@@ -20,7 +20,7 @@ import Control.Monad.Reader
 getUsersList :: ReaderT Environment IO (Response)
 getUsersList = do
     conn <- asks dbConnection
-    usersList <- lift $ DataBaseQueries.parseUsersList conn
+    usersList <- lift $ parseUsersList conn
     let jsonUsersList = encodePretty usersList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonUsersList
 
@@ -36,7 +36,7 @@ createUser req = do
         Just createUserReq -> do
             lift . putStrLn . show $ rawJSON
             newUser <- lift $ apiUserTransform createUserReq
-            lift $ DataBaseQueries.writeUser conn newUser
+            lift $ writeUser conn newUser
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
 apiUserTransform :: CreateUserRequest -> IO (User)

@@ -8,7 +8,7 @@ import Endpoints.Categories
 import Network.Wai
 import qualified Data.ByteString.Char8 as BS
 import Control.Monad.Reader
-import DataBaseQueries
+import DataBaseQueries.GetConnection (getConnection)
 
 application :: Request -> (Response -> IO ResponseReceived) -> IO ResponseReceived
 application req respond = do

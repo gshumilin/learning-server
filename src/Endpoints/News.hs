@@ -8,7 +8,7 @@ import Types.Picture
 import qualified Types.Database.News as DBType
 import Endpoints.Categories (dbCategoryTransform)
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries (writeNews, parseNewsList)
+import DataBaseQueries.News (writeNews, parseNewsList)
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Data.Aeson
@@ -33,7 +33,7 @@ dbNewsTransform DBType.News {..} = do
 getNewsList :: ReaderT Environment IO (Response)
 getNewsList = do
     conn <- asks dbConnection
-    bdNewsList <- lift $ DataBaseQueries.parseNewsList conn
+    bdNewsList <- lift $ parseNewsList conn
     newsList <- mapM dbNewsTransform bdNewsList
     let jsonNewsList = encodePretty newsList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
@@ -49,7 +49,7 @@ createNews req = do
             return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just newNews -> do
             lift . putStrLn . show $ rawJSON
-            lift $ DataBaseQueries.writeNews conn newNews
+            lift $ writeNews conn newNews
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
 editNews = undefined

@@ -9,7 +9,7 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import DataBaseQueries (parseCategoriesList)
+import DataBaseQueries.Category (parseCategoriesList)
 import Control.Monad (mapM)
 import Control.Monad.Reader
 
@@ -34,7 +34,7 @@ dbCategoryTransform dbCatId = do
 getCategoriesList :: ReaderT Environment IO Response
 getCategoriesList = do
     conn <- asks dbConnection
-    dbCatList <- lift $ DataBaseQueries.parseCategoriesList conn
+    dbCatList <- lift $ parseCategoriesList conn
     catList <- mapM dbCategoryTransform (map (DBType.categoryID) dbCatList)
     let jsonNewsList = encodePretty catList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList

@@ -25,7 +25,10 @@ source-repository head
 
 library
   exposed-modules:
-      DataBaseQueries
+      DataBaseQueries.Category
+      DataBaseQueries.GetConnection
+      DataBaseQueries.News
+      DataBaseQueries.User
       Endpoints.Categories
       Endpoints.News
       Endpoints.User
