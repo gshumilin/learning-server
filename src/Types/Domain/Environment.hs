@@ -1,4 +1,4 @@
-module Types.Environment where
+module Types.Domain.Environment where
 
 import Database.PostgreSQL.Simple (Connection)
 

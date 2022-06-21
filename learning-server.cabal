@@ -34,13 +34,13 @@ library
       Endpoints.User
       Routing
       Types.API.User
-      Types.Category
       Types.Database.Category
       Types.Database.News
-      Types.Environment
-      Types.News
-      Types.Picture
-      Types.User
+      Types.Domain.Category
+      Types.Domain.Environment
+      Types.Domain.News
+      Types.Domain.Picture
+      Types.Domain.User
   other-modules:
       Paths_learning_server
   hs-source-dirs:

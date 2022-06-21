@@ -1,10 +1,10 @@
 module Endpoints.News where
 
-import Types.User
+import Types.Domain.User
+import Types.Domain.Environment
 import Types.API.User
-import Types.Environment
-import qualified Types.News as HaskellType
-import Types.Picture
+import qualified Types.Domain.News as Domain
+import Types.Domain.Picture
 import qualified Types.Database.News as DBType
 import Endpoints.Categories (dbCategoryTransform)
 import Database.PostgreSQL.Simple (Connection)
@@ -17,11 +17,11 @@ import Control.Monad (mapM)
 import Control.Monad.Reader
 import Data.Time
 
-dbNewsTransform :: DBType.News -> ReaderT Environment IO HaskellType.News
+dbNewsTransform :: DBType.News -> ReaderT Environment IO Domain.News
 dbNewsTransform DBType.News {..} = do 
     transformedCat <- dbCategoryTransform categoryID
     currTime <- lift $ getCurrentTime
-    return $ HaskellType.News {
+    return $ Domain.News {
             title = title,
             createDate = createDate,
             creator = (User "nam" "log" "pas" currTime True True),
@@ -42,7 +42,7 @@ createNews :: Request -> ReaderT Environment IO (Response)
 createNews req = do
     conn <- asks dbConnection
     rawJSON <- lift $ getRequestBodyChunk req
-    let req = decodeStrict rawJSON :: Maybe HaskellType.News
+    let req = decodeStrict rawJSON :: Maybe Domain.News
     case req of 
         Nothing -> do
             lift $ putStrLn "Invalid JSON"

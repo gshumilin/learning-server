@@ -1,8 +1,8 @@
 module Endpoints.User where
 
-import Types.User
+import Types.Domain.User
+import Types.Domain.Environment
 import Types.API.User
-import Types.Environment
 import Database.PostgreSQL.Simple (Connection)
 import DataBaseQueries.User (parseUsersList, writeUser)
 import qualified Data.ByteString.Lazy as LBS

@@ -1,4 +1,4 @@
-module Types.User where
+module Types.Domain.User where
 
 import Data.Time
 import qualified Data.Text as T

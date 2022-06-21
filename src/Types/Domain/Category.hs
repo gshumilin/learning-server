@@ -1,4 +1,4 @@
-module Types.Category where
+module Types.Domain.Category where
 
 import qualified Data.Text as T
 import Data.Aeson

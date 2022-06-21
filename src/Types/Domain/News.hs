@@ -1,8 +1,8 @@
-module Types.News where
+module Types.Domain.News where
 
-import Types.User
-import Types.Picture
-import Types.Category
+import Types.Domain.User
+import Types.Domain.Picture
+import Types.Domain.Category
 import qualified Types.Database.Category as DBType
 import Data.Time.Clock
 import qualified Data.Text as T

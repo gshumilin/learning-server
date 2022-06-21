@@ -1,9 +1,9 @@
 module DataBaseQueries.News where
 
-import Types.User
-import Types.News
-import Types.Picture
-import Types.Category
+import Types.Domain.User
+import Types.Domain.News
+import Types.Domain.Picture
+import Types.Domain.Category
 import qualified Types.Database.News as DBType
 import qualified Types.Database.Category as DBType
 import Database.PostgreSQL.Simple

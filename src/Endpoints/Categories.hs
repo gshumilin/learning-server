@@ -1,8 +1,8 @@
 module Endpoints.Categories where
 
-import Types.Category
+import Types.Domain.Category
 import qualified Types.Database.Category as DBType
-import Types.Environment
+import Types.Domain.Environment
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Data.Aeson

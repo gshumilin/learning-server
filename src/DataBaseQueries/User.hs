@@ -1,6 +1,6 @@
 module DataBaseQueries.User where
 
-import Types.User
+import Types.Domain.User
 import Database.PostgreSQL.Simple
 
 parseUsersList :: Connection -> IO [(User)]

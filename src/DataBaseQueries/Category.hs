@@ -1,6 +1,6 @@
 module DataBaseQueries.Category where
 
-import Types.Category
+import Types.Domain.Category
 import qualified Types.Database.Category as DBType
 import Database.PostgreSQL.Simple
 

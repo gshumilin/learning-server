@@ -1,4 +1,4 @@
-module Types.Picture where
+module Types.Domain.Picture where
 
 import qualified Data.Text as T
 import Data.Aeson

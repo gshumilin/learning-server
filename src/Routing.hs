@@ -1,7 +1,7 @@
 module Routing where
 
-import Types.User
-import Types.Environment
+import Types.Domain.User
+import Types.Domain.Environment
 import qualified Endpoints.User
 import qualified Endpoints.News
 import Endpoints.Categories
