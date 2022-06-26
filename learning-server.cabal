@@ -28,6 +28,7 @@ library
       DataBaseQueries.Category
       DataBaseQueries.GetConnection
       DataBaseQueries.News
+      DataBaseQueries.Picture
       DataBaseQueries.User
       Endpoints.Categories
       Endpoints.News
