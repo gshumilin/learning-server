@@ -6,7 +6,7 @@ import Types.API.User
 import qualified Types.Domain.News as Domain
 import Types.Domain.Picture
 import qualified Types.Database.News as Database
-import Endpoints.Categories (dbCategoryTransform)
+import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
 import DataBaseQueries.News (writeNews, parseNewsList)
 import DataBaseQueries.User (findUser)
@@ -18,12 +18,13 @@ import Data.Aeson.Encode.Pretty (encodePretty)
 import Control.Monad (mapM)
 import Control.Monad.Reader
 import Data.Time
+import Data.List (find)
 
 dbNewsTransform :: Database.News -> ReaderT Environment IO Domain.News
 dbNewsTransform Database.News {..} = do 
     conn <- asks dbConnection
-    newsCategory <- dbCategoryTransform categoryID             --refactoring!
-    newsCreator <- lift $ findUser conn creatorID              --undefined
+    newsCategory <- getSpecificCategory categoryID             --refactoring!
+    newsCreator <- lift $ findUser conn creatorID              --refactoring! unsafe 'head' is used
     newsPicturesArray <- lift $ findPicturesArray conn newsID  --undefined
     return $ Domain.News {
             title = title,

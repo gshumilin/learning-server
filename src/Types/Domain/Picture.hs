@@ -33,8 +33,10 @@ instance ToJSON PicturesArray where
         object  [ "picturesArray" .= arr
                 ]
 
-instance FromRow PicturesArray where
-    fromRow = undefined
+instance FromRow Picture where
+    fromRow = do
+        base64 <- field
+        return Picture {..}
 
 instance ToField Picture where
     toField = undefined

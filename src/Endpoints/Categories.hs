@@ -9,7 +9,7 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import DataBaseQueries.Category (parseCategoriesList)
+import DataBaseQueries.Category (parseCategoriesList, parseSpecificCategory)
 import Control.Monad (mapM)
 import Control.Monad.Reader
 
@@ -39,4 +39,19 @@ getCategoriesList = do
     let jsonNewsList = encodePretty catList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
 
+fromDbCategoryList :: [DBType.Category] -> Category
+fromDbCategoryList (x:xs) = 
+    case DBType.parentID x of
+        Nothing -> Category (DBType.categoryID x) (DBType.title x) Nothing
+        Just id -> Category (DBType.categoryID x) (DBType.title x) parentCategory
+            where
+                parentCategory = if (null xs) then Nothing else Just $ fromDbCategoryList xs
+
+getSpecificCategory :: Integer -> ReaderT Environment IO Category
+getSpecificCategory id = do
+    conn <- asks dbConnection
+    categoryWithParrents <- lift $ parseSpecificCategory id conn
+    let domainCategory = fromDbCategoryList categoryWithParrents
+    return domainCategory
+    
 createCategory = undefined
