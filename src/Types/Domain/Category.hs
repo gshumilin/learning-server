@@ -8,7 +8,7 @@ import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 
 data Category = Category
-    { categoryID :: Integer,
+    { categoryID :: Int,
       title :: T.Text,
       parent :: Maybe Category
     } deriving Show

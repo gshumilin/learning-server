@@ -4,6 +4,7 @@ import Types.Domain.User
 import Types.Domain.Environment
 import Types.API.User
 import qualified Types.Domain.News as Domain
+import qualified Types.API.News as API
 import Types.Domain.Picture
 import qualified Types.Database.News as Database
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
@@ -35,6 +36,22 @@ dbNewsTransform Database.News {..} = do
             picturesArray = newsPicturesArray,
             isPublished = isPublished }
 
+apiNewsTransform :: API.CreateNewsRequest -> ReaderT Environment IO Domain.News
+apiNewsTransform API.CreateNewsRequest {..} = do
+    conn <- asks dbConnection
+    currTime <- lift $ getCurrentTime
+    newsCreator <- lift $ findUser conn 1             --HARD_CODE Sample userID
+    category' <- dbCategoryTransform categoryID
+    return $ 
+        Domain.News { title = "Test",
+                      createDate = currTime,
+                      creator = newsCreator,
+                      category = category',
+                      textContent = textContent,
+                      picturesArray = picturesArray,
+                      isPublished = False
+                    }
+
 getNewsList :: ReaderT Environment IO (Response)
 getNewsList = do
     conn <- asks dbConnection
@@ -47,14 +64,15 @@ createNews :: Request -> ReaderT Environment IO (Response)
 createNews req = do
     conn <- asks dbConnection
     rawJSON <- lift $ getRequestBodyChunk req
-    let req = decodeStrict rawJSON :: Maybe Domain.News
+    let req = decodeStrict rawJSON :: Maybe API.CreateNewsRequest
     case req of 
         Nothing -> do
             lift $ putStrLn "Invalid JSON"
             return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just newNews -> do
             lift . putStrLn . show $ rawJSON
-            lift $ writeNews conn newNews
+            transformedNews <- apiNewsTransform newNews
+            lift $ writeNews conn $ transformedNews
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
 editNews = undefined

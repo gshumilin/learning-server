@@ -24,7 +24,7 @@ data News = News
       creator :: User,
       category :: Category,
       textContent :: T.Text,
-      picturesArray :: PicturesArray,
+      picturesArray :: Maybe PicturesArray,
       isPublished :: Bool
     }
 

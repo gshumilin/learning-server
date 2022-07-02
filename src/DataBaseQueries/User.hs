@@ -14,7 +14,7 @@ writeUser conn User {..} = do
                     (name, login, password, createDate, isAdmin, isAbleToCreateNews)
     return ()
 
-findUser :: Connection -> Integer -> IO (User)
+findUser :: Connection -> Int -> IO User
 findUser conn userID = do
     res <- query conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users WHERE id = ?" $ Only userID
     return . head $ res

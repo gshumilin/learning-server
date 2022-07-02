@@ -7,11 +7,11 @@ import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 
-data PicturesArray = PicturesArray [Picture]
+data PicturesArray = PicturesArray [Picture] deriving Show
 
 data Picture = Picture 
     { base64 :: T.Text
-    }
+    } deriving Show
 
 instance FromJSON Picture where 
     parseJSON (Object inputJSON) = do

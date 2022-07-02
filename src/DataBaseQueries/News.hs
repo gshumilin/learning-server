@@ -17,5 +17,5 @@ parseNewsList conn = do
 writeNews :: Connection -> News -> IO ()
 writeNews conn News {..} = do
     execute conn "insert into news (title, create_date, creator_id, category_id, text_content, is_published) values (?,?,?,?,?,?)"
-                    (title, createDate, creator, category, textContent, picturesArray, isPublished)
+                    (title, createDate, 1 :: Int, (categoryID category), textContent, isPublished)  --HARD_CODE
     return ()

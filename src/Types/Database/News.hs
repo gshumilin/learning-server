@@ -14,11 +14,11 @@ import Database.PostgreSQL.Simple.FromRow
 data NewsList = NewsList [News]
 
 data News = News
-    { newsID :: Integer,
+    { newsID :: Int,
       title :: T.Text,
       createDate :: UTCTime,
-      creatorID :: Integer,
-      categoryID :: Integer,
+      creatorID :: Int,
+      categoryID :: Int,
       textContent :: T.Text,
       isPublished :: Bool
     }

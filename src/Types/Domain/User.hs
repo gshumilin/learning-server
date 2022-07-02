@@ -47,5 +47,5 @@ instance ToJSON User where
 instance FromRow User where
     fromRow = User <$> field <*> field <*> field <*> field <*> field <*> field
 
-instance ToField User where
-    toField = undefined
+-- instance ToField User where
+--     toField = undefined
