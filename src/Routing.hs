@@ -39,7 +39,7 @@ routing req respond = do
             res <- Endpoints.Categories.getCategoriesList    
             lift $ respond res
         "/createCategory" -> do
-            res <- Endpoints.Categories.createCategory
+            res <- Endpoints.Categories.createCategory req
             lift $ respond res
         _               -> error "Unknown method"
 

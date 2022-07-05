@@ -2,6 +2,7 @@ module Endpoints.Categories where
 
 import qualified Types.Domain.Category as Domain
 import qualified Types.Database.Category as DBType
+import qualified Types.API.Category as API
 import Types.Domain.Environment
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
@@ -9,7 +10,7 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import DataBaseQueries.Category (parseCategoriesList, parseSpecificCategory)
+import DataBaseQueries.Category (parseCategoriesList, parseSpecificCategory, writeCategory)
 import Control.Monad (mapM)
 import Control.Monad.Reader
 
@@ -53,5 +54,17 @@ getSpecificCategory id = do
     categoryWithParrents <- lift $ parseSpecificCategory id conn
     let domainCategory = fromDbCategoryList categoryWithParrents
     return domainCategory
-    
-createCategory = undefined
+
+createCategory :: Request -> ReaderT Environment IO Response
+createCategory request = do
+    conn <- asks dbConnection
+    rawJSON <- lift $ getRequestBodyChunk request
+    let decodedReq = decodeStrict rawJSON :: Maybe API.CreateCategoryRequest
+    case decodedReq of
+        Nothing -> do 
+            lift $ putStrLn "Invalid JSON"
+            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
+        Just newCategory -> do
+            lift . putStrLn . show $ rawJSON
+            lift $ writeCategory conn newCategory
+            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
