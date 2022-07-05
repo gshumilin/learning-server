@@ -33,7 +33,7 @@ routing req respond = do
             res <- Endpoints.News.createNews req
             lift $ respond res    
         "/editNews"     -> do
-            res <- Endpoints.News.editNews
+            res <- Endpoints.News.editNews req
             lift $ respond res
         "/getCategoriesList" -> do
             res <- Endpoints.Categories.getCategoriesList    

@@ -22,3 +22,20 @@ instance FromJSON CreateNewsRequest where
         textContent <- inputJSON .: "textContent"
         picturesArray <- inputJSON .:? "picturesArray"
         return $ CreateNewsRequest {..}
+
+data EditNewsRequest = EditNewsRequest
+    { newsID :: Int,
+      title :: T.Text,
+      categoryID :: Int,
+      textContent :: T.Text,
+      picturesArray :: Maybe PicturesArray
+    } deriving Show
+
+instance FromJSON EditNewsRequest where
+    parseJSON (Object inputJSON) = do
+        newsID <- inputJSON .: "newsID"
+        title <- inputJSON .: "title"
+        categoryID <- inputJSON .: "categoryID"
+        textContent <- inputJSON .: "textContent"
+        picturesArray <- inputJSON .:? "picturesArray"
+        return $ EditNewsRequest {..}

@@ -9,7 +9,7 @@ import Types.Domain.Picture
 import qualified Types.Database.News as Database
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries.News (writeNews, parseNewsList)
+import DataBaseQueries.News (writeNews, rewriteNews, parseNewsList)
 import DataBaseQueries.User (findUser)
 import DataBaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
@@ -75,4 +75,16 @@ createNews req = do
             lift $ writeNews conn $ transformedNews
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
-editNews = undefined
+editNews :: Request -> ReaderT Environment IO (Response)
+editNews request = do
+    conn <- asks dbConnection
+    rawJSON <- lift $ getRequestBodyChunk request
+    let decodedReq = decodeStrict rawJSON :: Maybe API.EditNewsRequest
+    case decodedReq of 
+        Nothing -> do
+            lift $ putStrLn "Invalid JSON"
+            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
+        Just editedNews -> do
+            lift . putStrLn . show $ rawJSON
+            lift $ rewriteNews conn editedNews
+            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"

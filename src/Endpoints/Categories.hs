@@ -36,7 +36,7 @@ getCategoriesList :: ReaderT Environment IO Response
 getCategoriesList = do
     conn <- asks dbConnection
     dbCatList <- lift $ parseCategoriesList conn -- :: [DBType.Categoy]
-    catList <- mapM dbCategoryTransform (map (DBType.categoryID) dbCatList)
+    catList <- mapM dbCategoryTransform $ map DBType.categoryID dbCatList
     let jsonNewsList = encodePretty catList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
 
