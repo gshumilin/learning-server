@@ -34,16 +34,26 @@ writeNews conn News {..} = do
 
 rewriteNews :: Connection -> API.EditNewsRequest -> IO ()
 rewriteNews conn API.EditNewsRequest {..} = do
-    execute conn "UPDATE news SET title = ?, category_id = ?, text_content = ? WHERE id = ?"
-                    (title, newsID, textContent, newsID)
-    case picturesArray of 
-        Nothing -> do
-            return ()
-        Just picArr -> do
+    editTitle <- execTitle newTitle
+    editCategory <- execCategoryID newCategoryID
+    editText <- execTextContent newTextContent
+    editPictures <- execPicturesArray newPicturesArray
+    return ()
+    where 
+        execTitle (Just tit) = execute conn "UPDATE news SET title = ? WHERE id = ?" (tit, newsID)
+        execTitle Nothing = pure 0
+
+        execCategoryID (Just cat) = execute conn "UPDATE news SET category_id = ? WHERE id = ?" (cat, newsID)
+        execCategoryID Nothing = pure 0
+
+        execTextContent (Just txt) = execute conn "UPDATE news SET text_content = ? WHERE id = ?" (txt, newsID)
+        execTextContent Nothing = pure 0
+
+        execPicturesArray (Just picArr) = do
             execute conn "DELETE * FROM news_pictures WHERE news_id = ?"
                     (Only newsID)
             mapM ( \(Picture b64) -> 
                 execute conn "UPDATE news_pictures SET pictures_id = ? WHERE news_id = ?"
                         (b64, newsID)
                 ) picArr
-            return ()
+        execPicturesArray Nothing = pure []

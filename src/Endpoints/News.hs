@@ -43,7 +43,7 @@ apiNewsTransform API.CreateNewsRequest {..} = do
     newsCreator <- lift $ findUser conn 1             --HARD_CODE Sample userID
     category' <- dbCategoryTransform categoryID
     return $ 
-        Domain.News { title = "Test",
+        Domain.News { title = title,
                       createDate = currTime,
                       creator = newsCreator,
                       category = category',
