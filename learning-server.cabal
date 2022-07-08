@@ -34,6 +34,7 @@ library
       Endpoints.News
       Endpoints.User
       Routing
+      Types.API.Category
       Types.API.News
       Types.API.User
       Types.Database.Category

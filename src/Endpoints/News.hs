@@ -72,7 +72,7 @@ createNews req = do
         Just newNews -> do
             lift . putStrLn . show $ rawJSON
             transformedNews <- apiNewsTransform newNews
-            lift $ writeNews conn $ transformedNews
+            lift $ writeNews conn transformedNews
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
 editNews :: Request -> ReaderT Environment IO (Response)

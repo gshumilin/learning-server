@@ -12,7 +12,7 @@ data CreateNewsRequest = CreateNewsRequest
     { title :: T.Text,
       categoryID :: Int,
       textContent :: T.Text,
-      picturesArray :: Maybe PicturesArray
+      picturesArray :: Maybe [Picture]
     } deriving Show
 
 instance FromJSON CreateNewsRequest where
@@ -28,7 +28,7 @@ data EditNewsRequest = EditNewsRequest
       title :: T.Text,
       categoryID :: Int,
       textContent :: T.Text,
-      picturesArray :: Maybe PicturesArray
+      picturesArray :: Maybe [Picture]
     } deriving Show
 
 instance FromJSON EditNewsRequest where

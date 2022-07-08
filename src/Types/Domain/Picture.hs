@@ -9,6 +9,19 @@ import Database.PostgreSQL.Simple.ToField
 
 data PicturesArray = PicturesArray [Picture] deriving Show
 
+instance FromJSON PicturesArray where 
+    parseJSON (Object inputJSON) = do
+        arr <- inputJSON .: "picturesArray"
+        return $ PicturesArray arr
+
+instance ToJSON PicturesArray where
+    toJSON (PicturesArray arr) = 
+        object  [ "picturesArray" .= arr
+                ]
+                
+instance ToField PicturesArray where
+    toField = undefined
+
 data Picture = Picture 
     { base64 :: T.Text
     } deriving Show
@@ -18,19 +31,9 @@ instance FromJSON Picture where
         base64 <- inputJSON .: "base64"
         return Picture {..}
 
-instance FromJSON PicturesArray where 
-    parseJSON (Object inputJSON) = do
-        arr <- inputJSON .: "picturesArray"
-        return $ PicturesArray arr
-
 instance ToJSON Picture where
     toJSON Picture {..} = 
         object  [ "base64" .= base64
-                ]
-
-instance ToJSON PicturesArray where
-    toJSON (PicturesArray arr) = 
-        object  [ "picturesArray" .= arr
                 ]
 
 instance FromRow Picture where
@@ -39,7 +42,4 @@ instance FromRow Picture where
         return Picture {..}
 
 instance ToField Picture where
-    toField = undefined
-
-instance ToField PicturesArray where
     toField = undefined

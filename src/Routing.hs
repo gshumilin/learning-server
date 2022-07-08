@@ -41,6 +41,9 @@ routing req respond = do
         "/createCategory" -> do
             res <- Endpoints.Categories.createCategory req
             lift $ respond res
+        "/editCategory"     -> do
+            res <- Endpoints.News.editNews req
+            lift $ respond res
         _               -> error "Unknown method"
 
 parseEnvironment :: IO (Environment)

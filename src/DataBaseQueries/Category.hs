@@ -19,6 +19,6 @@ parseSpecificCategory id conn = do
 
 writeCategory :: Connection -> API.CreateCategoryRequest -> IO ()
 writeCategory conn API.Category {..} = do
-    execute conn "insert into categories (title,parent_category_id) values (?,?)"
+    execute conn "INSERT INTO categories (title,parent_category_id) values (?,?)"
                     (title, parentCategoryID)
     return ()
