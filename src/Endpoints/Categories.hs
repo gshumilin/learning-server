@@ -10,7 +10,7 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import DataBaseQueries.Category (parseCategoriesList, parseSpecificCategory, writeCategory)
+import DataBaseQueries.Category (parseCategoriesList, parseSpecificCategory, writeCategory, rewriteCategory)
 import Control.Monad (mapM)
 import Control.Monad.Reader
 
@@ -67,4 +67,18 @@ createCategory request = do
         Just newCategory -> do
             lift . putStrLn . show $ rawJSON
             lift $ writeCategory conn newCategory
+            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
+
+editCategory :: Request -> ReaderT Environment IO Response
+editCategory request = do
+    conn <- asks dbConnection
+    rawJSON <- lift $ getRequestBodyChunk request
+    let decodedReq = decodeStrict rawJSON :: Maybe API.EditCategoryRequest
+    case decodedReq of 
+        Nothing -> do
+            lift $ putStrLn "Invalid JSON"
+            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
+        Just editedCategory -> do
+            lift . putStrLn . show $ rawJSON
+            lift $ rewriteCategory conn editedCategory
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"

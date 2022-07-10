@@ -18,7 +18,19 @@ parseSpecificCategory id conn = do
     return res
 
 writeCategory :: Connection -> API.CreateCategoryRequest -> IO ()
-writeCategory conn API.Category {..} = do
+writeCategory conn API.CreateCategoryRequest {..} = do
     execute conn "INSERT INTO categories (title,parent_category_id) values (?,?)"
                     (title, parentCategoryID)
     return ()
+
+rewriteCategory :: Connection -> API.EditCategoryRequest -> IO ()
+rewriteCategory conn API.EditCategoryRequest {..} = do
+    editTitle <- execTitle newTitle
+    editParent <- execParent newParentCategoryID
+    return ()
+    where 
+        execTitle (Just t) = execute conn "UPDATE categories SET title = ? WHERE id = ?" (newTitle, categoryID)
+        execTitle Nothing = pure (0)
+
+        execParent (Just parID) = execute conn "UPDATE categories SET parent_category_id = ? WHERE id = ?" (parID, categoryID)
+        execParent Nothing = pure (0) 

@@ -4,11 +4,14 @@ import Types.Domain.User
 import Types.Domain.Environment
 import qualified Endpoints.User
 import qualified Endpoints.News
+import qualified Endpoints.Picture
 import Endpoints.Categories
+import DataBaseQueries.GetConnection (getConnection)
 import Network.Wai
 import qualified Data.ByteString.Char8 as BS
 import Control.Monad.Reader
-import DataBaseQueries.GetConnection (getConnection)
+import Data.List (find)
+import Text.Read (readMaybe)
 
 application :: Request -> (Response -> IO ResponseReceived) -> IO ResponseReceived
 application req respond = do
@@ -18,7 +21,6 @@ application req respond = do
 routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 routing req respond = do
     let reqPath = rawPathInfo req
-    let reqQuery = rawQueryString req
     case reqPath of
         "/getUsersList" -> do
             res <- Endpoints.User.getUsersList
@@ -42,8 +44,21 @@ routing req respond = do
             res <- Endpoints.Categories.createCategory req
             lift $ respond res
         "/editCategory"     -> do
-            res <- Endpoints.News.editNews req
+            res <- Endpoints.Categories.editCategory req
             lift $ respond res
+        "/getPicture"     -> do
+            let idPole = find (\(k,v) -> k == "id") $ queryString req
+            case idPole of
+                Nothing -> error "'id' parameter not specified"
+                Just (_, Nothing) -> error "empty value of the id parameter"
+                Just (_, Just bsPicID) -> do
+                    let mbPicID = readMaybe $ BS.unpack bsPicID :: Maybe Int
+                    case mbPicID of
+                        Nothing -> do
+                            error "invalid id parameter value"
+                        Just picID -> do 
+                            res <- Endpoints.Picture.getPicture picID
+                            lift $ respond res
         _               -> error "Unknown method"
 
 parseEnvironment :: IO (Environment)
