@@ -7,7 +7,7 @@ import qualified Endpoints.News
 import qualified Endpoints.Picture
 import Endpoints.Categories
 import DataBaseQueries.GetConnection (getConnection)
-import DataBaseQueries.Auth (checkIsAdmin)
+import DataBaseQueries.Auth (checkIsAdmin, checkIsAbleToCreateNews)
 import Network.Wai
 import Network.HTTP.Types (hContentType, status404)
 import Network.HTTP.Types.Header
@@ -18,6 +18,7 @@ import qualified Data.Text.Encoding as T
 import Control.Monad.Reader
 import Data.List (find)
 import Text.Read (readMaybe)
+import Database.PostgreSQL.Simple (Connection)
 
 application :: Request -> (Response -> IO ResponseReceived) -> IO ResponseReceived
 application req respond = do
@@ -34,22 +35,14 @@ routing req respond = do
             res <- Endpoints.User.getUsersList
             lift $ respond res
         "/createUser"   -> do
-            res <- Endpoints.User.createUser req
+            res <- withAuth checkIsAdmin Endpoints.User.createUser req
             lift $ respond res
         "/getNewsList"  -> do
             res <- Endpoints.News.getNewsList
             lift $ respond res
         "/createNews"   -> do
-            case (find (\(h,_) -> h == hAuthorization) (reqHeaders)) of     --Как выполнять поиск по хэдерам?
-                Nothing -> lift $ respond authFailResponse
-                Just (_, authKey) -> do
-                    checkAuthResult <- lift $ checkIsAdmin conn authKey
-                    case checkAuthResult of
-                        Left err -> lift . respond $ authDecodeFailResponse err
-                        Right False -> lift $ respond authFailResponse
-                        Right True -> do
-                            res <- Endpoints.News.createNews req
-                            lift $ respond res    
+            res <- withAuth checkIsAbleToCreateNews Endpoints.News.createNews req
+            lift $ respond res    
         "/editNews"     -> do
             res <- Endpoints.News.editNews req
             lift $ respond res
@@ -57,10 +50,10 @@ routing req respond = do
             res <- Endpoints.Categories.getCategoriesList    
             lift $ respond res
         "/createCategory" -> do
-            res <- Endpoints.Categories.createCategory req
+            res <- withAuth checkIsAdmin Endpoints.Categories.createCategory req
             lift $ respond res
         "/editCategory"     -> do
-            res <- Endpoints.Categories.editCategory req
+            res <- withAuth checkIsAdmin Endpoints.Categories.editCategory req
             lift $ respond res
         "/getPicture"     -> do
             let idPole = find (\(k,v) -> k == "id") $ queryString req
@@ -75,6 +68,9 @@ routing req respond = do
                         Just picID -> do 
                             res <- Endpoints.Picture.getPicture picID
                             lift $ respond res
+        "sdsdsdsdsdsd"  -> do
+            res <- withAuth checkIsAdmin (Endpoints.Categories.createCategory) req
+            lift $ respond res
         _               -> error "Unknown method"
 
 parseEnvironment :: IO (Environment)
@@ -87,3 +83,27 @@ authFailResponse = responseLBS status404 [(hContentType, "text/plain")] $ "Not f
 
 authDecodeFailResponse :: T.Text -> Response
 authDecodeFailResponse decodeErr = responseLBS status404 [(hContentType, "text/plain")] . BS.packChars . T.unpack $ decodeErr
+
+findAuthHeader :: Request -> Maybe BS.ByteString
+findAuthHeader req = 
+    case authHeader of     
+        Nothing -> Nothing
+        Just (_, authKey) -> return authKey
+    where 
+        authHeader = (find (\(h,_) -> h == hAuthorization) (requestHeaders req))
+
+withAuth :: (BS.ByteString -> ReaderT Environment IO (Either T.Text Bool))
+            -> (Request -> ReaderT Environment IO Response) 
+            -> Request 
+            -> ReaderT Environment IO Response
+withAuth checkFunc endpointFunc req = do
+    case findAuthHeader req  of
+        Nothing -> return authFailResponse
+        Just authKey -> do
+            checkAuthResult <- checkFunc authKey
+            case checkAuthResult of
+                Left err -> return $ authDecodeFailResponse err
+                Right False -> return $ authFailResponse
+                Right True -> do
+                    res <- endpointFunc req
+                    return res
