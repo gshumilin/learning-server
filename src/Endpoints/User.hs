@@ -28,6 +28,7 @@ createUser req = do
     case req of
         Nothing -> do 
             lift $ putStrLn "Invalid JSON"
+            lift $ print rawJSON
             return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just createUserReq -> do
             lift . putStrLn . show $ rawJSON

@@ -7,8 +7,14 @@ import qualified Endpoints.News
 import qualified Endpoints.Picture
 import Endpoints.Categories
 import DataBaseQueries.GetConnection (getConnection)
+import DataBaseQueries.Auth (checkIsAdmin)
 import Network.Wai
+import Network.HTTP.Types (hContentType, status404)
+import Network.HTTP.Types.Header
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy.Internal as BS (packChars)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import Control.Monad.Reader
 import Data.List (find)
 import Text.Read (readMaybe)
@@ -21,6 +27,8 @@ application req respond = do
 routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 routing req respond = do
     let reqPath = rawPathInfo req
+    let reqHeaders = requestHeaders req
+    conn <- asks dbConnection
     case reqPath of
         "/getUsersList" -> do
             res <- Endpoints.User.getUsersList
@@ -32,8 +40,16 @@ routing req respond = do
             res <- Endpoints.News.getNewsList
             lift $ respond res
         "/createNews"   -> do
-            res <- Endpoints.News.createNews req
-            lift $ respond res    
+            case (find (\(h,_) -> h == hAuthorization) (reqHeaders)) of     --Как выполнять поиск по хэдерам?
+                Nothing -> lift $ respond authFailResponse
+                Just (_, authKey) -> do
+                    checkAuthResult <- lift $ checkIsAdmin conn authKey
+                    case checkAuthResult of
+                        Left err -> lift . respond $ authDecodeFailResponse err
+                        Right False -> lift $ respond authFailResponse
+                        Right True -> do
+                            res <- Endpoints.News.createNews req
+                            lift $ respond res    
         "/editNews"     -> do
             res <- Endpoints.News.editNews req
             lift $ respond res
@@ -65,3 +81,9 @@ parseEnvironment :: IO (Environment)
 parseEnvironment = do
     conn <- getConnection
     return (Environment conn)
+
+authFailResponse :: Response
+authFailResponse = responseLBS status404 [(hContentType, "text/plain")] $ "Not found"
+
+authDecodeFailResponse :: T.Text -> Response
+authDecodeFailResponse decodeErr = responseLBS status404 [(hContentType, "text/plain")] . BS.packChars . T.unpack $ decodeErr
