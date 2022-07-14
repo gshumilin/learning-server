@@ -10,10 +10,17 @@ import qualified Types.Database.Category as DBType
 import Database.PostgreSQL.Simple
 import qualified Data.Text as T
 import Control.Monad (mapM)
+import qualified Data.ByteString.Char8 as BS
 
-parseNewsList :: Connection -> IO [(DBType.News)]
-parseNewsList conn = do
-    res <- query_ conn "SELECT * FROM news"
+
+parseNewsForAutors :: Connection -> Int -> IO [(DBType.News)]
+parseNewsForAutors conn userID = do
+    res <- query conn "SELECT * FROM news WHERE is_published = true OR creator_id = ?" (Only userID)
+    return res
+
+parseNewsPublished :: Connection -> IO [(DBType.News)]
+parseNewsPublished conn = do
+    res <- query_ conn "SELECT * FROM news WHERE is_published = true"
     return res
 
 writeNews :: Connection -> News -> IO ()

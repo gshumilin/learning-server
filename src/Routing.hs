@@ -1,5 +1,6 @@
 module Routing where
 
+import Auth
 import Types.Domain.User
 import Types.Domain.Environment
 import qualified Endpoints.User
@@ -12,9 +13,7 @@ import Network.Wai
 import Network.HTTP.Types (hContentType, status404)
 import Network.HTTP.Types.Header
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.ByteString.Lazy.Internal as BS (packChars)
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 import Control.Monad.Reader
 import Data.List (find)
 import Text.Read (readMaybe)
@@ -38,7 +37,7 @@ routing req respond = do
             res <- withAuth checkIsAdmin Endpoints.User.createUser req
             lift $ respond res
         "/getNewsList"  -> do
-            res <- Endpoints.News.getNewsList
+            res <- Endpoints.News.getNewsList req
             lift $ respond res
         "/createNews"   -> do
             res <- withAuth checkIsAbleToCreateNews Endpoints.News.createNews req
@@ -77,33 +76,3 @@ parseEnvironment :: IO (Environment)
 parseEnvironment = do
     conn <- getConnection
     return (Environment conn)
-
-authFailResponse :: Response
-authFailResponse = responseLBS status404 [(hContentType, "text/plain")] $ "Not found"
-
-authDecodeFailResponse :: T.Text -> Response
-authDecodeFailResponse decodeErr = responseLBS status404 [(hContentType, "text/plain")] . BS.packChars . T.unpack $ decodeErr
-
-findAuthHeader :: Request -> Maybe BS.ByteString
-findAuthHeader req = 
-    case authHeader of     
-        Nothing -> Nothing
-        Just (_, authKey) -> return authKey
-    where 
-        authHeader = (find (\(h,_) -> h == hAuthorization) (requestHeaders req))
-
-withAuth :: (BS.ByteString -> ReaderT Environment IO (Either T.Text Bool))
-            -> (Request -> ReaderT Environment IO Response) 
-            -> Request 
-            -> ReaderT Environment IO Response
-withAuth checkFunc endpointFunc req = do
-    case findAuthHeader req  of
-        Nothing -> return authFailResponse
-        Just authKey -> do
-            checkAuthResult <- checkFunc authKey
-            case checkAuthResult of
-                Left err -> return $ authDecodeFailResponse err
-                Right False -> return $ authFailResponse
-                Right True -> do
-                    res <- endpointFunc req
-                    return res

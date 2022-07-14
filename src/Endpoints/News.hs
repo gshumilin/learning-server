@@ -1,5 +1,7 @@
 module Endpoints.News where
 
+import Auth
+import DataBaseQueries.Auth (getUserIDWhithAuth)
 import Types.Domain.User
 import Types.Domain.Environment
 import Types.API.User
@@ -9,7 +11,7 @@ import Types.Domain.Picture
 import qualified Types.Database.News as Database
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries.News (writeNews, rewriteNews, parseNewsList)
+import DataBaseQueries.News (writeNews, rewriteNews, parseNewsForAutors, parseNewsPublished)
 import DataBaseQueries.User (findUser)
 import DataBaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
@@ -52,13 +54,24 @@ apiNewsTransform API.CreateNewsRequest {..} = do
                       isPublished = False
                     }
 
-getNewsList :: ReaderT Environment IO (Response)
-getNewsList = do
+getNewsList :: Request -> ReaderT Environment IO (Response)
+getNewsList req = do
     conn <- asks dbConnection
-    bdNewsList <- lift $ parseNewsList conn
-    newsList <- mapM dbNewsTransform bdNewsList
-    let jsonNewsList = encodePretty $ Domain.NewsList newsList
-    return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
+    case findAuthKey req of 
+        Nothing -> do
+            bdNewsList <- lift $ parseNewsPublished conn
+            newsList <- mapM dbNewsTransform bdNewsList
+            let jsonNewsList = encodePretty $ Domain.NewsList newsList
+            return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
+        Just authKey -> do
+            eiUserID <- getUserIDWhithAuth $ authKey
+            case eiUserID of
+                Left err -> return $ authFailResponse
+                Right userID -> do
+                    bdNewsList <- lift $ parseNewsForAutors conn userID
+                    newsList <- mapM dbNewsTransform bdNewsList
+                    let jsonNewsList = encodePretty $ Domain.NewsList newsList
+                    return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
 
 createNews :: Request -> ReaderT Environment IO (Response)
 createNews req = do
