@@ -23,6 +23,8 @@ instance FromJSON CreateNewsRequest where
         picturesArray <- inputJSON .:? "picturesArray"
         return $ CreateNewsRequest {..}
 
+
+
 data EditNewsRequest = EditNewsRequest
     { newsID :: Int,
       newTitle :: Maybe T.Text,
@@ -39,3 +41,11 @@ instance FromJSON EditNewsRequest where
         newTextContent <- inputJSON .:? "newTextContent"
         newPicturesArray <- inputJSON .:? "newPicturesArray"
         return $ EditNewsRequest {..}
+
+
+
+data GetNewsRequest = GetNewsRequest
+    { sortBy :: Maybe SortBy
+    }
+
+data SortBy = NewsCreationDate | NewsCreator | NewsCategory | NewsNumbersOfPictures

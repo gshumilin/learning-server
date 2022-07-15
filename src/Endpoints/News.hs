@@ -11,17 +11,20 @@ import Types.Domain.Picture
 import qualified Types.Database.News as Database
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries.News (writeNews, rewriteNews, parseNewsForAutors, parseNewsPublished)
+import DataBaseQueries.News (writeNews, rewriteNews, parseNewsForAutors, parseNewsPublished, parseNews)
 import DataBaseQueries.User (findUser)
 import DataBaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
+import Network.HTTP.Types.URI
 import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
+import qualified Data.ByteString.Char8 as BS
 import Control.Monad (mapM)
 import Control.Monad.Reader
 import Data.Time
 import Data.List (find)
+import qualified Database.PostgreSQL.Simple.Types as Postgres
 
 dbNewsTransform :: Database.News -> ReaderT Environment IO Domain.News
 dbNewsTransform Database.News {..} = do 
@@ -54,17 +57,35 @@ apiNewsTransform API.CreateNewsRequest {..} = do
                       isPublished = False
                     }
 
+parseSortBy :: Query -> Maybe Postgres.Query
+parseSortBy q = parserSort =<< snd =<< mbPole
+    where
+        mbPole = find (\(k,v) -> k == "sort_by") q
+        parserSort :: BS.ByteString -> Maybe Postgres.Query
+        parserSort bstr = 
+            case bstr of
+                "create_date" -> Just $ Postgres.Query "create_date"
+                "creator_id" -> Just $ Postgres.Query "creator_id"
+                "category_id" -> Just $ Postgres.Query "category_id"
+                "numbers_of_pictures" -> Just $ Postgres.Query "numbers_of_pictures"
+                _ -> Nothing
+
+parseFilterBy :: Query -> Maybe Postgres.Query
+parseFilterBy q = undefined
+
 getNewsList :: Request -> ReaderT Environment IO (Response)
 getNewsList req = do
     conn <- asks dbConnection
+    let sortBy = parseSortBy (queryString req)
+    let filteredBy = Nothing 
     case findAuthKey req of 
         Nothing -> do
-            bdNewsList <- lift $ parseNewsPublished conn
+            bdNewsList <- lift $ parseNewsPublished conn filteredBy sortBy
             newsList <- mapM dbNewsTransform bdNewsList
             let jsonNewsList = encodePretty $ Domain.NewsList newsList
             return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
         Just authKey -> do
-            eiUserID <- getUserIDWhithAuth $ authKey
+            eiUserID <- lift $ getUserIDWhithAuth conn authKey
             case eiUserID of
                 Left err -> return $ authFailResponse
                 Right userID -> do

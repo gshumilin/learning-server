@@ -7,7 +7,9 @@ import Types.Domain.Category
 import qualified Types.Database.News as DBType
 import qualified Types.API.News as API
 import qualified Types.Database.Category as DBType
+import DataBaseQueries.Auth (getUserIDWhithAuth)
 import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.Types
 import qualified Data.Text as T
 import Control.Monad (mapM)
 import qualified Data.ByteString.Char8 as BS
@@ -18,9 +20,14 @@ parseNewsForAutors conn userID = do
     res <- query conn "SELECT * FROM news WHERE is_published = true OR creator_id = ?" (Only userID)
     return res
 
-parseNewsPublished :: Connection -> IO [(DBType.News)]
-parseNewsPublished conn = do
-    res <- query_ conn "SELECT * FROM news WHERE is_published = true"
+parseNewsPublished :: Connection -> Maybe Query -> Maybe Query -> IO [(DBType.News)]
+parseNewsPublished conn startFilterVal startSortVal = do
+    let initQuery = Query $ "SELECT * FROM news"
+    let filterVal = (Just (Query " is_published = true ")) <> startFilterVal
+    let sortVal = startSortVal
+    let q = (initQuery `addFilter` filterVal) `addSort` sortVal
+    print q                                                             --log
+    res <- query_ conn q
     return res
 
 writeNews :: Connection -> News -> IO ()
@@ -64,3 +71,11 @@ rewriteNews conn API.EditNewsRequest {..} = do
                         (b64, newsID)
                 ) picArr
         execPicturesArray Nothing = pure []
+
+addSort :: Query -> Maybe Query -> Query
+addSort q Nothing = q
+addSort q (Just sortVal) = q <> " ORDER BY " <> sortVal
+
+addFilter :: Query -> Maybe Query -> Query
+addFilter q Nothing = q
+addFilter q (Just filterVal) = q <> " WHERE " <> filterVal

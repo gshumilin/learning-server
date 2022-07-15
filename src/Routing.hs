@@ -28,6 +28,7 @@ routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment I
 routing req respond = do
     let reqPath = rawPathInfo req
     let reqHeaders = requestHeaders req
+    let reqQuery = queryString req
     conn <- asks dbConnection
     case reqPath of
         "/getUsersList" -> do
@@ -37,7 +38,7 @@ routing req respond = do
             res <- withAuth checkIsAdmin Endpoints.User.createUser req
             lift $ respond res
         "/getNewsList"  -> do
-            res <- Endpoints.News.getNewsList req
+            res <- Endpoints.News.getNews req
             lift $ respond res
         "/createNews"   -> do
             res <- withAuth checkIsAbleToCreateNews Endpoints.News.createNews req
@@ -55,7 +56,7 @@ routing req respond = do
             res <- withAuth checkIsAdmin Endpoints.Categories.editCategory req
             lift $ respond res
         "/getPicture"     -> do
-            let idPole = find (\(k,v) -> k == "id") $ queryString req
+            let idPole = find (\(k,v) -> k == "id") $ reqQuery
             case idPole of
                 Nothing -> error "'id' parameter not specified"
                 Just (_, Nothing) -> error "empty value of the id parameter"

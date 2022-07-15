@@ -3,8 +3,8 @@ module DataBaseQueries.Auth where
 import Auth
 import Types.Domain.Environment
 import Database.PostgreSQL.Simple
-import qualified Data.ByteString.Char8 as BS
 import Database.PostgreSQL.Simple.FromRow
+import qualified Data.ByteString.Char8 as BS
 import Data.ByteString.Base64
 import qualified Data.Text as T
 import Data.List (takeWhile, dropWhile)
@@ -16,14 +16,13 @@ instance FromRow Bool where
 instance FromRow Int where
     fromRow = field
 
-getUserIDWhithAuth :: BS.ByteString -> ReaderT Environment IO (Either T.Text Int)
-getUserIDWhithAuth key = do
-    conn <- asks dbConnection 
+getUserIDWhithAuth :: Connection -> BS.ByteString -> IO (Either T.Text Int)
+getUserIDWhithAuth conn key = do
     case decodeAuthKey key of
         Left err -> return $ Left err
         Right (login, password) -> do
             let q = "SELECT id FROM users WHERE login = ? AND password = ?;"
-            resArr <- lift (query conn q (login :: BS.ByteString, password :: BS.ByteString))
+            resArr <- (query conn q (login :: BS.ByteString, password :: BS.ByteString))
             case resArr of
                 [] -> return (Left "No such User")
                 [userID] -> return (Right userID)
