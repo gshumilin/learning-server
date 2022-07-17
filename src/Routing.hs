@@ -38,7 +38,7 @@ routing req respond = do
             res <- withAuth checkIsAdmin Endpoints.User.createUser req
             lift $ respond res
         "/getNewsList"  -> do
-            res <- Endpoints.News.getNews req
+            res <- Endpoints.News.getNewsList req
             lift $ respond res
         "/createNews"   -> do
             res <- withAuth checkIsAbleToCreateNews Endpoints.News.createNews req
