@@ -11,7 +11,7 @@ import Types.Domain.Picture
 import qualified Types.Database.News as Database
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries.News (writeNews, rewriteNews, parseNewsForAutors, parseNewsPublished, parseNews)
+import DataBaseQueries.News (writeNews, rewriteNews, parseNewsForAutors, parseNewsPublished)
 import DataBaseQueries.User (findUser)
 import DataBaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
