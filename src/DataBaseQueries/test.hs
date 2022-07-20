@@ -5,45 +5,15 @@ import Database.PostgreSQL.Simple.Types
 import DataBaseQueries.GetConnection (getConnection)
 import qualified Data.ByteString as B
 
+ex :: [(B.ByteString, Maybe B.ByteString)]
+ex = [("creator_id", Just "1"), ("category_id", Just "2")]
 
-main'' :: IO ()
-main'' = do
-    conn <- getConnection
-    res <- parseUser' conn qq' :: IO [User]
-    print res
+makeDBRequest :: [(B.ByteString, Maybe B.ByteString)] -> Query
+makeDBRequest ls = Query $ B.intercalate " AND " $ foldr addParam [] ls
+    where
+        countOfDatesFilter = length $ filter (\(name, _) -> name `elem` ["created_at", "created_until", "created_since"]) ls
+        addParam (poleName, Nothing) acc = acc
+        addParam (poleName, Just val) acc = (poleName <> " = " <> val) : acc
 
-qq' :: Query
-qq' = "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users " <> "WHERE id=" <> "1"
-
-parseUser' :: FromRow r => Connection -> Query -> IO [r]
-parseUser' conn q = query_ conn q
-
-
------------------------------------------------------------------------------------------
-
--- editNews ls newsID = Query $ "UPDATE news SET " <>  buildChanges ls <> " WHERE news_id = " <> newsID
-
--- buildChanges = undefined
-
-main' :: IO ()
-main' = do
-    conn <- getConnection
-    let q = initQuery `addFilter` Just "id<4" `addSort` Just "name DESC"
-    res <- parseUser conn q :: IO [User]
-    print res
-
-parseUser :: FromRow r => Connection -> Query -> IO [r]
-parseUser conn q = query_ conn q
-
-initQuery :: Query
-initQuery = Query $ "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users"
-
-addSort :: Query -> Maybe Query -> Query
-addSort q Nothing = q
-addSort q (Just sortVal) = q <> " ORDER BY " <> sortVal
-
-addFilter :: Query -> Maybe Query -> Query
-addFilter q Nothing = q
-addFilter q (Just filterVal) = q <> " WHERE " <> filterVal
-
-ls = Query $ "select *" <> Nothing
+xs :: Query
+xs = "Haha" <> "ha"

@@ -29,6 +29,7 @@ routing req respond = do
     let reqPath = rawPathInfo req
     let reqHeaders = requestHeaders req
     let reqQuery = queryString req
+    lift $ print req
     conn <- asks dbConnection
     case reqPath of
         "/getUsersList" -> do
@@ -38,7 +39,7 @@ routing req respond = do
             res <- withAuth checkIsAdmin Endpoints.User.createUser req
             lift $ respond res
         "/getNewsList"  -> do
-            res <- Endpoints.News.getNewsList req
+            res <- Endpoints.News.getNews req
             lift $ respond res
         "/createNews"   -> do
             res <- withAuth checkIsAbleToCreateNews Endpoints.News.createNews req

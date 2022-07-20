@@ -14,6 +14,42 @@ import qualified Data.Text as T
 import Control.Monad (mapM)
 import qualified Data.ByteString.Char8 as BS
 
+parseNews :: Connection -> [(BS.ByteString, Maybe BS.ByteString)] -> IO [(DBType.News)]
+parseNews conn queryList = do
+    let initQ = Query "SELECT * FROM news"
+    let filters = findFilters queryList
+    let sorts = findSorts queryList
+    let q = addSorting' sorts $ addFilter' filters initQ
+    res <- query_ conn q
+    return res
+
+findFilters :: [(BS.ByteString, Maybe BS.ByteString)] -> [(BS.ByteString, Maybe BS.ByteString)]
+findFilters ls = filter (\(poleName, _) -> poleName `elem` lislistOfAllowedFilters) ls
+    where lislistOfAllowedFilters = 
+            [   "creator_id",
+                "category_id",
+                "created_at",
+                "created_until",
+                "created_since"
+            ]
+
+findSorts ::  [(BS.ByteString, Maybe BS.ByteString)] -> [(BS.ByteString, Maybe BS.ByteString)]
+findSorts ls = filter (\(poleName, _) -> poleName == "sort_by") ls
+
+addFilter' :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
+addFilter' [] q = q
+addFilter' ls q = q <> " WHERE " <> (Query $ BS.intercalate " AND " $ foldr addParam [] ls)
+    where
+        addParam (_, Nothing) acc = acc
+        addParam ("creator_id", Just val) acc = ("creator_id" <> " = " <> val) : acc
+        addParam ("category_id", Just val) acc = ("category_id" <> " = " <> val) : acc
+        addParam ("created_at", Just val) acc = ("create_date" <> " = '" <> val <> "'::timestamp") : acc
+        addParam ("created_until", Just val) acc = ("create_date" <> " < '" <> val <> "'::timestamp") : acc
+        addParam ("created_since", Just val) acc = ("create_date" <> " >= '" <> val <> "'::timestamp") : acc
+
+addSorting' :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
+addSorting' [] q  = q
+addSorting' [("sort_by", Just val)] q = q <> " ORDER BY " <> Query val
 
 parseNewsForAutors :: Connection -> Int -> IO [(DBType.News)]
 parseNewsForAutors conn userID = do

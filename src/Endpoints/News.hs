@@ -11,7 +11,7 @@ import Types.Domain.Picture
 import qualified Types.Database.News as Database
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries.News (writeNews, rewriteNews, parseNewsForAutors, parseNewsPublished)
+import DataBaseQueries.News (writeNews, rewriteNews, parseNewsForAutors, parseNewsPublished, parseNews)
 import DataBaseQueries.User (findUser)
 import DataBaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
@@ -72,6 +72,15 @@ parseSortBy q = parserSort =<< snd =<< mbPole
 
 parseFilterBy :: Query -> Maybe Postgres.Query
 parseFilterBy q = undefined
+
+getNews :: Request -> ReaderT Environment IO (Response)
+getNews req = do
+    conn <- asks dbConnection
+    bdNewsList <- lift $ parseNews conn $ queryString req
+    lift $ print $ queryString req                                      --log
+    newsList <- mapM dbNewsTransform bdNewsList
+    let jsonNewsList = encodePretty $ Domain.NewsList newsList
+    return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
 
 getNewsList :: Request -> ReaderT Environment IO (Response)
 getNewsList req = do
