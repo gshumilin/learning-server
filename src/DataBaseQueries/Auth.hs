@@ -16,17 +16,6 @@ instance FromRow Bool where
 instance FromRow Int where
     fromRow = field
 
-getUserIDWhithAuth :: Connection -> BS.ByteString -> IO (Either T.Text Int)
-getUserIDWhithAuth conn key = do
-    case decodeAuthKey key of
-        Left err -> return $ Left err
-        Right (login, password) -> do
-            let q = "SELECT id FROM users WHERE login = ? AND password = ?;"
-            resArr <- (query conn q (login :: BS.ByteString, password :: BS.ByteString))
-            case resArr of
-                [] -> return (Left "No such User")
-                [userID] -> return (Right userID)
-
 checkIsAdmin :: BS.ByteString -> ReaderT Environment IO (Either T.Text Bool)
 checkIsAdmin key = do
     conn <- asks dbConnection 
@@ -50,3 +39,12 @@ checkIsAbleToCreateNews key = do
             case resArr of
                 [] -> return (Right False)
                 [boolVal] -> return (Right boolVal)
+
+getUserIdWithAuth :: Connection -> Either T.Text (BS.ByteString, BS.ByteString) -> IO (Maybe Int)
+getUserIdWithAuth conn (Left _) = return Nothing
+getUserIdWithAuth conn (Right (login, password)) = do
+    let q = "SELECT id FROM users WHERE login = ? AND password = ?;"
+    resArr <- query conn q (login :: BS.ByteString, password :: BS.ByteString)
+    case resArr of
+        [] -> return Nothing
+        [intVal] -> return $ Just intVal

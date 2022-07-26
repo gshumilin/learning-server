@@ -5,7 +5,6 @@ import qualified Types.Database.Category as DBType
 import qualified Types.API.Category as API
 import Database.PostgreSQL.Simple
 
-
 parseCategoriesList :: Connection -> IO [DBType.Category]
 parseCategoriesList conn = do
     res <- query_ conn "SELECT * FROM categories"

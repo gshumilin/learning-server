@@ -4,6 +4,7 @@ import qualified Types.Domain.Category as Domain
 import qualified Types.Database.Category as DBType
 import qualified Types.API.Category as API
 import Types.Domain.Environment
+import Database.PostgreSQL.Simple
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Data.Aeson
@@ -48,10 +49,9 @@ fromDbCategoryList (x:xs) =
             where
                 parentCategory = if (null xs) then Nothing else Just $ fromDbCategoryList xs
 
-getSpecificCategory :: Int -> ReaderT Environment IO Domain.Category
-getSpecificCategory id = do
-    conn <- asks dbConnection
-    categoryWithParrents <- lift $ parseSpecificCategory id conn
+getSpecificCategory :: Connection -> Int -> IO Domain.Category
+getSpecificCategory conn id = do
+    categoryWithParrents <- parseSpecificCategory id conn
     let domainCategory = fromDbCategoryList categoryWithParrents
     return domainCategory
 
