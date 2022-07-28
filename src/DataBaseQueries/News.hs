@@ -26,16 +26,17 @@ parseNews req = do
     conn <- asks dbConnection
     let queryList = queryString req
     let authInfo = findAuthKey req
-    let initQ = Query "SELECT * FROM news"
-    clientUserID' <- lift $ getUserIdWithAuth conn (decodeAuthKey =<< authInfo)
-    let clientUserID = (BS.pack . show) <$> clientUserID'
-    let clientsFilters = findFilters queryList
-    let initFilters  =  if null (filter (\(k,_) -> k == "creator_id") clientsFilters)
-                            then [("is_published", Just "True"), ("creator_id", clientUserID)]
-                            else [("is_published", Just "True")]
-    let filters = clientsFilters ++ initFilters
-    let sorts = findSorts queryList
-    let q = addSorting' sorts $ addFilter' filters initQ
+    mbClientUserID <- lift $ getUserIdWithAuth conn (decodeAuthKey =<< authInfo) 
+    let filters = findFilters queryList  
+    let sorts = findSorts queryList         
+    let initQ = 
+            case mbClientUserID of
+                Nothing -> Query "SELECT * FROM news WHERE is_published = True"
+                Just clientUserID -> 
+                    if any (\(k,v) -> k=="creator_id") filters 
+                        then Query "SELECT * FROM news WHERE is_published = True"
+                        else Query "SELECT * FROM news WHERE is_published = True OR creator_id = " <> Query (BS.pack $ show clientUserID) 
+    let q = addSorting sorts $ addFilter filters initQ
     lift . putStrLn $ "----- created this psql-request: \"" ++ (show q) ++ "\"\n" --log
     dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DBType.News]
     res <- lift $ mapM (fromDbNews conn) dbNews
@@ -45,7 +46,7 @@ fromDbNews :: Connection -> DBType.News -> IO Domain.News
 fromDbNews conn DBType.News {..} = do 
     newsCategory <- getSpecificCategory conn categoryID             --refactoring!
     newsCreator <- findUser conn creatorID              --refactoring! unsafe 'head' is used
-    newsPicturesArray <- findPicturesArray conn newsID  --undefined
+    newsPicturesArray <- findPicturesArray conn newsID
     return $ Domain.News 
         {   newsID = newsID,
             title = title,
@@ -70,9 +71,9 @@ findFilters ls = filter (\(poleName, _) -> poleName `elem` lislistOfAllowedFilte
 findSorts ::  [(BS.ByteString, Maybe BS.ByteString)] -> [(BS.ByteString, Maybe BS.ByteString)]
 findSorts ls = filter (\(poleName, _) -> poleName == "sort_by") ls
 
-addFilter' :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
-addFilter' [] q = q
-addFilter' ls q = q <> " WHERE " <> (Query $ BS.intercalate " AND " $ foldr addParam [] ls)
+addFilter :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
+addFilter [] q = q
+addFilter ls q = q <> " AND " <> (Query $ BS.intercalate " AND " $ foldr addParam [] ls)
     where
         addParam (_, Nothing) acc = acc
         addParam ("is_published", Just val) acc = ("is_published" <> " = " <> val) : acc
@@ -83,12 +84,12 @@ addFilter' ls q = q <> " WHERE " <> (Query $ BS.intercalate " AND " $ foldr addP
         addParam ("created_since", Just val) acc = ("create_date" <> " >= '" <> val <> "'::timestamp") : acc
 
 
-addSorting' :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
-addSorting' [] q  = q
-addSorting' [("sort_by", Just val)] q = q <> " ORDER BY " <> Query val
+addSorting :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
+addSorting [] q  = q
+addSorting [("sort_by", Just val)] q = q <> " ORDER BY " <> Query val
 
 writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
-writeNews conn a API.CreateNewsRequest {..} = do
+writeNews conn API.CreateNewsRequest {..} = do
     let newsCreatorID = 1 :: Int
     currTime <- getCurrentTime
     let isPublished = False
@@ -132,10 +133,29 @@ rewriteNews conn API.EditNewsRequest {..} = do
                 ) picArr
         execPicturesArray Nothing = pure []
 
-addSort :: Query -> Maybe Query -> Query
-addSort q Nothing = q
-addSort q (Just sortVal) = q <> " ORDER BY " <> sortVal
+xs = [  ("creator_id", Just "1"),
+        ("category_id", Nothing), 
+        ("created_since", Just "2022-12-21")
+     ] :: [(BS.ByteString, Maybe BS.ByteString)]
 
-addFilter :: Query -> Maybe Query -> Query
-addFilter q Nothing = q
-addFilter q (Just filterVal) = q <> " WHERE " <> filterVal
+ys = [] :: [(BS.ByteString, Maybe BS.ByteString)]
+
+zs = [  ("creator_id", Just "1"), 
+        ("category_id", Nothing), 
+        ("created_since", Just "2022-12-21"), 
+        ("created_since", Just "2022-12-21")
+     ] :: [(BS.ByteString, Maybe BS.ByteString)]
+
+initQ = Query "SELECT * FROM news WHERE is_published=True OR creator_id=1"
+
+addFilter' :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
+addFilter' [] q = q
+addFilter' ls q = q <> " AND " <> (Query $ BS.intercalate " AND " $ foldr addParam [] ls)
+    where
+        addParam (_, Nothing) acc = acc
+        addParam ("is_published", Just val) acc = ("is_published" <> " = " <> val) : acc
+        addParam ("creator_id", Just val) acc = ("creator_id" <> " = " <> val) : acc
+        addParam ("category_id", Just val) acc = ("category_id" <> " = " <> val) : acc
+        addParam ("created_at", Just val) acc = ("create_date" <> " = '" <> val <> "'::timestamp") : acc
+        addParam ("created_until", Just val) acc = ("create_date" <> " < '" <> val <> "'::timestamp") : acc
+        addParam ("created_since", Just val) acc = ("create_date" <> " >= '" <> val <> "'::timestamp") : acc
