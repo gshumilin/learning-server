@@ -70,9 +70,6 @@ routing req respond = do
                         Just picID -> do 
                             res <- Endpoints.Picture.getPicture picID
                             lift $ respond res
-        "sdsdsdsdsdsd"  -> do
-            res <- withAuth checkIsAdmin (Endpoints.Categories.createCategory) req
-            lift $ respond res
         _               -> error "Unknown method"
 
 parseEnvironment :: IO (Environment)
