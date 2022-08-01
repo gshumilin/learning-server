@@ -11,7 +11,7 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import DataBaseQueries.Category (parseCategoriesList, parseSpecificCategory, writeCategory, rewriteCategory)
+import DatabaseQueries.Category (parseCategoriesList, parseSpecificCategory, writeCategory, rewriteCategory)
 import Control.Monad (mapM)
 import Control.Monad.Reader
 

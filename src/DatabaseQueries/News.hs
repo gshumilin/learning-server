@@ -1,4 +1,4 @@
-module DataBaseQueries.News where
+module DatabaseQueries.News where
 
 import qualified Types.Domain.User as Domain
 import qualified Types.Domain.News as Domain
@@ -9,9 +9,9 @@ import qualified Types.Database.News as DBType
 import qualified Types.API.News as API
 import qualified Types.Database.Category as DBType
 import Endpoints.Categories (getSpecificCategory)
-import DataBaseQueries.User (findUser)
-import DataBaseQueries.Picture (findPicturesArray)
-import DataBaseQueries.Auth (getUserIdWithAuth)
+import DatabaseQueries.User (findUser)
+import DatabaseQueries.Picture (findPicturesArray)
+import DatabaseQueries.Auth (getUserIdWithAuth)
 import Auth
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.Types
@@ -88,7 +88,7 @@ addSorting :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
 addSorting [] q  = q
 addSorting [("sort_by", Just val)] q = q <> " ORDER BY " <> Query val
 
-writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
+writeNews :: Connection -> API.CreateNewsRequest -> IO ()
 writeNews conn API.CreateNewsRequest {..} = do
     let newsCreatorID = 1 :: Int
     currTime <- getCurrentTime

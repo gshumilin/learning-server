@@ -1,6 +1,8 @@
 module Auth where
 
 import Types.Domain.Environment
+import qualified Types.Database.User as Database
+import DatabaseQueries.Auth (authentication)
 import Database.PostgreSQL.Simple (Connection)
 import qualified Data.Text as T
 import Network.Wai
@@ -19,6 +21,9 @@ authFailResponse = responseLBS status404 [(hContentType, "text/plain")] $ "Not f
 
 authDecodeFailResponse :: T.Text -> Response
 authDecodeFailResponse decodeErr = responseLBS status404 [(hContentType, "text/plain")] . BS.packChars . T.unpack $ decodeErr
+
+authorization :: Request -> IO (Either T.Text Database.User)
+authorization req = authentication =<< decodeAuthKey <$> findAuthKey req
 
 findAuthKey :: Request -> Either T.Text BS.ByteString
 findAuthKey req = 

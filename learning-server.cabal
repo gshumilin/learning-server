@@ -26,12 +26,12 @@ source-repository head
 library
   exposed-modules:
       Auth
-      DataBaseQueries.Auth
-      DataBaseQueries.Category
-      DataBaseQueries.GetConnection
-      DataBaseQueries.News
-      DataBaseQueries.Picture
-      DataBaseQueries.User
+      DatabaseQueries.Auth
+      DatabaseQueries.Category
+      DatabaseQueries.GetConnection
+      DatabaseQueries.News
+      DatabaseQueries.Picture
+      DatabaseQueries.User
       Endpoints.Categories
       Endpoints.News
       Endpoints.Picture
@@ -42,6 +42,7 @@ library
       Types.API.User
       Types.Database.Category
       Types.Database.News
+      Types.Database.User
       Types.Domain.Category
       Types.Domain.Environment
       Types.Domain.News

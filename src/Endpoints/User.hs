@@ -3,7 +3,7 @@ module Endpoints.User where
 import Types.Domain.User
 import Types.Domain.Environment
 import Types.API.User
-import DataBaseQueries.User (parseUsersList, writeUser)
+import DatabaseQueries.User (parseUsersList, writeUser)
 import Data.Time
 import Data.Time.Calendar
 import Data.Time.Clock

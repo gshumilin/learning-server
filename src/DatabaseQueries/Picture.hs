@@ -1,4 +1,4 @@
-module DataBaseQueries.Picture where
+module DatabaseQueries.Picture where
 
 import Types.Domain.Picture
 import Database.PostgreSQL.Simple

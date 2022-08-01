@@ -7,12 +7,11 @@ import Types.API.User
 import qualified Types.Domain.News as Domain
 import qualified Types.API.News as API
 import Types.Domain.Picture
-import qualified Types.Database.News as Database
+import qualified Types.Database.News as DBType
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DataBaseQueries.News (writeNews, rewriteNews, parseNews)
-import DataBaseQueries.User (findUser)
-import DataBaseQueries.Picture (findPicturesArray)
+import DatabaseQueries.News (writeNews, rewriteNews, parseNews)
+import DatabaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Network.HTTP.Types.URI
@@ -56,5 +55,5 @@ createNews req = do
         Just newNews -> do
             lift . putStrLn $ "----- createNews got rhis JSON: \n" ++ (show rawJSON) ++ "\n"
             let userInfo = undefined 
-            lift $ writeNews conn 1 newNews
+            lift $ writeNews conn newNews
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"

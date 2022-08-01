@@ -4,7 +4,7 @@ import Types.Domain.Environment
 import Types.Domain.Picture
 import Control.Monad.Reader
 import Network.Wai
-import DataBaseQueries.Picture (findPicture)
+import DatabaseQueries.Picture (findPicture)
 import Network.HTTP.Types (hContentType, status200, status400)
 import Data.ByteString.Lazy.Internal (packChars)
 

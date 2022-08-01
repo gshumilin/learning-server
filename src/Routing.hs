@@ -7,8 +7,8 @@ import qualified Endpoints.User
 import qualified Endpoints.News
 import qualified Endpoints.Picture
 import Endpoints.Categories
-import DataBaseQueries.GetConnection (getConnection)
-import DataBaseQueries.Auth (checkIsAdmin, checkIsAbleToCreateNews)
+import DatabaseQueries.GetConnection (getConnection)
+import DatabaseQueries.Auth (checkIsAdmin, checkIsAbleToCreateNews)
 import Network.Wai
 import Network.HTTP.Types (hContentType, status404)
 import Network.HTTP.Types.Header

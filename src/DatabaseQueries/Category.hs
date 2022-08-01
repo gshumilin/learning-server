@@ -1,4 +1,4 @@
-module DataBaseQueries.Category where
+module DatabaseQueries.Category where
 
 import Types.Domain.Category
 import qualified Types.Database.Category as DBType

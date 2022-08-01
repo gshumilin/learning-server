@@ -1,4 +1,4 @@
-module DataBaseQueries.GetConnection where
+module DatabaseQueries.GetConnection where
 
 import Database.PostgreSQL.Simple
 
