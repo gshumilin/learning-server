@@ -24,7 +24,8 @@ readNews req = do
     case mbQuery of 
         Nothing -> return []
         Just q -> do
-            lift . putStrLn $ "----- made this psql-request: \"" ++ (show q) ++ "\"\n" --log
+            let (Query bsQ) = q
+            lift . BS.putStrLn $ "----- made this psql-request: \n\"" <> bsQ <> "\"\n" --log
             dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DBType.News]
             lift . putStrLn $ "----- got this psql News List: \"" ++ (show dbNews) ++ "\"\n" --log
             res <- lift $ mapM (fromDbNews conn) dbNews

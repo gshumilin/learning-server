@@ -18,18 +18,22 @@ data News = News
       title :: T.Text,
       createDate :: UTCTime,
       creatorID :: Int,
+      creatorLogin :: T.Text, 
       categoryID :: Int,
+      categoryTitle :: T.Text,
       textContent :: T.Text,
       isPublished :: Bool
     } deriving Show
 
 instance FromRow News where
     fromRow = do
-        newsID <- field
-        title <- field
-        createDate <- field
-        creatorID <- field
-        categoryID <- field
-        textContent <- field
-        isPublished <- field
-        return News {..}
+      newsID <- field
+      title <- field
+      createDate <- field
+      creatorID <- field
+      creatorLogin <- field
+      categoryID <- field
+      categoryTitle <- field
+      textContent <- field
+      isPublished <- field
+      return News {..}
