@@ -4,6 +4,11 @@ import Types.Domain.Category
 import qualified Types.Database.Category as DBType
 import qualified Types.API.Category as API
 import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromRow
+import qualified Data.ByteString.Char8 as BS
+
+instance FromRow Int where
+    fromRow = field
 
 parseCategoriesList :: Connection -> IO [DBType.Category]
 parseCategoriesList conn = do
@@ -33,3 +38,10 @@ rewriteCategory conn API.EditCategoryRequest {..} = do
 
         execParent (Just parID) = execute conn "UPDATE categories SET parent_category_id = ? WHERE id = ?" (parID, categoryID)
         execParent Nothing = pure (0) 
+
+findCategoryIdByTitle :: Connection -> BS.ByteString -> IO (Maybe BS.ByteString)
+findCategoryIdByTitle conn title = do
+    res <- query conn "SELECT id FROM categories WHERE title = ?" $ Only title
+    case res of 
+        [] -> return Nothing
+        (x:xs) -> return $ Just (BS.pack . show $ ( x:: Int))

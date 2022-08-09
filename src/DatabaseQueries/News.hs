@@ -1,18 +1,14 @@
 module DatabaseQueries.News where
 
-import qualified Types.Domain.User as Domain
 import qualified Types.Domain.News as Domain
 import qualified Types.Domain.Picture as Domain
-import qualified Types.Domain.Category as Domain
-import Types.Domain.Environment
 import qualified Types.Database.News as DBType
+import Types.Domain.Environment
 import qualified Types.API.News as API
-import qualified Types.Database.Category as DBType
-import Endpoints.Categories (getSpecificCategory)
-import DatabaseQueries.User (findUser)
+import DatabaseQueries.QueryCreator (makeReadNewsQuery)
 import DatabaseQueries.Picture (findPicturesArray)
-import DatabaseQueries.Auth (getUserIdWithAuth)
-import Auth
+import DatabaseQueries.User (findUser)
+import Endpoints.Categories (getSpecificCategory)
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.Types
 import qualified Data.Text as T
@@ -21,31 +17,23 @@ import Control.Monad.Reader
 import qualified Data.ByteString.Char8 as BS
 import Network.Wai
 
-parseNews :: Request -> ReaderT Environment IO [Domain.News]
-parseNews req = do
+readNews :: Request -> ReaderT Environment IO [Domain.News]
+readNews req = do
     conn <- asks dbConnection
-    let queryList = queryString req
-    let authInfo = findAuthKey req
-    mbClientUserID <- lift $ getUserIdWithAuth conn (decodeAuthKey =<< authInfo) 
-    let filters = findFilters queryList  
-    let sorts = findSorts queryList         
-    let initQ = 
-            case mbClientUserID of
-                Nothing -> Query "SELECT * FROM news WHERE is_published = True"
-                Just clientUserID -> 
-                    if any (\(k,v) -> k=="creator_id") filters 
-                        then Query "SELECT * FROM news WHERE is_published = True"
-                        else Query "SELECT * FROM news WHERE is_published = True OR creator_id = " <> Query (BS.pack $ show clientUserID) 
-    let q = addSorting sorts $ addFilter filters initQ
-    lift . putStrLn $ "----- created this psql-request: \"" ++ (show q) ++ "\"\n" --log
-    dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DBType.News]
-    res <- lift $ mapM (fromDbNews conn) dbNews
-    return res
+    mbQuery <- lift $ makeReadNewsQuery conn req
+    case mbQuery of 
+        Nothing -> return []
+        Just q -> do
+            lift . putStrLn $ "----- made this psql-request: \"" ++ (show q) ++ "\"\n" --log
+            dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DBType.News]
+            lift . putStrLn $ "----- got this psql News List: \"" ++ (show dbNews) ++ "\"\n" --log
+            res <- lift $ mapM (fromDbNews conn) dbNews
+            return res
 
 fromDbNews :: Connection -> DBType.News -> IO Domain.News
 fromDbNews conn DBType.News {..} = do 
-    newsCategory <- getSpecificCategory conn categoryID             --refactoring!
-    newsCreator <- findUser conn creatorID              --refactoring! unsafe 'head' is used
+    newsCategory <- getSpecificCategory conn categoryID
+    newsCreator <- findUser conn creatorID
     newsPicturesArray <- findPicturesArray conn newsID
     return $ Domain.News 
         {   newsID = newsID,
@@ -57,36 +45,6 @@ fromDbNews conn DBType.News {..} = do
             picturesArray = newsPicturesArray,
             isPublished = isPublished 
         }
-
-findFilters :: [(BS.ByteString, Maybe BS.ByteString)] -> [(BS.ByteString, Maybe BS.ByteString)]
-findFilters ls = filter (\(poleName, _) -> poleName `elem` lislistOfAllowedFilters) ls
-    where lislistOfAllowedFilters = 
-            [   "creator_id",
-                "category_id",
-                "created_at",
-                "created_until",
-                "created_since"
-            ]
-
-findSorts ::  [(BS.ByteString, Maybe BS.ByteString)] -> [(BS.ByteString, Maybe BS.ByteString)]
-findSorts ls = filter (\(poleName, _) -> poleName == "sort_by") ls
-
-addFilter :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
-addFilter [] q = q
-addFilter ls q = q <> " AND " <> (Query $ BS.intercalate " AND " $ foldr addParam [] ls)
-    where
-        addParam (_, Nothing) acc = acc
-        addParam ("is_published", Just val) acc = ("is_published" <> " = " <> val) : acc
-        addParam ("creator_id", Just val) acc = ("creator_id" <> " = " <> val) : acc
-        addParam ("category_id", Just val) acc = ("category_id" <> " = " <> val) : acc
-        addParam ("created_at", Just val) acc = ("create_date" <> " = '" <> val <> "'::timestamp") : acc
-        addParam ("created_until", Just val) acc = ("create_date" <> " < '" <> val <> "'::timestamp") : acc
-        addParam ("created_since", Just val) acc = ("create_date" <> " >= '" <> val <> "'::timestamp") : acc
-
-
-addSorting :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
-addSorting [] q  = q
-addSorting [("sort_by", Just val)] q = q <> " ORDER BY " <> Query val
 
 writeNews :: Connection -> API.CreateNewsRequest -> IO ()
 writeNews conn API.CreateNewsRequest {..} = do
@@ -132,30 +90,3 @@ rewriteNews conn API.EditNewsRequest {..} = do
                         (b64, newsID)
                 ) picArr
         execPicturesArray Nothing = pure []
-
-xs = [  ("creator_id", Just "1"),
-        ("category_id", Nothing), 
-        ("created_since", Just "2022-12-21")
-     ] :: [(BS.ByteString, Maybe BS.ByteString)]
-
-ys = [] :: [(BS.ByteString, Maybe BS.ByteString)]
-
-zs = [  ("creator_id", Just "1"), 
-        ("category_id", Nothing), 
-        ("created_since", Just "2022-12-21"), 
-        ("created_since", Just "2022-12-21")
-     ] :: [(BS.ByteString, Maybe BS.ByteString)]
-
-initQ = Query "SELECT * FROM news WHERE is_published=True OR creator_id=1"
-
-addFilter' :: [(BS.ByteString, Maybe BS.ByteString)] -> Query -> Query
-addFilter' [] q = q
-addFilter' ls q = q <> " AND " <> (Query $ BS.intercalate " AND " $ foldr addParam [] ls)
-    where
-        addParam (_, Nothing) acc = acc
-        addParam ("is_published", Just val) acc = ("is_published" <> " = " <> val) : acc
-        addParam ("creator_id", Just val) acc = ("creator_id" <> " = " <> val) : acc
-        addParam ("category_id", Just val) acc = ("category_id" <> " = " <> val) : acc
-        addParam ("created_at", Just val) acc = ("create_date" <> " = '" <> val <> "'::timestamp") : acc
-        addParam ("created_until", Just val) acc = ("create_date" <> " < '" <> val <> "'::timestamp") : acc
-        addParam ("created_since", Just val) acc = ("create_date" <> " >= '" <> val <> "'::timestamp") : acc

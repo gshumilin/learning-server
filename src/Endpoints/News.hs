@@ -10,7 +10,7 @@ import Types.Domain.Picture
 import qualified Types.Database.News as DBType
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DatabaseQueries.News (writeNews, rewriteNews, parseNews)
+import DatabaseQueries.News (writeNews, rewriteNews, readNews, readNews)
 import DatabaseQueries.Picture (findPicturesArray)
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
@@ -25,7 +25,7 @@ import qualified Database.PostgreSQL.Simple.Types as Postgres
 
 getNews :: Request -> ReaderT Environment IO (Response)
 getNews req = do
-    newsList <- parseNews req
+    newsList <- readNews req
     let jsonNewsList = encodePretty $ Domain.NewsList newsList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
 

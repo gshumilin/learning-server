@@ -21,7 +21,7 @@ data News = News
       categoryID :: Int,
       textContent :: T.Text,
       isPublished :: Bool
-    }
+    } deriving Show
 
 instance FromRow News where
     fromRow = do

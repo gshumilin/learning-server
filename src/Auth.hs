@@ -19,11 +19,11 @@ import Control.Monad.Reader
 authFailResponse :: Response
 authFailResponse = responseLBS status404 [(hContentType, "text/plain")] $ "Not found"
 
-authDecodeFailResponse :: T.Text -> Response
-authDecodeFailResponse decodeErr = responseLBS status404 [(hContentType, "text/plain")] . BS.packChars . T.unpack $ decodeErr
-
-authorization :: Request -> IO (Either T.Text Database.User)
-authorization req = authentication =<< decodeAuthKey <$> findAuthKey req
+authorization :: Connection -> Request -> IO (Either T.Text Database.User)
+authorization conn req = do 
+    case decodeAuthKey =<< findAuthKey req of
+        Left err -> return (Left err)
+        Right loginPassword -> authentication conn loginPassword
 
 findAuthKey :: Request -> Either T.Text BS.ByteString
 findAuthKey req = 
@@ -38,18 +38,20 @@ decodeAuthKey base64code = makeAuthTuple <$> decodeBase64 base64code
     where 
         makeAuthTuple decodedInfo = (BS.takeWhile (/=':') decodedInfo, BS.tail $ BS.dropWhile (/= ':') decodedInfo)
 
-withAuth :: (BS.ByteString -> ReaderT Environment IO (Either T.Text Bool))
+withAuth :: (Database.User -> Bool)
             -> (Request -> ReaderT Environment IO Response) 
             -> Request 
             -> ReaderT Environment IO Response
-withAuth checkFunc endpointFunc req = do
-    case findAuthKey req  of
-        Left err -> return authFailResponse
-        Right authKey -> do
-            checkAuthResult <- checkFunc authKey
-            case checkAuthResult of
-                Left err -> return $ authDecodeFailResponse err
-                Right False -> return $ authFailResponse
-                Right True -> do
-                    res <- endpointFunc req
-                    return res
+withAuth isFunc endpointFunc req = do
+    conn <- asks dbConnection
+    auth <- lift $ authorization conn req 
+    case auth of
+        Left err -> do
+            lift $ putStrLn $ "----- There is authError: \"" ++ (show err) ++ "\"\n" --log
+            return authFailResponse
+        Right user -> 
+            case isFunc user of
+                False -> do
+                    lift $ putStrLn $ "----- There is authError: \"authentication fail\" \n" --log
+                    return authFailResponse
+                True -> endpointFunc req
