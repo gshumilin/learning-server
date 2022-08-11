@@ -26,7 +26,8 @@ data News = News
       category :: Category,
       textContent :: T.Text,
       picturesArray :: Maybe [Picture],
-      isPublished :: Bool
+      isPublished :: Bool,
+      numbersOfPictures :: Int
     }
 
 instance FromJSON News where
@@ -39,6 +40,7 @@ instance FromJSON News where
         textContent <- inputJSON .: "textContent"
         picturesArray <- inputJSON .: "picturesArray"
         isPublished <- inputJSON .: "isPublished"
+        numbersOfPictures <- inputJSON .: "numbersOfPictures"
         return $ News {..}
 
 instance ToJSON News where
@@ -51,5 +53,6 @@ instance ToJSON News where
                , "textContent" .= textContent
                , "picturesArray" .= picturesArray
                , "isPublished" .= isPublished
+               , "numbersOfPictures" .= numbersOfPictures
                ]
 

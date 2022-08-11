@@ -44,7 +44,8 @@ fromDbNews conn DBType.News {..} = do
             category = newsCategory,
             textContent = textContent,
             picturesArray = newsPicturesArray,
-            isPublished = isPublished 
+            isPublished = isPublished, 
+            numbersOfPictures = numbersOfPictures
         }
 
 writeNews :: Connection -> API.CreateNewsRequest -> IO ()

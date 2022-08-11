@@ -22,7 +22,8 @@ data News = News
       categoryID :: Int,
       categoryTitle :: T.Text,
       textContent :: T.Text,
-      isPublished :: Bool
+      isPublished :: Bool,
+      numbersOfPictures :: Int
     } deriving Show
 
 instance FromRow News where
@@ -36,4 +37,5 @@ instance FromRow News where
       categoryTitle <- field
       textContent <- field
       isPublished <- field
+      numbersOfPictures <- field
       return News {..}
