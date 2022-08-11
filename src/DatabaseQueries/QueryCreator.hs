@@ -52,7 +52,14 @@ makeReadNewsQuery :: Connection -> Request -> IO (Maybe Query)
 makeReadNewsQuery conn req = do
     clientUser <- authorization conn req
     let initQ = makeInitReadNewsQuery clientUser
-    let filtersQuery = makeFiltersQuery . findCompletedFields [ "creator_login", "category_title", "created_at", "created_until", "created_since"] . queryString $ req
+    let filtersQuery = makeFiltersQuery . findCompletedFields [ "creator_login",
+                                                                "category_title", 
+                                                                "created_at",
+                                                                "created_until", 
+                                                                "created_since", 
+                                                                "title",
+                                                                "content"
+                                                              ] . queryString $ req
     let groupQ = Query $  "  GROUP BY news.id,\n" <>
                           "           news.title,\n" <>
                           "           news.create_date,\n" <>
@@ -110,6 +117,9 @@ makeFiltersQuery ls = Just $ Query $ "           AND " <> (BS.intercalate " AND 
         addParam ("created_at", Just val) acc       = ("news.create_date" <> " = '" <> val <> "'::timestamp") : acc
         addParam ("created_until", Just val) acc    = ("news.create_date" <> " < '" <> val <> "'::timestamp") : acc
         addParam ("created_since", Just val) acc    = ("news.create_date" <> " >= '" <> val <> "'::timestamp") : acc
+        addParam ("title", Just val) acc            = ("news.title" <> " LIKE '%" <> val <> "%'") : acc
+        addParam ("content", Just val) acc          = ("news.text_content" <> " LIKE '%" <> val <> "%'") : acc
+
 
 makeSimpleQuery :: [(BS.ByteString, Maybe BS.ByteString)] -> Maybe Query
 makeSimpleQuery [] = Nothing
