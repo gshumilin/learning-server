@@ -16,24 +16,18 @@ import Network.HTTP.Types.Header
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as T
 import Control.Monad.Reader
-import Data.List (find)
-import Text.Read (readMaybe)
 import Database.PostgreSQL.Simple (Connection)
 
 application :: Request -> (Response -> IO ResponseReceived) -> IO ResponseReceived
 application req respond = do
+    putStrLn $ "----- got request:\n" ++ (show req) ++ "\n"              --log
     env <- parseEnvironment
     runReaderT (routing req respond) env
 
 routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 routing req respond = do
-    let reqPath = rawPathInfo req
-    let reqHeaders = requestHeaders req
-    let reqQuery = queryString req
-    lift . putStrLn $ "----- got request:\n" ++ (show req) ++ "\n"              --log
-    lift . putStrLn $ "got query:\n" ++ (show $ queryString req) ++ "\n"        --log
     conn <- asks dbConnection
-    case reqPath of
+    case rawPathInfo req of
         "/getUsersList" -> do
             res <- Endpoints.User.getUsersList
             lift $ respond res
@@ -59,18 +53,11 @@ routing req respond = do
             res <- withAuth isAdmin Endpoints.Categories.editCategory req
             lift $ respond res
         "/getPicture"     -> do
-            let idPole = find (\(k,v) -> k == "id") $ reqQuery
-            case idPole of
-                Nothing -> error "'id' parameter not specified"
-                Just (_, Nothing) -> error "empty value of the id parameter"
-                Just (_, Just bsPicID) -> do
-                    let mbPicID = readMaybe $ BS.unpack bsPicID :: Maybe Int
-                    case mbPicID of
-                        Nothing -> do
-                            error "invalid id parameter value"
-                        Just picID -> do 
-                            res <- Endpoints.Picture.getPicture picID
-                            lift $ respond res
+            res <- Endpoints.Picture.getPicture req
+            lift $ respond res
+        "/putPicture"     -> do
+            res <- Endpoints.Picture.putPicture req
+            lift $ respond res
         _               -> error "Unknown method"
 
 parseEnvironment :: IO (Environment)

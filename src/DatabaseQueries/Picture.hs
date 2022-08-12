@@ -12,10 +12,15 @@ findPicturesArray conn newsID = do
         then return $ Just res
         else return Nothing
 
-findPicture :: Connection -> Int -> IO (Maybe Picture)
-findPicture conn pictureID = do
+readPicture :: Connection -> Int -> IO (Maybe Picture)
+readPicture conn pictureID = do
     let q = "SELECT base64 FROM pictures WHERE id = ?"
     res <- query conn q $ Only pictureID
     case res of
         [] -> return Nothing
         [x] -> return $ Just x
+
+writePicture :: Connection -> Picture -> IO ()
+writePicture conn Picture {..} = do
+    execute conn "INSERT INTO pictures (base64) VALUES (?)" (Only base64)
+    return ()

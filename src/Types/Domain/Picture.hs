@@ -6,6 +6,7 @@ import Data.Aeson.Types
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
+import Data.ByteString as BS 
 
 data PicturesArray = PicturesArray [Picture] deriving Show
 
