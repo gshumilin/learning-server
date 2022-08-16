@@ -11,7 +11,7 @@ import qualified Types.Database.News as DBType
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.News (writeNews, rewriteNews, readNews, readNews)
-import DatabaseQueries.Picture (findPicturesArray)
+import DatabaseQueries.Picture (findPictures)
 import Network.HTTP.Types (hContentType, status200, status400)
 import Network.Wai
 import Network.HTTP.Types.URI
@@ -47,13 +47,12 @@ createNews :: Request -> ReaderT Environment IO (Response)
 createNews req = do
     conn <- asks dbConnection
     rawJSON <- lift $ getRequestBodyChunk req
-    let req = decodeStrict rawJSON :: Maybe API.CreateNewsRequest
-    case req of 
+    let apiReq = decodeStrict rawJSON :: Maybe API.CreateNewsRequest
+    case apiReq of 
         Nothing -> do
             lift . putStrLn $ "----- createNews returned \"Invalid JSON\"" --log
             return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just newNews -> do
-            lift . putStrLn $ "----- createNews got rhis JSON: \n" ++ (show rawJSON) ++ "\n"
-            let userInfo = undefined 
+            lift . putStrLn $ "----- createNews got this JSON: \n" ++ (show rawJSON) ++ "\n"
             lift $ writeNews conn newNews
             return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
