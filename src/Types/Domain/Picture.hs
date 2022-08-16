@@ -24,22 +24,22 @@ instance ToField PicturesArray where
     toField = undefined
 
 data Picture = Picture 
-    { base64 :: T.Text
+    { picData :: T.Text
     } deriving Show
 
 instance FromJSON Picture where 
     parseJSON (Object inputJSON) = do
-        base64 <- inputJSON .: "base64"
+        picData <- inputJSON .: "data"
         return Picture {..}
 
 instance ToJSON Picture where
     toJSON Picture {..} = 
-        object  [ "base64" .= base64
+        object  [ "data" .= picData
                 ]
 
 instance FromRow Picture where
     fromRow = do
-        base64 <- field
+        picData <- field
         return Picture {..}
 
 instance ToField Picture where

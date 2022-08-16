@@ -60,8 +60,8 @@ writeNews conn API.CreateNewsRequest {..} = do
         Just picArr -> do
             print picArr
             mapM ( \Domain.Picture {..} -> do
-                let q = "INSERT INTO pictures (base64) values (?) RETURNING id"
-                [Only picID] <- query conn q (Only base64) :: IO [Only Int]
+                let q = "INSERT INTO pictures (picData) values (?) RETURNING id"
+                [Only picID] <- query conn q (Only picData) :: IO [Only Int]
                 let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
                 execute conn q' (newId, picID)            
                 ) picArr

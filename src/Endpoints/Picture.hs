@@ -30,9 +30,9 @@ getPicture req = do
             case mbPic of
                 Nothing -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "Not Found 404"
                 Just Picture {..} -> do
-                    case decodeBase64 . BS.pack . T.unpack $ base64 of
+                    case decodeBase64 . BS.pack . T.unpack $ picData of
                         Left err -> do
-                            lift . putStrLn $ "-----base64 decoding error: " ++ show err --log
+                            lift . putStrLn $ "-----picData decoding error: " ++ show err --log
                             return $ responseLBS status404 [(hContentType, "text/plain")] $ "Not Found 404"
                         Right decodedPic -> return $ responseLBS status200 [(hContentType, "image/png")] . LBS.fromStrict $ decodedPic
 
