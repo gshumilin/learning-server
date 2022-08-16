@@ -6,7 +6,7 @@ import qualified Types.Database.News as DBType
 import Types.Domain.Environment
 import qualified Types.API.News as API
 import DatabaseQueries.QueryCreator (makeReadNewsQuery)
-import DatabaseQueries.Picture (findPicturesArray)
+import DatabaseQueries.Picture (findPictures)
 import DatabaseQueries.User (findUser)
 import Endpoints.Categories (getSpecificCategory)
 import Database.PostgreSQL.Simple
@@ -35,7 +35,7 @@ fromDbNews :: Connection -> DBType.News -> IO Domain.News
 fromDbNews conn DBType.News {..} = do 
     newsCategory <- getSpecificCategory conn categoryID
     newsCreator <- findUser conn creatorID
-    newsPicturesArray <- findPicturesArray conn newsID
+    newsPictures <- findPictures conn newsID
     return $ Domain.News 
         {   newsID = newsID,
             title = title,
@@ -43,7 +43,7 @@ fromDbNews conn DBType.News {..} = do
             creator = newsCreator,
             category = newsCategory,
             textContent = textContent,
-            picturesArray = newsPicturesArray,
+            pictures = newsPictures,
             isPublished = isPublished, 
             numbersOfPictures = numbersOfPictures
         }
@@ -55,9 +55,9 @@ writeNews conn API.CreateNewsRequest {..} = do
     let isPublished = False
     let q = "INSERT INTO news (title, create_date, creator_id, category_id, text_content, is_published) values (?,?,?,?,?,?) RETURNING id"
     [Only newId] <- query conn q (title, currTime, newsCreatorID, categoryID, textContent, isPublished) :: IO [Only Int]
-    case picturesArray of
+    case pictures of
         Nothing -> return ()
-        Just picArr -> do
+        Just (Domain.Pictures picArr) -> do
             mapM ( \Domain.Picture {..} -> do
                 let q = "INSERT INTO pictures (data,mime) values (?,?) RETURNING id"
                 [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
@@ -71,7 +71,7 @@ rewriteNews conn API.EditNewsRequest {..} = do
     editTitle <- execTitle newTitle
     editCategory <- execCategoryID newCategoryID
     editText <- execTextContent newTextContent
-    editPictures <- execPicturesArray newPicturesArray
+    editPictures <- execPicturesArray newPictures
     return ()
     where 
         execTitle (Just tit) = execute conn "UPDATE news SET title = ? WHERE id = ?" (tit, newsID)

@@ -43,6 +43,7 @@ instance ToJSON Picture where
 instance FromRow Picture where
     fromRow = do
         picData <- field
+        mime <- field
         return Picture {..}
 
 instance ToField Picture where

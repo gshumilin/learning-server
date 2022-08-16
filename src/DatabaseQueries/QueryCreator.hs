@@ -7,7 +7,7 @@ import qualified Types.Database.User as DBType
 import Endpoints.Categories (getSpecificCategory)
 import DatabaseQueries.User (findUser, findUserIdByLogin)
 import DatabaseQueries.Category (findCategoryIdByTitle)
-import DatabaseQueries.Picture (findPicturesArray)
+import DatabaseQueries.Picture (findPictures)
 import Auth (authorization)
 import qualified Data.Text as T
 import qualified Data.ByteString.Char8 as BS

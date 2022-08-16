@@ -4,12 +4,12 @@ import Types.Domain.Picture
 import Database.PostgreSQL.Simple
 import qualified Data.Text as T
 
-findPicturesArray :: Connection -> Int -> IO (Maybe [Picture])
-findPicturesArray conn newsID = do
-    let q = "SELECT p.data FROM news_pictures np LEFT JOIN pictures p on p.id=np.picture_id WHERE np.news_id = ?"
+findPictures :: Connection -> Int -> IO (Maybe Pictures)
+findPictures conn newsID = do
+    let q = "SELECT pictures.data FROM news_pictures LEFT JOIN pictures on pictures.id=news_pictures.picture_id WHERE news_pictures.news_id = ?"
     res <- query conn q $ Only newsID
     if not . null $ res
-        then return $ Just res
+        then return $ Just (Pictures res)
         else return Nothing
 
 readPicture :: Connection -> Int -> IO (Maybe Picture)
