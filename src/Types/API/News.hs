@@ -12,7 +12,7 @@ data CreateNewsRequest = CreateNewsRequest
     { title :: T.Text,
       categoryID :: Int,
       textContent :: T.Text,
-      picturesArray :: Maybe [Picture]
+      pictures :: Maybe [Picture]
     } deriving Show
 
 instance FromJSON CreateNewsRequest where
@@ -20,17 +20,15 @@ instance FromJSON CreateNewsRequest where
         title <- inputJSON .: "title"
         categoryID <- inputJSON .: "categoryID"
         textContent <- inputJSON .: "textContent"
-        picturesArray <- inputJSON .:? "picturesArray"
+        pictures <- inputJSON .:? "pictures"
         return $ CreateNewsRequest {..}
-
-
 
 data EditNewsRequest = EditNewsRequest
     { newsID :: Int,
       newTitle :: Maybe T.Text,
       newCategoryID :: Maybe Int,
       newTextContent :: Maybe T.Text,
-      newPicturesArray :: Maybe [Picture]
+      newPictures :: Maybe Pictures
     } deriving Show
 
 instance FromJSON EditNewsRequest where
@@ -39,7 +37,7 @@ instance FromJSON EditNewsRequest where
         newTitle <- inputJSON .:? "newTitle"
         newCategoryID <- inputJSON .:? "newCategoryID"
         newTextContent <- inputJSON .:? "newTextContent"
-        newPicturesArray <- inputJSON .:? "newPicturesArray"
+        newPictures <- inputJSON .:? "newPictures"
         return $ EditNewsRequest {..}
 
 

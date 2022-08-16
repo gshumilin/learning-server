@@ -62,7 +62,7 @@ createCategory request = do
     let decodedReq = decodeStrict rawJSON :: Maybe API.CreateCategoryRequest
     case decodedReq of
         Nothing -> do 
-            lift $ putStrLn "Invalid JSON"
+            lift $ putStrLn "Invalid JSON" -- log
             return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
         Just newCategory -> do
             lift . putStrLn . show $ rawJSON
