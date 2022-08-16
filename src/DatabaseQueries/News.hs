@@ -58,10 +58,9 @@ writeNews conn API.CreateNewsRequest {..} = do
     case picturesArray of
         Nothing -> return ()
         Just picArr -> do
-            print picArr
             mapM ( \Domain.Picture {..} -> do
-                let q = "INSERT INTO pictures (picData) values (?) RETURNING id"
-                [Only picID] <- query conn q (Only picData) :: IO [Only Int]
+                let q = "INSERT INTO pictures (data,mime) values (?,?) RETURNING id"
+                [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
                 let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
                 execute conn q' (newId, picID)            
                 ) picArr
@@ -84,11 +83,11 @@ rewriteNews conn API.EditNewsRequest {..} = do
         execTextContent (Just txt) = execute conn "UPDATE news SET text_content = ? WHERE id = ?" (txt, newsID)
         execTextContent Nothing = pure 0
 
-        execPicturesArray (Just picArr) = do
-            execute conn "DELETE * FROM news_pictures WHERE news_id = ?"
-                    (Only newsID)
-            mapM ( \(Domain.Picture b64) -> 
-                execute conn "UPDATE news_pictures SET pictures_id = ? WHERE news_id = ?"
-                        (b64, newsID)
-                ) picArr
+        execPicturesArray (Just picArr) = undefined
+            -- execute conn "DELETE * FROM news_pictures WHERE news_id = ?"
+            --         (Only newsID)
+            -- mapM ( \(Domain.Picture b64) -> 
+            --     execute conn "UPDATE news_pictures SET pictures_id = ? WHERE news_id = ?"
+            --             (b64, newsID)
+            --     ) picArr
         execPicturesArray Nothing = pure []

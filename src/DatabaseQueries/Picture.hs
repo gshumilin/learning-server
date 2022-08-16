@@ -6,7 +6,7 @@ import qualified Data.Text as T
 
 findPicturesArray :: Connection -> Int -> IO (Maybe [Picture])
 findPicturesArray conn newsID = do
-    let q = "SELECT p.picData FROM news_pictures np LEFT JOIN pictures p on p.id=np.picture_id WHERE np.news_id = ?"
+    let q = "SELECT p.data FROM news_pictures np LEFT JOIN pictures p on p.id=np.picture_id WHERE np.news_id = ?"
     res <- query conn q $ Only newsID
     if not . null $ res
         then return $ Just res
@@ -14,7 +14,7 @@ findPicturesArray conn newsID = do
 
 readPicture :: Connection -> Int -> IO (Maybe Picture)
 readPicture conn pictureID = do
-    let q = "SELECT picData FROM pictures WHERE id = ?"
+    let q = "SELECT data FROM pictures WHERE id = ?"
     res <- query conn q $ Only pictureID
     case res of
         [] -> return Nothing
@@ -22,5 +22,5 @@ readPicture conn pictureID = do
 
 writePicture :: Connection -> Picture -> IO ()
 writePicture conn Picture {..} = do
-    execute conn "INSERT INTO pictures (picData) VALUES (?)" (Only picData)
+    execute conn "INSERT INTO pictures (data) VALUES (?)" (Only picData)
     return ()

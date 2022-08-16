@@ -8,28 +8,31 @@ import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 import Data.ByteString as BS 
 
-data PicturesArray = PicturesArray [Picture] deriving Show
+data Pictures = Pictures [Picture] deriving Show
 
-instance FromJSON PicturesArray where 
+instance FromJSON Pictures where 
     parseJSON (Object inputJSON) = do
-        arr <- inputJSON .: "picturesArray"
-        return $ PicturesArray arr
+        arr <- inputJSON .: "pictures"
+        return $ Pictures arr
 
-instance ToJSON PicturesArray where
-    toJSON (PicturesArray arr) = 
-        object  [ "picturesArray" .= arr
+instance ToJSON Pictures where
+    toJSON (Pictures arr) = 
+        object  [ "pictures" .= arr
                 ]
                 
-instance ToField PicturesArray where
+instance ToField Pictures where
     toField = undefined
 
 data Picture = Picture 
-    { picData :: T.Text
+    {   mime :: T.Text,
+        picData :: T.Text
     } deriving Show
 
 instance FromJSON Picture where 
     parseJSON (Object inputJSON) = do
-        picData <- inputJSON .: "data"
+        picture <- inputJSON .: "image"
+        mime <- picture .: "mime"
+        picData <- picture .: "data"
         return Picture {..}
 
 instance ToJSON Picture where
