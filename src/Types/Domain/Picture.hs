@@ -6,7 +6,8 @@ import Data.Aeson.Types
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
-import Data.ByteString as BS 
+import Data.ByteString as BS
+import Control.Monad (mzero)
 
 data Pictures = Pictures [Picture] deriving Show
 
@@ -14,6 +15,7 @@ instance FromJSON Pictures where
     parseJSON (Object inputJSON) = do
         arr <- inputJSON .: "pictures"
         return $ Pictures arr
+    parseJSON _ = mzero
 
 instance ToJSON Pictures where
     toJSON (Pictures arr) = 
@@ -33,11 +35,12 @@ instance FromJSON Picture where
         picture <- inputJSON .: "image"
         mime <- picture .: "mime"
         picData <- picture .: "data"
-        return Picture {..}
+        return $ Picture mime picData
 
 instance ToJSON Picture where
     toJSON Picture {..} = 
-        object  [ "data" .= picData
+        object  [ "mime" .= mime
+                , "data" .= picData
                 ]
 
 instance FromRow Picture where

@@ -6,7 +6,7 @@ import qualified Types.Database.News as DBType
 import Types.Domain.Environment
 import qualified Types.API.News as API
 import DatabaseQueries.QueryCreator (makeReadNewsQuery)
-import DatabaseQueries.Picture (findPictures)
+import DatabaseQueries.Picture (parsePicturesLinks)
 import DatabaseQueries.User (findUser)
 import Endpoints.Categories (getSpecificCategory)
 import Database.PostgreSQL.Simple
@@ -35,7 +35,7 @@ fromDbNews :: Connection -> DBType.News -> IO Domain.News
 fromDbNews conn DBType.News {..} = do 
     newsCategory <- getSpecificCategory conn categoryID
     newsCreator <- findUser conn creatorID
-    newsPictures <- findPictures conn newsID
+    newsPictures <- parsePicturesLinks conn newsID
     return $ Domain.News 
         {   newsID = newsID,
             title = title,
@@ -43,26 +43,25 @@ fromDbNews conn DBType.News {..} = do
             creator = newsCreator,
             category = newsCategory,
             textContent = textContent,
-            pictures = newsPictures,
+            picturesLinks = newsPictures,
             isPublished = isPublished, 
             numbersOfPictures = numbersOfPictures
         }
 
-writeNews :: Connection -> API.CreateNewsRequest -> IO ()
-writeNews conn API.CreateNewsRequest {..} = do
-    let newsCreatorID = 1 :: Int
+writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
+writeNews conn newsCreatorID API.CreateNewsRequest {..} = do
     currTime <- getCurrentTime
     let isPublished = False
     let q = "INSERT INTO news (title, create_date, creator_id, category_id, text_content, is_published) values (?,?,?,?,?,?) RETURNING id"
-    [Only newId] <- query conn q (title, currTime, newsCreatorID, categoryID, textContent, isPublished) :: IO [Only Int]
+    [Only newsId] <- query conn q (title, currTime, newsCreatorID, categoryID, textContent, isPublished) :: IO [Only Int]
     case pictures of
         Nothing -> return ()
-        Just (Domain.Pictures picArr) -> do
+        Just picArr -> do
             mapM ( \Domain.Picture {..} -> do
                 let q = "INSERT INTO pictures (data,mime) values (?,?) RETURNING id"
                 [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
                 let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
-                execute conn q' (newId, picID)            
+                execute conn q' (newsId, picID)            
                 ) picArr
             return ()
 

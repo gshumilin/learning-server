@@ -7,7 +7,7 @@ import qualified Types.Database.User as DBType
 import Endpoints.Categories (getSpecificCategory)
 import DatabaseQueries.User (findUser, findUserIdByLogin)
 import DatabaseQueries.Category (findCategoryIdByTitle)
-import DatabaseQueries.Picture (findPictures)
+import DatabaseQueries.Picture (parsePicturesLinks)
 import Auth (authorization)
 import qualified Data.Text as T
 import qualified Data.ByteString.Char8 as BS
@@ -125,8 +125,8 @@ makeSimpleQuery :: [(BS.ByteString, Maybe BS.ByteString)] -> Maybe Query
 makeSimpleQuery [] = Nothing
 makeSimpleQuery [("limit", Just val)]   = Just $ Query $ " LIMIT "    <> val
 makeSimpleQuery [("offset", Just val)]  = Just $ Query $ " OFFSET "   <> val
-makeSimpleQuery [("sort_by", Just "creator_login")] = Just $ Query $ " ORDER BY users.login"
-makeSimpleQuery [("sort_by", Just "category_title")] = Just $ Query $ " ORDER BY categories.title"
-makeSimpleQuery [("sort_by", Just "create_date")] = Just $ Query $ " ORDER BY create_date"
-makeSimpleQuery [("sort_by", Just "number_of_pictures")] = Just $ Query $ "ORDER BY number_of_pictures"
+makeSimpleQuery [("sort_by", Just "creator_login")] = Just $ Query $ " ORDER BY users.login\n"
+makeSimpleQuery [("sort_by", Just "category_title")] = Just $ Query $ " ORDER BY categories.title\n"
+makeSimpleQuery [("sort_by", Just "create_date")] = Just $ Query $ " ORDER BY create_date\n"
+makeSimpleQuery [("sort_by", Just "number_of_pictures")] = Just $ Query $ "ORDER BY number_of_pictures\n"
 makeSimpleQuery [("sort_by", Just _)] = Nothing

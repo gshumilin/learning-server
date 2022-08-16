@@ -8,11 +8,12 @@ import qualified Types.Domain.News as Domain
 import qualified Types.API.News as API
 import Types.Domain.Picture
 import qualified Types.Database.News as DBType
+import qualified Types.Database.User as DBType
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.News (writeNews, rewriteNews, readNews, readNews)
-import DatabaseQueries.Picture (findPictures)
-import Network.HTTP.Types (hContentType, status200, status400)
+import DatabaseQueries.Picture (parsePicturesLinks)
+import Network.HTTP.Types (hContentType, status200, status400, status404)
 import Network.Wai
 import Network.HTTP.Types.URI
 import Data.Aeson
@@ -46,13 +47,16 @@ editNews request = do
 createNews :: Request -> ReaderT Environment IO (Response)
 createNews req = do
     conn <- asks dbConnection
-    rawJSON <- lift $ getRequestBodyChunk req
-    let apiReq = decodeStrict rawJSON :: Maybe API.CreateNewsRequest
-    case apiReq of 
-        Nothing -> do
-            lift . putStrLn $ "----- createNews returned \"Invalid JSON\"" --log
-            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
-        Just newNews -> do
-            lift . putStrLn $ "----- createNews got this JSON: \n" ++ (show rawJSON) ++ "\n"
-            lift $ writeNews conn newNews
-            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
+    authUser <- lift $ authorization conn req
+    case authUser of 
+        Left err -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "404 Not Found\n"
+        Right clientsUser -> do
+            rawJSON <- lift $ getRequestBodyChunk req
+            let apiReq = decodeStrict rawJSON :: Maybe API.CreateNewsRequest
+            case apiReq of 
+                Nothing -> do
+                    lift . putStrLn $ "----- createNews returned \"Invalid JSON\"" --log
+                    return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
+                Just newNews -> do
+                    lift $ writeNews conn (DBType.userID clientsUser) newNews
+                    return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"

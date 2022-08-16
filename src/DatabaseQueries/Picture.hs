@@ -2,15 +2,22 @@ module DatabaseQueries.Picture where
 
 import Types.Domain.Picture
 import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromRow
 import qualified Data.Text as T
 
-findPictures :: Connection -> Int -> IO (Maybe Pictures)
-findPictures conn newsID = do
-    let q = "SELECT pictures.data FROM news_pictures LEFT JOIN pictures on pictures.id=news_pictures.picture_id WHERE news_pictures.news_id = ?"
-    res <- query conn q $ Only newsID
-    if not . null $ res
-        then return $ Just (Pictures res)
-        else return Nothing
+instance FromRow Int where
+    fromRow = field
+
+parsePicturesLinks :: Connection -> Int -> IO (Maybe [T.Text])
+parsePicturesLinks conn newsID = do
+    let q = "SELECT picture_id FROM news_pictures WHERE news_id = ?"
+    res <- query conn q $ Only newsID :: IO ([Int])
+    if null $ res
+        then return Nothing
+        else return . Just $ map makeLinks res
+    where
+        makeLinks :: Int -> T.Text
+        makeLinks picId = "localhost:3000/getPicture?id=" <> (T.pack . show $ picId)
 
 readPicture :: Connection -> Int -> IO (Maybe Picture)
 readPicture conn pictureID = do
@@ -22,5 +29,5 @@ readPicture conn pictureID = do
 
 writePicture :: Connection -> Picture -> IO ()
 writePicture conn Picture {..} = do
-    execute conn "INSERT INTO pictures (data) VALUES (?)" (Only picData)
+    execute conn "INSERT INTO pictures (data,mime) VALUES (?,?)" (picData,mime)
     return ()
