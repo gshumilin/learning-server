@@ -39,3 +39,18 @@ instance FromRow News where
       isPublished <- field
       numbersOfPictures <- field
       return News {..}
+
+data EditedNewsFields = EditedNewsFields
+    { oldCreatorID :: Int,
+      oldTitle :: T.Text,
+      oldCategoryID :: Int,
+      oldTextContent :: T.Text
+    } deriving Show
+
+instance FromRow EditedNewsFields where
+    fromRow = do
+      oldCreatorID <- field
+      oldTitle <- field
+      oldCategoryID <- field
+      oldTextContent <- field
+      return EditedNewsFields {..}

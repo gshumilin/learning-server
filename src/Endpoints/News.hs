@@ -11,7 +11,7 @@ import qualified Types.Database.News as DBType
 import qualified Types.Database.User as DBType
 import Endpoints.Categories (dbCategoryTransform, getSpecificCategory)
 import Database.PostgreSQL.Simple (Connection)
-import DatabaseQueries.News (writeNews, rewriteNews, readNews, readNews)
+import DatabaseQueries.News (writeNews, rewriteNews, readNews, readSpecificNews)
 import DatabaseQueries.Picture (parsePicturesLinks)
 import Network.HTTP.Types (hContentType, status200, status400, status404)
 import Network.Wai
@@ -34,15 +34,19 @@ editNews :: Request -> ReaderT Environment IO (Response)
 editNews request = do
     conn <- asks dbConnection
     rawJSON <- lift $ getRequestBodyChunk request
-    let decodedReq = decodeStrict rawJSON :: Maybe API.EditNewsRequest
-    case decodedReq of 
-        Nothing -> do
-            lift $ putStrLn "Invalid JSON"
-            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
-        Just editedNews -> do
-            lift . putStrLn . show $ rawJSON
-            lift $ rewriteNews conn editedNews
-            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
+    eiClientsUser <- lift $ authorization conn request
+    case eiClientsUser of
+        Left err -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "404 : Not Found"
+        Right clientsUser -> do
+            let decodedReq = decodeStrict rawJSON :: Maybe API.EditNewsRequest
+            case decodedReq of 
+                Nothing -> do
+                    lift $ putStrLn "Invalid JSON" -- log
+                    return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
+                Just editedNews -> do
+                    currNews <- lift $ readSpecificNews conn (API.newsID editedNews) (DBType.userID clientsUser)
+                    lift $ rewriteNews conn currNews editedNews
+                    return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
 
 createNews :: Request -> ReaderT Environment IO (Response)
 createNews req = do
