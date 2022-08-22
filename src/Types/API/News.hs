@@ -28,7 +28,7 @@ data EditNewsRequest = EditNewsRequest
       newTitle :: Maybe T.Text,
       newCategoryID :: Maybe Int,
       newTextContent :: Maybe T.Text,
-      newPictures :: Maybe Pictures
+      newPictures :: Maybe [Picture]
     } deriving Show
 
 instance FromJSON EditNewsRequest where
