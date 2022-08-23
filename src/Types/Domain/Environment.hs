@@ -4,16 +4,17 @@ import Database.PostgreSQL.Simple (Connection, ConnectInfo(..))
 import Data.Aeson.Types
 
 data Environment = Environment 
-    {   config :: Config,
-        dbConnection :: Connection
+    {   dbConnection :: Connection
     }
 
 data Config = Config
-    {   dbConnectInfo :: ConnectInfo        
+    {   serverPort :: Int,
+        dbConnectInfo :: ConnectInfo        
     }
 
 instance FromJSON Config where
     parseJSON (Object inputJSON) = do
+        serverPort <- inputJSON .: "serverPort"
         dbConnectInfo <- inputJSON .: "dbConnectInfo"
         return Config {..}
 

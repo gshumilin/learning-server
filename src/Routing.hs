@@ -8,25 +8,16 @@ import qualified Endpoints.User
 import qualified Endpoints.News
 import qualified Endpoints.Picture
 import Endpoints.Categories
-import DatabaseQueries.GetConnection (getConnection)
 import DatabaseQueries.Auth
 import Network.Wai
 import Network.HTTP.Types (hContentType, status404)
 import Network.HTTP.Types.Header
-import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as T
 import Control.Monad.Reader
-import Database.PostgreSQL.Simple (Connection)
-
-application :: Request -> (Response -> IO ResponseReceived) -> IO ResponseReceived
-application req respond = do
-    putStrLn $ "----- got request:\n" ++ (show req) ++ "\n"              --log
-    env <- parseEnvironment
-    runReaderT (routing req respond) env
 
 routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 routing req respond = do
-    conn <- asks dbConnection
+    lift . putStrLn $ "----- got request:\n" ++ (show req) ++ "\n"              --log
     case rawPathInfo req of
         "/getUsersList" -> do
             res <- Endpoints.User.getUsersList
@@ -59,12 +50,3 @@ routing req respond = do
             res <- Endpoints.Picture.putPicture req
             lift $ respond res
         _               -> error "Unknown method"
-
-parseEnvironment :: IO (Environment)
-parseEnvironment = do
-    config <- getConfig
-    conn <- getConnection
-    return (Environment config conn)
-
-getConfig :: IO (Config)
-getConfig = undefined

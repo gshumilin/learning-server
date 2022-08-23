@@ -1,6 +1,5 @@
 module DatabaseQueries.News where
 
-import DatabaseQueries.GetConnection
 import qualified Types.Domain.News as Domain
 import qualified Types.Domain.Picture as Domain
 import qualified Types.Domain.User as Domain

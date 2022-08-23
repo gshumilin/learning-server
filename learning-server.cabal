@@ -28,7 +28,6 @@ library
       Auth
       DatabaseQueries.Auth
       DatabaseQueries.Category
-      DatabaseQueries.GetConnection
       DatabaseQueries.News
       DatabaseQueries.Picture
       DatabaseQueries.QueryCreator
