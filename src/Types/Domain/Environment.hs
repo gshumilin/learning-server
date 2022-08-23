@@ -12,6 +12,11 @@ data Config = Config
     {   dbConnectInfo :: ConnectInfo        
     }
 
+instance FromJSON Config where
+    parseJSON (Object inputJSON) = do
+        dbConnectInfo <- inputJSON .: "dbConnectInfo"
+        return Config {..}
+
 instance FromJSON ConnectInfo where
     parseJSON (Object inputJSON) = do
         connectHost <- inputJSON .: "connectHost"	 
