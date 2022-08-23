@@ -15,8 +15,8 @@ import Network.HTTP.Types.Header
 import qualified Data.Text as T
 import Control.Monad.Reader
 
-routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
-routing req respond = do
+application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
+application req respond = do
     lift . putStrLn $ "----- got request:\n" ++ (show req) ++ "\n"              --log
     case rawPathInfo req of
         "/getUsersList" -> do

@@ -1,6 +1,6 @@
 module Main where
 
-import Routing (routing)
+import Routing (application)
 import Types.Domain.Environment
 import Network.Wai.Handler.Warp (run)
 import Data.Aeson (decodeStrict)
@@ -13,8 +13,8 @@ main = do
     conf <- getConfig
     env <- buildEnvironment conf
     let port = serverPort conf
-    let appFunc = runReaderT (routing) env
-    run port appFunc
+    let app = \req respond -> runReaderT (application req respond) env
+    run port app
 
 buildEnvironment :: Config -> IO (Environment)
 buildEnvironment conf = do
