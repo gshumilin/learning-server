@@ -62,5 +62,9 @@ routing req respond = do
 
 parseEnvironment :: IO (Environment)
 parseEnvironment = do
+    config <- getConfig
     conn <- getConnection
-    return (Environment conn)
+    return (Environment config conn)
+
+getConfig :: IO (Config)
+getConfig = undefined
