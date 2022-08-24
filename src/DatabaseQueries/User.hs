@@ -27,7 +27,6 @@ findUser conn userID = do
 findUserIdByLogin :: Connection -> BS.ByteString -> IO (Maybe BS.ByteString)
 findUserIdByLogin conn login = do
     res <- query conn "SELECT id FROM users WHERE login = ?" $ Only login
-    putStrLn $ "----- got this from db wher parse UserId: \"" ++ (show res) ++ "\"\n" --log
     case res of 
         [] -> return Nothing
         (x:xs) -> return $ Just (BS.pack . show $ ( x:: Int))

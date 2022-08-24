@@ -1,5 +1,7 @@
 module Endpoints.Picture where
 
+import Types.Domain.Log
+import Log (addLog)
 import Types.Domain.Environment
 import Types.Domain.Picture
 import Control.Monad.Reader
@@ -33,7 +35,7 @@ getPicture req = do
                 Just pic@Picture {..} -> do
                     case decodeBase64 . BS.pack . T.unpack $ picData of
                         Left err -> do
-                            lift . putStrLn $ "-----data decoding error: " ++ show err --log
+                            addLog WARNING $ "-----data decoding error: " ++ show err
                             return $ responseLBS status404 [(hContentType, "text/plain")] $ "Not Found 404"
                         Right decodedPic -> return $ responseLBS status200 [(hContentType, (T.encodeUtf8 mime))] . LBS.fromStrict $ decodedPic
 

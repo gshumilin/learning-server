@@ -1,6 +1,8 @@
 module Routing where
 
 import Auth
+import Log (addLog)
+import Types.Domain.Log
 import Types.Domain.User
 import Types.Database.User (isAdmin, isAbleToCreateNews)
 import Types.Domain.Environment
@@ -17,7 +19,7 @@ import Control.Monad.Reader
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 application req respond = do
-    lift . putStrLn $ "----- got request:\n" ++ (show req) ++ "\n"              --log
+    addLog DEBUG ("----- got request:\n" ++ (show req) ++ "\n")
     case rawPathInfo req of
         "/getUsersList" -> do
             res <- Endpoints.User.getUsersList

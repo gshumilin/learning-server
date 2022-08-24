@@ -1,5 +1,7 @@
 module Auth where
 
+import Types.Domain.Log
+import Log (addLog)
 import Hash (passHashBS)
 import Types.Domain.Environment
 import qualified Types.Database.User as Database
@@ -51,11 +53,11 @@ withAuth isFunc endpointFunc req = do
     auth <- lift $ authorization conn req 
     case auth of
         Left err -> do
-            lift $ putStrLn $ "----- There is authError: \"" ++ (show err) ++ "\"\n" --log
+            addLog WARNING $ "----- There is authError: \"" ++ (show err) ++ "\"\n"
             return authFailResponse
         Right user -> 
             case isFunc user of
                 False -> do
-                    lift $ putStrLn $ "----- There is authError: \"authentication fail\" \n" --log
+                    addLog WARNING $ "----- There is authError: \"authentication fail\" \n"
                     return authFailResponse
                 True -> endpointFunc req

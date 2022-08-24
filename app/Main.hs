@@ -16,7 +16,7 @@ main = do
     env <- buildEnvironment conf
     let port = serverPort conf
     let app = \req respond -> runReaderT (application req respond) env
-    runReaderT (addLog DEBUG "_____ Server started _____") env
+    runReaderT (addLog RELEASE "_____ Server started _____") env
     runReaderT (addLog DEBUG ("port = " ++ show port ++ "\n")) env
     run port app
 

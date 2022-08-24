@@ -1,5 +1,7 @@
 module Endpoints.News where
 
+import Types.Domain.Log
+import Log (addLog)
 import Auth
 import Types.Domain.User
 import Types.Domain.Environment
@@ -59,7 +61,7 @@ createNews req = do
             let apiReq = decodeStrict rawJSON :: Maybe API.CreateNewsRequest
             case apiReq of 
                 Nothing -> do
-                    lift . putStrLn $ "----- createNews returned \"Invalid JSON\"" --log
+                    addLog DEBUG $ "----- createNews returned \"Invalid JSON\""
                     return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
                 Just newNews -> do
                     lift $ writeNews conn (DBType.userID clientsUser) newNews

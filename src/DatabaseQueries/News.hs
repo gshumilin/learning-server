@@ -1,5 +1,7 @@
 module DatabaseQueries.News where
 
+import Types.Domain.Log
+import Log (addLog)
 import qualified Types.Domain.News as Domain
 import qualified Types.Domain.Picture as Domain
 import qualified Types.Domain.User as Domain
@@ -21,15 +23,16 @@ import Network.Wai
 
 readNews :: Request -> ReaderT Environment IO [Domain.News]
 readNews req = do
+    addLog DEBUG "----- Started readNews \n"
     conn <- asks dbConnection
     mbQuery <- lift $ makeReadNewsQuery conn req
     case mbQuery of 
         Nothing -> return []
         Just q -> do
             let (Query bsQ) = q
-            lift . BS.putStrLn $ "----- made this psql-request: \n\"" <> bsQ <> "\"\n" --log
+            addLog DEBUG $ show $ "----- made this psql-request: \n\"" <> bsQ <> "\"\n"
             dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DBType.News]
-            lift . putStrLn $ "----- got this psql News List: \"" ++ (show dbNews) ++ "\"\n" --log
+            addLog DEBUG $ "----- got this psql News List: \"" ++ (show dbNews) ++ "\"\n"
             res <- lift $ mapM (fromDbNews conn) dbNews
             return res
 
