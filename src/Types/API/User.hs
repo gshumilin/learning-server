@@ -1,5 +1,6 @@
 module Types.API.User where
 
+import Hash (passHashT)
 import Data.Time (Day)
 import qualified Data.Text as T
 import Data.Aeson
@@ -17,7 +18,8 @@ instance FromJSON CreateUserRequest where
     parseJSON (Object inputJSON) = do
         reqName <- inputJSON .: "name"
         reqLogin <- inputJSON .: "login"
-        reqPassword <- inputJSON .: "password"
+        reqPasswordUnhashed <- inputJSON .: "password"
+        let reqPassword = passHashT reqPasswordUnhashed 
         reqIsAdmin <- inputJSON .: "isAdmin"
         reqIsAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
         return $ CreateUserRequest {..}

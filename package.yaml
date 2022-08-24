@@ -32,6 +32,7 @@ dependencies:
 - postgresql-simple
 - mtl
 - base64
+- cryptonite
 
 default-extensions:
 - OverloadedStrings

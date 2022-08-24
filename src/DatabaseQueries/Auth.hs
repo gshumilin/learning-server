@@ -19,6 +19,7 @@ instance FromRow Int where
 authentication :: Connection -> (BS.ByteString, BS.ByteString) -> IO (Either T.Text Database.User)
 authentication conn (login, password) = do
     let q = "SELECT * FROM users WHERE login = ? AND password = ?"
+    putStrLn $ show login ++ " = " ++ show password
     mbRes <- query conn q (login :: BS.ByteString, password :: BS.ByteString)
     case mbRes of
         [] -> return (Left "Authentication fail")

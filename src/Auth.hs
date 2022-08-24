@@ -1,5 +1,6 @@
 module Auth where
 
+import Hash (passHashBS)
 import Types.Domain.Environment
 import qualified Types.Database.User as Database
 import DatabaseQueries.Auth (authentication)
@@ -36,7 +37,10 @@ findAuthKey req =
 decodeAuthKey :: BS.ByteString -> Either T.Text (BS.ByteString, BS.ByteString)
 decodeAuthKey base64code = makeAuthTuple <$> decodeBase64 base64code
     where 
-        makeAuthTuple decodedInfo = (BS.takeWhile (/=':') decodedInfo, BS.tail $ BS.dropWhile (/= ':') decodedInfo)
+        makeAuthTuple decodedInfo = 
+            (   BS.takeWhile (/=':') decodedInfo
+            ,   passHashBS . BS.tail $ BS.dropWhile (/= ':') decodedInfo
+            )
 
 withAuth :: (Database.User -> Bool)
             -> (Request -> ReaderT Environment IO Response) 

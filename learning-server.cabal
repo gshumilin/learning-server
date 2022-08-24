@@ -36,6 +36,7 @@ library
       Endpoints.News
       Endpoints.Picture
       Endpoints.User
+      Hash
       Routing
       Types.API.Category
       Types.API.News
@@ -62,6 +63,7 @@ library
     , base >=4.7 && <5
     , base64
     , bytestring
+    , cryptonite
     , http-types
     , mtl
     , postgresql-simple
@@ -88,6 +90,7 @@ executable learning-server-exe
     , base >=4.7 && <5
     , base64
     , bytestring
+    , cryptonite
     , http-types
     , learning-server
     , mtl
@@ -116,6 +119,7 @@ test-suite learning-server-test
     , base >=4.7 && <5
     , base64
     , bytestring
+    , cryptonite
     , http-types
     , learning-server
     , mtl
