@@ -37,6 +37,7 @@ library
       Endpoints.Picture
       Endpoints.User
       Hash
+      Log
       Routing
       Types.API.Category
       Types.API.News
@@ -46,6 +47,7 @@ library
       Types.Database.User
       Types.Domain.Category
       Types.Domain.Environment
+      Types.Domain.Log
       Types.Domain.News
       Types.Domain.Picture
       Types.Domain.User

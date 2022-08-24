@@ -17,9 +17,9 @@ main = do
     run port app
 
 buildEnvironment :: Config -> IO (Environment)
-buildEnvironment conf = do
-    conn <- connect . dbConnectInfo $ conf
-    return $ Environment conn
+buildEnvironment Config {..} = do
+    conn <- connect dbConnectInfo
+    return $ Environment conn logLvl
 
 getConfig :: IO (Config)
 getConfig = do
