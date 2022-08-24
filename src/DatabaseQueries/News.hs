@@ -30,7 +30,7 @@ readNews req = do
         Nothing -> return []
         Just q -> do
             let (Query bsQ) = q
-            addLog DEBUG $ show $ "----- made this psql-request: \n\"" <> bsQ <> "\"\n"
+            addLog DEBUG $ "----- made this psql-request: \n\"" ++ BS.unpack bsQ ++ "\"\n"
             dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DBType.News]
             addLog DEBUG $ "----- got this psql News List: \"" ++ (show dbNews) ++ "\"\n"
             res <- lift $ mapM (fromDbNews conn) dbNews
