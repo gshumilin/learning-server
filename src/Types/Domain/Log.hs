@@ -4,9 +4,9 @@ import qualified Data.Text as T
 import Data.Aeson.Types
 import Data.Text (toUpper)
 
--- DEBUG — логирование всех событий при отладке.
--- WARNING — логирование ошибок и предупреждений.
--- RELEASE — логироване только тотальных ошибок (например "нет связи с базой данных")
+-- DEBUG    — логирование всех событий при отладке.
+-- WARNING  — логирование ошибок и предупреждений.
+-- RELEASE  — логироване только тотальных ошибок (например "нет связи с базой данных")
 
 data LogInfo = LogInfo
     {   logLvl :: LogLvl,

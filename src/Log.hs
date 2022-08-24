@@ -7,7 +7,9 @@ import Data.Text.Encoding as T
 import Control.Monad.Reader
 
 addLog :: LogLvl ->  String -> ReaderT Environment IO ()
-addLog logLvl log = do
+addLog lvl log = do
     LogInfo {..} <- asks logInfo
     lift $ putStrLn log
-    lift $ appendFile (T.unpack logPath) (log ++ "\n") 
+    if lvl >= logLvl
+        then lift $ appendFile (T.unpack logPath) (log ++ "\n") 
+        else return ()
