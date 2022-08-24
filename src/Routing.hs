@@ -20,9 +20,10 @@ import Control.Monad.Reader
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 application req respond = do
     addLog DEBUG ("----- got request:\n" ++ (show req) ++ "\n")
+    addLog DEBUG ("----- method :\n" ++ (show (rawPathInfo req)) ++ "\n")
     case rawPathInfo req of
-        "/getUsersList" -> do
-            res <- Endpoints.User.getUsersList
+        "/getUsers" -> do
+            res <- Endpoints.User.getUsers
             lift $ respond res
         "/createUser"   -> do
             res <- withAuth isAdmin Endpoints.User.createUser req

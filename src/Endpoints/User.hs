@@ -3,7 +3,7 @@ module Endpoints.User where
 import Types.Domain.User
 import Types.Domain.Environment
 import Types.API.User
-import DatabaseQueries.User (parseUsersList, writeUser)
+import DatabaseQueries.User (readUsers, writeUser)
 import Data.Time
 import Data.Time.Calendar
 import Data.Time.Clock
@@ -13,10 +13,10 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Control.Monad.Reader
 
-getUsersList :: ReaderT Environment IO (Response)
-getUsersList = do
+getUsers :: ReaderT Environment IO (Response)
+getUsers = do
     conn <- asks dbConnection
-    usersList <- lift $ parseUsersList conn
+    usersList <- lift $ readUsers conn
     let jsonUsersList = encodePretty (UsersList usersList)
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonUsersList
 
