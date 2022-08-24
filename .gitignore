@@ -2,4 +2,5 @@
 .testing-curl-commands/
 .postgreSQL-commands.txt
 config.json
+logFile.txt
 *~

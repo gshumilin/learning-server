@@ -1,25 +1,25 @@
 module Types.Domain.Environment where
 
-import Types.Domain.Log (LogLvl(..))
+import Types.Domain.Log
 import Database.PostgreSQL.Simple (Connection, ConnectInfo(..))
 import Data.Aeson.Types
 
 data Environment = Environment 
     {   dbConnection :: Connection,
-        logLvl :: LogLvl
+        logInfo :: LogInfo
     }
 
 data Config = Config
     {   serverPort :: Int,
         dbConnectInfo :: ConnectInfo,
-        logLvl :: LogLvl 
+        logInfo :: LogInfo 
     }
 
 instance FromJSON Config where
     parseJSON (Object inputJSON) = do
         serverPort <- inputJSON .: "serverPort"
         dbConnectInfo <- inputJSON .: "dbConnectInfo"
-        logLvl <- inputJSON .: "logLvl"
+        logInfo <- inputJSON .: "logInfo"
         return Config {..}
 
 instance FromJSON ConnectInfo where

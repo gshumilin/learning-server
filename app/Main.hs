@@ -19,7 +19,7 @@ main = do
 buildEnvironment :: Config -> IO (Environment)
 buildEnvironment Config {..} = do
     conn <- connect dbConnectInfo
-    return $ Environment conn logLvl
+    return $ Environment conn logInfo
 
 getConfig :: IO (Config)
 getConfig = do
