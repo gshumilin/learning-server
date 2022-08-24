@@ -10,6 +10,7 @@ import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Internal as LBS
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as T 
+import qualified Data.Text.Encoding as T (encodeUtf8)
 import Data.ByteString.Base64 (decodeBase64)
 import Text.Read (readMaybe)
 import Data.List (find)
@@ -29,12 +30,12 @@ getPicture req = do
             mbPic <- lift $ readPicture conn picId
             case mbPic of
                 Nothing -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "Not Found 404"
-                Just Picture {..} -> do
+                Just pic@Picture {..} -> do
                     case decodeBase64 . BS.pack . T.unpack $ picData of
                         Left err -> do
                             lift . putStrLn $ "-----data decoding error: " ++ show err --log
                             return $ responseLBS status404 [(hContentType, "text/plain")] $ "Not Found 404"
-                        Right decodedPic -> return $ responseLBS status200 [(hContentType, "image/png")] . LBS.fromStrict $ decodedPic
+                        Right decodedPic -> return $ responseLBS status200 [(hContentType, (T.encodeUtf8 mime))] . LBS.fromStrict $ decodedPic
 
 findPicId :: Request -> Either LBS.ByteString Int
 findPicId req = 

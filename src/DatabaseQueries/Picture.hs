@@ -21,7 +21,7 @@ parsePicturesLinks conn newsID = do
 
 readPicture :: Connection -> Int -> IO (Maybe Picture)
 readPicture conn pictureID = do
-    let q = "SELECT data FROM pictures WHERE id = ?"
+    let q = "SELECT data, mime FROM pictures WHERE id = ?"
     res <- query conn q $ Only pictureID
     case res of
         [] -> return Nothing
