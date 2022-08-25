@@ -1,2 +1,2 @@
 INSERT INTO "users" ("name", "login", "password", "create_date", "is_admin", "is_able_to_create_news") VALUES
-('admin', 'admin', 'pleasedonthackme', CURRENT_TIMESTAMP, True, True);
+('admin', 'admin', '1aa66b393b8ab47d2489de43016f5f39ca8c2412737c6cdc5f7bc33de2f6dbed', CURRENT_TIMESTAMP, True, True);
