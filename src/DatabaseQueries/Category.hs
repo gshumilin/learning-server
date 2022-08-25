@@ -36,6 +36,7 @@ rewriteCategory conn API.EditCategoryRequest {..} = do
         execTitle (Just t) = execute conn "UPDATE categories SET title = ? WHERE id = ?" (newTitle, categoryID)
         execTitle Nothing = pure (0)
 
+        execParent (Just 0) = execute conn "UPDATE categories SET parent_category_id = NULL WHERE id = ?" (Only categoryID)
         execParent (Just parID) = execute conn "UPDATE categories SET parent_category_id = ? WHERE id = ?" (parID, categoryID)
         execParent Nothing = pure (0) 
 

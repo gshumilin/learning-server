@@ -24,9 +24,9 @@ instance FromJSON Config where
 
 instance FromJSON ConnectInfo where
     parseJSON (Object inputJSON) = do
-        connectHost <- inputJSON .: "connectHost"	 
-        connectPort <- inputJSON .: "connectPort"	 
-        connectUser <- inputJSON .: "connectUser"	 
-        connectPassword <- inputJSON .: "connectPassword"	 
-        connectDatabase <- inputJSON .: "connectDatabase"	 
+        connectHost <- inputJSON .: "connectHost"
+        connectPort <- inputJSON .: "connectPort"
+        connectUser <- inputJSON .: "connectUser"
+        connectPassword <- inputJSON .: "connectPassword"
+        connectDatabase <- inputJSON .: "connectDatabase"
         return ConnectInfo {..}

@@ -28,7 +28,7 @@ data News = News
       picturesLinks :: Maybe [T.Text],
       isPublished :: Bool,
       numbersOfPictures :: Int
-    }
+    } deriving Show
 
 instance FromJSON News where
     parseJSON (Object inputJSON) = do
