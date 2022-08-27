@@ -1,6 +1,7 @@
 module Routing where
 
 import Auth
+import Utils (withAuth, withAuthAndParsedRequest, withParsedRequest)
 import Log (addLog)
 import Types.Domain.Log
 import Types.Domain.User
@@ -10,6 +11,7 @@ import qualified Endpoints.User
 import qualified Endpoints.News
 import qualified Endpoints.Picture
 import Endpoints.Categories
+import Endpoints.EditNews (editNews)
 import DatabaseQueries.Auth
 import Network.Wai
 import Network.HTTP.Types (hContentType, status404)
@@ -35,8 +37,8 @@ application req respond = do
             res <- withAuth isAbleToCreateNews Endpoints.News.createNews req
             lift $ respond res    
         "/editNews"     -> do
-            res <- Endpoints.News.editNews req
-            lift $ respond res
+            res <- withAuthAndParsedRequest editNews req
+            lift $ respond res  
         "/getCategoriesList" -> do
             res <- Endpoints.Categories.getCategoriesList    
             lift $ respond res

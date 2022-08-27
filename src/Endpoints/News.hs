@@ -32,31 +32,13 @@ getNews req = do
     let jsonNewsList = encodePretty $ Domain.NewsList newsList
     return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonNewsList
 
-editNews :: Request -> ReaderT Environment IO (Response)
-editNews request = do
-    conn <- asks dbConnection
-    rawJSON <- lift $ getRequestBodyChunk request
-    eiClientsUser <- lift $ authorization conn request
-    case eiClientsUser of
-        Left err -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "404 : Not Found"
-        Right clientsUser -> do
-            let decodedReq = decodeStrict rawJSON :: Maybe API.EditNewsRequest
-            case decodedReq of 
-                Nothing -> do
-                    lift $ putStrLn "Invalid JSON" -- log
-                    return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
-                Just editedNews -> do
-                    currNews <- lift $ readSpecificNews conn (API.newsID editedNews) (DBType.userID clientsUser)
-                    lift $ rewriteNews conn currNews editedNews
-                    return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
-
 createNews :: Request -> ReaderT Environment IO (Response)
 createNews req = do
     conn <- asks dbConnection
     authUser <- lift $ authorization conn req
     case authUser of 
         Left err -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "404 Not Found\n"
-        Right clientsUser -> do
+        Right invoker -> do
             rawJSON <- lift $ getRequestBodyChunk req
             let apiReq = decodeStrict rawJSON :: Maybe API.CreateNewsRequest
             case apiReq of 
@@ -64,5 +46,5 @@ createNews req = do
                     addLog DEBUG $ "----- createNews returned \"Invalid JSON\""
                     return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
                 Just newNews -> do
-                    lift $ writeNews conn (DBType.userID clientsUser) newNews
+                    lift $ writeNews conn (DBType.userID invoker) newNews
                     return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"

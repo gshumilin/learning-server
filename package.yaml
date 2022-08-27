@@ -33,6 +33,7 @@ dependencies:
 - mtl
 - base64
 - cryptonite
+- hspec
 
 default-extensions:
 - OverloadedStrings

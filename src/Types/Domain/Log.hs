@@ -3,6 +3,7 @@ module Types.Domain.Log where
 import qualified Data.Text as T
 import Data.Aeson.Types
 import Data.Text (toUpper)
+import Control.Monad (mzero)
 
 -- DEBUG    — логирование всех событий при отладке.
 -- WARNING  — логирование ошибок и предупреждений.
@@ -26,4 +27,4 @@ instance FromJSON LogLvl where
         | toUpper txt == "DEBUG" = return DEBUG
         | toUpper txt == "WARNING" = return WARNING
         | toUpper txt == "RELEASE" = return RELEASE
-    --  | otherwise = ???
+        | otherwise = mzero

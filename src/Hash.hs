@@ -14,11 +14,3 @@ passHashBS :: BS.ByteString -> BS.ByteString
 passHashBS p = BS.pack . show $ hashedPass
     where 
         hashedPass = hash p :: Digest Blake2b_256
-
-
-pass :: BS.ByteString
-pass = passHashBS "admin"
-
--- 1aa66b393b8ab47d2489de43016f5f39ca8c2412737c6cdc5f7bc33de2f6dbed
--- 1aa66b393b8ab47d2489de43016f5f39ca8c2412737c6cdc5f7bc33de2f6dbed
--- 1aa66b393b8ab47d2489de43016f5f39ca8c2412737c6cdc5f7bc33de2f6dbed

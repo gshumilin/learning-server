@@ -53,11 +53,14 @@ fromDbNews conn DBType.News {..} = do
             numbersOfPictures = numbersOfPictures
         }
 
-readSpecificNews :: Connection -> Int -> Int -> IO DBType.EditedNewsFields
-readSpecificNews conn newsID creatorID = do
-    let q = "SELECT creator_id, title, category_id, text_content FROM news WHERE id=? AND creator_id=?"
-    [res] <- query conn q (newsID, creatorID) :: IO [DBType.EditedNewsFields]
-    return res 
+readSpecificNews :: Connection -> Int -> IO (Maybe DBType.EditedNewsFields)
+readSpecificNews conn newsID = do
+    let q = "SELECT creator_id, title, category_id, text_content FROM news WHERE id=?"
+    res <- query conn q (Only newsID) :: IO [DBType.EditedNewsFields]
+    case res of
+        [] -> return $ Nothing
+        [news] -> return $ Just news
+        (news:xs) -> return $ Just news
 
 writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
 writeNews conn newsCreatorID API.CreateNewsRequest {..} = do

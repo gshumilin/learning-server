@@ -33,6 +33,8 @@ library
       DatabaseQueries.QueryCreator
       DatabaseQueries.User
       Endpoints.Categories
+      Endpoints.EditNews
+      Endpoints.Handlers.EditNews
       Endpoints.News
       Endpoints.Picture
       Endpoints.User
@@ -51,6 +53,7 @@ library
       Types.Domain.News
       Types.Domain.Picture
       Types.Domain.User
+      Utils
   other-modules:
       Paths_learning_server
   hs-source-dirs:
@@ -66,6 +69,7 @@ library
     , base64
     , bytestring
     , cryptonite
+    , hspec
     , http-types
     , mtl
     , postgresql-simple
@@ -93,6 +97,7 @@ executable learning-server-exe
     , base64
     , bytestring
     , cryptonite
+    , hspec
     , http-types
     , learning-server
     , mtl
@@ -107,6 +112,7 @@ test-suite learning-server-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      EditNewsTests
       Paths_learning_server
   hs-source-dirs:
       test
@@ -122,6 +128,7 @@ test-suite learning-server-test
     , base64
     , bytestring
     , cryptonite
+    , hspec
     , http-types
     , learning-server
     , mtl

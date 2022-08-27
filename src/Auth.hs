@@ -43,21 +43,3 @@ decodeAuthKey base64code = makeAuthTuple <$> decodeBase64 base64code
             (   BS.takeWhile (/=':') decodedInfo
             ,   passHashBS . BS.tail $ BS.dropWhile (/= ':') decodedInfo
             )
-
-withAuth :: (Database.User -> Bool)
-            -> (Request -> ReaderT Environment IO Response) 
-            -> Request 
-            -> ReaderT Environment IO Response
-withAuth isFunc endpointFunc req = do
-    conn <- asks dbConnection
-    auth <- lift $ authorization conn req 
-    case auth of
-        Left err -> do
-            addLog WARNING $ "----- There is authError: \"" ++ (show err) ++ "\"\n"
-            return authFailResponse
-        Right user -> 
-            case isFunc user of
-                False -> do
-                    addLog WARNING $ "----- There is authError: \"authentication fail\" \n"
-                    return authFailResponse
-                True -> endpointFunc req
