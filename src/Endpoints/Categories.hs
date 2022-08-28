@@ -11,7 +11,7 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import DatabaseQueries.Category (parseCategoriesList, parseSpecificCategory, writeCategory, rewriteCategory)
+import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById, writeCategory, rewriteCategory)
 import Control.Monad (mapM)
 import Control.Monad.Reader
 
@@ -51,7 +51,7 @@ fromDbCategoryList (x:xs) =
 
 getSpecificCategory :: Connection -> Int -> IO Domain.Category
 getSpecificCategory conn id = do
-    categoryWithParrents <- parseSpecificCategory id conn
+    categoryWithParrents <- readCategoryWithParentsById id conn
     let domainCategory = fromDbCategoryList categoryWithParrents
     return domainCategory
 

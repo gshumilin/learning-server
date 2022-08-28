@@ -10,7 +10,8 @@ import Types.Domain.Environment
 import qualified Endpoints.User
 import qualified Endpoints.News
 import qualified Endpoints.Picture
-import Endpoints.Categories
+import Endpoints.Categories (getCategoriesList, createCategory)
+import Endpoints.EditCategory (editCategory)
 import Endpoints.EditNews (editNews)
 import DatabaseQueries.Auth
 import Network.Wai
@@ -46,7 +47,7 @@ application req respond = do
             res <- withAuth isAdmin Endpoints.Categories.createCategory req
             lift $ respond res
         "/editCategory"     -> do
-            res <- withAuth isAdmin Endpoints.Categories.editCategory req
+            res <- withAuthAndParsedRequest editCategory req
             lift $ respond res
         "/getPicture"     -> do
             res <- Endpoints.Picture.getPicture req

@@ -1,5 +1,5 @@
 .stack-work/
-.testing-curl-commands/
+.test-requests/
 .postgreSQL-commands.txt
 config.json
 logFile.txt

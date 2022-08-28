@@ -15,14 +15,14 @@ instance FromJSON CreateCategoryRequest where
         return CreateCategoryRequest {..}
 
 data EditCategoryRequest = EditCategoryRequest
-    {   categoryID :: Int,
+    {   processedCategoryID :: Int,
         newTitle :: Maybe T.Text,
         newParentCategoryID :: Maybe Int
     }
 
 instance FromJSON EditCategoryRequest where
     parseJSON (Object inputJSON) = do
-        categoryID <- inputJSON .: "categoryID"
+        processedCategoryID <- inputJSON .: "categoryID"
         newTitle <- inputJSON .:? "newTitle"
         newParentCategoryID <- inputJSON .:? "newParentCategoryID"
         return EditCategoryRequest {..}
