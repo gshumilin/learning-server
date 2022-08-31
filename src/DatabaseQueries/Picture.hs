@@ -1,9 +1,9 @@
 module DatabaseQueries.Picture where
 
-import Types.Domain.Picture
+import qualified Data.Text as T
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
-import qualified Data.Text as T
+import Types.Domain.Picture
 
 instance FromRow Int where
   fromRow = field
@@ -29,17 +29,19 @@ readPicture conn pictureID = do
 
 writePicture :: Connection -> Picture -> IO ()
 writePicture conn Picture {..} = do
-  execute conn "INSERT INTO pictures (data,mime) VALUES (?,?)" (picData,mime)
+  execute conn "INSERT INTO pictures (data,mime) VALUES (?,?)" (picData, mime)
   pure ()
 
 addPicturesToNews :: Connection -> Int -> [Picture] -> IO ()
 addPicturesToNews conn newsId picArr = do
-  mapM_ ( \Picture {..} -> do
-    let q = "INSERT INTO pictures (data,mime) values (?,?) pureING id"
-    [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
-    let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
-    execute conn q' (newsId, picID)      
-    ) picArr
+  mapM_
+    ( \Picture {..} -> do
+        let q = "INSERT INTO pictures (data,mime) values (?,?) pureING id"
+        [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
+        let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
+        execute conn q' (newsId, picID)
+    )
+    picArr
 
 deleteNewsPictures :: Connection -> Int -> IO ()
 deleteNewsPictures conn newsId = do

@@ -2,11 +2,11 @@
 
 module Endpoints.Handlers.EditCategory where
 
-import qualified Data.Text as T
 import Data.Maybe (isJust, isNothing)
+import qualified Data.Text as T
+import qualified Types.API.Category as API
 import qualified Types.Database.Category as DB
 import qualified Types.Database.User as DB
-import qualified Types.API.Category as API
 
 data EditCategoryResult = NotAdmin | CategoryNotExists | IncorrectParentId | IncorrectTitle | EditCategorySuccess deriving (Show, Eq)
 
@@ -17,27 +17,28 @@ data Handle m = Handle
   }
 
 hEditCategory :: Monad m => Handle m -> DB.User -> API.EditCategoryRequest -> m EditCategoryResult
-hEditCategory Handle {..} DB.User{..} req@API.EditCategoryRequest {..} = do
+hEditCategory Handle {..} DB.User {..} req@API.EditCategoryRequest {..} = do
   isNotExist <- isNotExistCheck processedCategoryID
   isTitleBad <- isNewTitleBadCheck newTitle
   isParentBad <- isParentBadCheck newParentCategoryID processedCategoryID
-  if | not isAdmin -> pure NotAdmin
-     | isNotExist -> pure CategoryNotExists
-     | isTitleBad -> pure IncorrectTitle
-     | isParentBad -> pure IncorrectParentId
-     | otherwise -> do 
+  if
+      | not isAdmin -> pure NotAdmin
+      | isNotExist -> pure CategoryNotExists
+      | isTitleBad -> pure IncorrectTitle
+      | isParentBad -> pure IncorrectParentId
+      | otherwise -> do
         hRewriteCategory req
         pure EditCategorySuccess
   where
     isNotExistCheck currId = do
       mbCurrCat <- hReadCategoryById currId
       pure . isNothing $ mbCurrCat
-    
+
     isNewTitleBadCheck Nothing = pure False
     isNewTitleBadCheck (Just t) = do
       mbSomeCat <- hReadCategoryByTitle t
       pure (isJust mbSomeCat)
-    
+
     isParentBadCheck Nothing _ = pure False
     isParentBadCheck (Just 0) curId = pure False
     isParentBadCheck (Just parId) curId = do

@@ -1,18 +1,18 @@
 module Endpoints.EditNews where
 
-import Endpoints.Handlers.EditNews (EditNewsResult(..), Handle (..), hEditNews)
-import DatabaseQueries.News (readSpecificNews, rewriteNews)
-import Types.Domain.Log (LogLvl(..))
-import Log (addLog)
 import Auth (authorization)
-import Types.Domain.Environment (Environment(..))
+import Control.Monad.Reader (ReaderT, asks, lift)
+import Data.Aeson (FromJSON, decodeStrict)
 import Database.PostgreSQL.Simple (Connection)
-import qualified Types.API.News as API 
+import DatabaseQueries.News (readSpecificNews, rewriteNews)
+import Endpoints.Handlers.EditNews (EditNewsResult (..), Handle (..), hEditNews)
+import Log (addLog)
+import Network.HTTP.Types (hContentType, status200, status400, status403, status404)
+import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
+import qualified Types.API.News as API
 import qualified Types.Database.User as Database
-import Network.HTTP.Types (status200, status400, status403, status404, hContentType)
-import Network.Wai (Request, Response, responseLBS, getRequestBodyChunk)
-import Data.Aeson (decodeStrict, FromJSON)
-import Control.Monad.Reader (asks, ReaderT, lift)
+import Types.Domain.Environment (Environment (..))
+import Types.Domain.Log (LogLvl (..))
 
 editNews :: Database.User -> API.EditNewsRequest -> ReaderT Environment IO Response
 editNews invoker editNewsRequest = do
@@ -22,8 +22,10 @@ editNews invoker editNewsRequest = do
     NotAuthor -> pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
     NewsNotExists -> pure $ responseLBS status404 [(hContentType, "text/plain")] "Forbidden"
     EditNewsSuccess -> pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
-  where 
+  where
     handle :: Connection -> Handle IO
-    handle conn = Handle { hReadSpecificNews = readSpecificNews conn,
-                 hRewriteNews = rewriteNews conn
-               }
+    handle conn =
+      Handle
+        { hReadSpecificNews = readSpecificNews conn,
+          hRewriteNews = rewriteNews conn
+        }

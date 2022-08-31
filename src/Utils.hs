@@ -1,58 +1,60 @@
 module Utils where
 
+import Auth (authFailResponse, authorization)
+import Control.Monad.Reader (ReaderT, asks, lift)
+import Data.Aeson (FromJSON, decodeStrict)
 import DatabaseQueries.Auth (authentication)
-import Types.Domain.Log (LogLvl(..))
 import Log (addLog)
-import Auth (authorization, authFailResponse)
-import Types.Domain.Environment (Environment(..))
-import qualified Types.API.News as API 
+import Network.HTTP.Types (hContentType, status400, status404)
+import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
+import qualified Types.API.News as API
 import qualified Types.Database.User as Database
-import Network.HTTP.Types (status400, status404, hContentType)
-import Network.Wai (Request, Response, responseLBS, getRequestBodyChunk)
-import Data.Aeson (decodeStrict, FromJSON)
-import Control.Monad.Reader (asks, ReaderT, lift)
+import Types.Domain.Environment (Environment (..))
+import Types.Domain.Log (LogLvl (..))
 
 withParsedRequest :: FromJSON a => (a -> ReaderT Environment IO Response) -> Request -> ReaderT Environment IO Response
 withParsedRequest f req = do
   rawJSON <- lift $ getRequestBodyChunk req
   let decodedReq = decodeStrict rawJSON
-  case decodedReq of 
+  case decodedReq of
     Nothing -> do
       addLog WARNING "Invalid JSON"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
     Just parsedReq -> f parsedReq
 
-withAuthAndParsedRequest :: FromJSON a 
-                         => (Database.User -> a -> ReaderT Environment IO Response) 
-                         -> Request 
-                         -> ReaderT Environment IO Response
+withAuthAndParsedRequest ::
+  FromJSON a =>
+  (Database.User -> a -> ReaderT Environment IO Response) ->
+  Request ->
+  ReaderT Environment IO Response
 withAuthAndParsedRequest f req = do
   conn <- asks dbConnection
-  eiInvoker <- lift $ authorization conn req 
+  eiInvoker <- lift $ authorization conn req
   case eiInvoker of
     Left err -> do
       addLog WARNING "Authorization fail"
       pure $ responseLBS status404 [(hContentType, "text/plain")] "404 : Not Found"
     Right invoker -> do
       rawJSON <- lift $ getRequestBodyChunk req
-      case decodeStrict rawJSON of 
+      case decodeStrict rawJSON of
         Nothing -> do
           addLog WARNING "Invalid JSON"
           pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON"
         Just parsedReq -> f invoker parsedReq
 
-withAuth :: (Database.User -> Bool)
-      -> (Request -> ReaderT Environment IO Response) 
-      -> Request 
-      -> ReaderT Environment IO Response
+withAuth ::
+  (Database.User -> Bool) ->
+  (Request -> ReaderT Environment IO Response) ->
+  Request ->
+  ReaderT Environment IO Response
 withAuth isFunc endpointFunc req = do
   conn <- asks dbConnection
-  auth <- lift $ authorization conn req 
+  auth <- lift $ authorization conn req
   case auth of
     Left err -> do
       addLog WARNING $ "----- There is authError: \"" ++ show err ++ "\"\n"
       pure authFailResponse
-    Right user -> 
+    Right user ->
       if isFunc user
         then endpointFunc req
         else do

@@ -1,17 +1,17 @@
 module Endpoints.EditCategory where
 
-import Endpoints.Handlers.EditCategory (EditCategoryResult(..), Handle (..), hEditCategory)
-import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, rewriteCategory)
-import Types.Domain.Log (LogLvl(..))
-import Log (addLog)
-import Types.Domain.Environment (Environment(..))
+import Control.Monad.Reader (ReaderT, asks, lift)
+import Data.Aeson (FromJSON, decodeStrict)
 import Database.PostgreSQL.Simple (Connection)
-import qualified Types.API.Category as API 
-import qualified Types.Database.User as DB
-import Network.HTTP.Types (status200, status400, status403, hContentType)
+import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, rewriteCategory)
+import Endpoints.Handlers.EditCategory (EditCategoryResult (..), Handle (..), hEditCategory)
+import Log (addLog)
+import Network.HTTP.Types (hContentType, status200, status400, status403)
 import Network.Wai (Response, responseLBS)
-import Data.Aeson (decodeStrict, FromJSON)
-import Control.Monad.Reader (asks, ReaderT, lift)
+import qualified Types.API.Category as API
+import qualified Types.Database.User as DB
+import Types.Domain.Environment (Environment (..))
+import Types.Domain.Log (LogLvl (..))
 
 editCategory :: DB.User -> API.EditCategoryRequest -> ReaderT Environment IO Response
 editCategory invoker editCategoryRequest = do
@@ -33,9 +33,11 @@ editCategory invoker editCategoryRequest = do
     EditCategorySuccess -> do
       addLog DEBUG "editCategory: Success"
       pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
-  where 
+  where
     handle :: Connection -> Handle IO
-    handle conn = Handle {  hReadCategoryById = readCategoryById conn,
-                hReadCategoryByTitle = readCategoryByTitle conn,
-                hRewriteCategory = rewriteCategory conn
-               }
+    handle conn =
+      Handle
+        { hReadCategoryById = readCategoryById conn,
+          hReadCategoryByTitle = readCategoryByTitle conn,
+          hRewriteCategory = rewriteCategory conn
+        }

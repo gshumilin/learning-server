@@ -1,72 +1,78 @@
 module EditCategoryTests where
 
+import Data.Functor.Identity
 import Data.Time
 import Endpoints.Handlers.EditCategory
-import qualified Types.Database.User as DB (User(..)) 
-import Types.API.Category
-import qualified Types.Database.Category as DB (Category(..))
 import Test.Hspec
-import Data.Functor.Identity
+import Types.API.Category
+import qualified Types.Database.Category as DB (Category (..))
+import qualified Types.Database.User as DB (User (..))
 
 testHandle :: Handle Identity
-testHandle = Handle
-  { hReadCategoryById = \catId -> case catId of
-      1 -> pure (Just sampleCategory1)
-      4 -> pure (Just sampleDoughterCategory)
-      42 -> pure Nothing,
-    hReadCategoryByTitle = \title -> case title of 
-      "titleIsTaken" -> pure (Just sampleCategory2)
-      _ -> pure Nothing,
-    hRewriteCategory = \_ -> pure ()
-  }
+testHandle =
+  Handle
+    { hReadCategoryById = \catId -> case catId of
+        1 -> pure (Just sampleCategory1)
+        4 -> pure (Just sampleDoughterCategory)
+        42 -> pure Nothing,
+      hReadCategoryByTitle = \title -> case title of
+        "titleIsTaken" -> pure (Just sampleCategory2)
+        _ -> pure Nothing,
+      hRewriteCategory = \_ -> pure ()
+    }
 
 sampleAdminUser :: IO DB.User
 sampleAdminUser = do
   now <- getCurrentTime
-  pure $ DB.User
-    { userID = 1,
-      name = "Name",
-      login = "login",
-      password = "password",
-      createDate = now,
-      isAdmin = True,
-      isAbleToCreateNews = True
-    }
+  pure $
+    DB.User
+      { userID = 1,
+        name = "Name",
+        login = "login",
+        password = "password",
+        createDate = now,
+        isAdmin = True,
+        isAbleToCreateNews = True
+      }
 
-sampleNotAdminUser = do 
+sampleNotAdminUser = do
   user <- sampleAdminUser
-  let res = user {DB.isAdmin=False}
+  let res = user {DB.isAdmin = False}
   pure res
 
 sampleCategory1 :: DB.Category
-sampleCategory1 = DB.Category
-  { categoryID = 1,
-    title = "title1",
-    parentID = Just 3
-  }
+sampleCategory1 =
+  DB.Category
+    { categoryID = 1,
+      title = "title1",
+      parentID = Just 3
+    }
 
 sampleCategory2 :: DB.Category
-sampleCategory2 = DB.Category
-  { categoryID = 2,
-    title = "titleIsTaken",
-    parentID = Just 3
-  }  
+sampleCategory2 =
+  DB.Category
+    { categoryID = 2,
+      title = "titleIsTaken",
+      parentID = Just 3
+    }
 
 sampleDoughterCategory :: DB.Category
-sampleDoughterCategory = DB.Category
-  { categoryID = 4,
-    title = "Doughter",
-    parentID = Just 1
-  }  
+sampleDoughterCategory =
+  DB.Category
+    { categoryID = 4,
+      title = "Doughter",
+      parentID = Just 1
+    }
 
-editCategoryRequest = EditCategoryRequest
-  { processedCategoryID = 1,
-    newTitle = Nothing ,
-    newParentCategoryID = Nothing
-  }
+editCategoryRequest =
+  EditCategoryRequest
+    { processedCategoryID = 1,
+      newTitle = Nothing,
+      newParentCategoryID = Nothing
+    }
 
 editCategoryTest :: SpecWith ()
-editCategoryTest = 
+editCategoryTest =
   describe "editCategoryTests" $ do
     it "Shouldn't edit category if user is not admin" $ do
       invoker <- sampleNotAdminUser

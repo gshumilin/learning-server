@@ -1,32 +1,32 @@
 module DatabaseQueries.News where
 
-import Types.Domain.Log
+import Control.Monad.Reader
+import qualified Data.ByteString.Char8 as BS
+import Data.Maybe (fromMaybe)
+import qualified Data.Text as T
+import Data.Time
+import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.Types
+import DatabaseQueries.Picture (addPicturesToNews, deleteNewsPictures, parsePicturesLinks)
+import DatabaseQueries.QueryCreator (makeReadNewsQuery)
+import DatabaseQueries.User (findUser)
+import Endpoints.Categories (getSpecificCategory)
 import Log (addLog)
+import Network.Wai
+import qualified Types.API.News as API
+import qualified Types.Database.News as DBType
+import Types.Domain.Environment
+import Types.Domain.Log
 import qualified Types.Domain.News as Domain
 import qualified Types.Domain.Picture as Domain
 import qualified Types.Domain.User as Domain
-import qualified Types.Database.News as DBType
-import Types.Domain.Environment
-import qualified Types.API.News as API
-import DatabaseQueries.QueryCreator (makeReadNewsQuery)
-import DatabaseQueries.Picture (parsePicturesLinks, deleteNewsPictures, addPicturesToNews)
-import DatabaseQueries.User (findUser)
-import Endpoints.Categories (getSpecificCategory)
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.Types
-import qualified Data.Text as T
-import Data.Time
-import Data.Maybe (fromMaybe)
-import Control.Monad.Reader
-import qualified Data.ByteString.Char8 as BS
-import Network.Wai
 
 readNews :: Request -> ReaderT Environment IO [Domain.News]
 readNews req = do
   addLog DEBUG "----- Started readNews \n"
   conn <- asks dbConnection
   mbQuery <- lift $ makeReadNewsQuery conn req
-  case mbQuery of 
+  case mbQuery of
     Nothing -> pure []
     Just q -> do
       let (Query bsQ) = q
@@ -36,21 +36,22 @@ readNews req = do
       lift $ mapM (fromDbNews conn) dbNews
 
 fromDbNews :: Connection -> DBType.News -> IO Domain.News
-fromDbNews conn DBType.News {..} = do 
+fromDbNews conn DBType.News {..} = do
   newsCategory <- getSpecificCategory conn categoryID
   newsCreator <- findUser conn creatorID
   newsPictures <- parsePicturesLinks conn newsID
-  pure $ Domain.News 
-    {   newsID = newsID,
-      title = title,
-      createDate = createDate,
-      creator = newsCreator,
-      category = newsCategory,
-      textContent = textContent,
-      picturesLinks = newsPictures,
-      isPublished = isPublished, 
-      numbersOfPictures = numbersOfPictures
-    }
+  pure $
+    Domain.News
+      { newsID = newsID,
+        title = title,
+        createDate = createDate,
+        creator = newsCreator,
+        category = newsCategory,
+        textContent = textContent,
+        picturesLinks = newsPictures,
+        isPublished = isPublished,
+        numbersOfPictures = numbersOfPictures
+      }
 
 readSpecificNews :: Connection -> Int -> IO (Maybe DBType.EditedNewsFields)
 readSpecificNews conn newsID = do
@@ -59,7 +60,7 @@ readSpecificNews conn newsID = do
   case res of
     [] -> pure Nothing
     [news] -> pure $ Just news
-    (news:xs) -> pure $ Just news
+    (news : xs) -> pure $ Just news
 
 writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
 writeNews conn newsCreatorID API.CreateNewsRequest {..} = do
@@ -70,24 +71,29 @@ writeNews conn newsCreatorID API.CreateNewsRequest {..} = do
   case pictures of
     Nothing -> pure ()
     Just picArr -> do
-      mapM_ ( \Domain.Picture {..} -> do
-        let q = "INSERT INTO pictures (data,mime) values (?,?) pureING id"
-        [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
-        let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
-        execute conn q' (newsId, picID)
-        ) picArr
+      mapM_
+        ( \Domain.Picture {..} -> do
+            let q = "INSERT INTO pictures (data,mime) values (?,?) pureING id"
+            [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
+            let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
+            execute conn q' (newsId, picID)
+        )
+        picArr
 
 rewriteNews :: Connection -> DBType.EditedNewsFields -> API.EditNewsRequest -> IO ()
 rewriteNews conn editedNewsFields editNewsRequest = do
   let q = "UPDATE news SET title=?, category_id=?, text_content=? WHERE id=?"
-  execute conn q ( fromMaybe (DBType.oldTitle editedNewsFields) (API.newTitle editNewsRequest),
-           fromMaybe (DBType.oldCategoryID editedNewsFields) (API.newCategoryID editNewsRequest),
-           fromMaybe (DBType.oldTextContent editedNewsFields) (API.newTextContent editNewsRequest),
-           API.newsID editNewsRequest
-           )
+  execute
+    conn
+    q
+    ( fromMaybe (DBType.oldTitle editedNewsFields) (API.newTitle editNewsRequest),
+      fromMaybe (DBType.oldCategoryID editedNewsFields) (API.newCategoryID editNewsRequest),
+      fromMaybe (DBType.oldTextContent editedNewsFields) (API.newTextContent editNewsRequest),
+      API.newsID editNewsRequest
+    )
   case API.newPictures editNewsRequest of
     Nothing -> pure ()
-    Just [] -> do 
+    Just [] -> do
       deleteNewsPictures conn (API.newsID editNewsRequest)
       pure ()
     Just picArr -> do

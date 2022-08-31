@@ -1,9 +1,9 @@
 module Types.Domain.User where
 
-import Data.Time
-import qualified Data.Text as T
 import Data.Aeson
 import Data.Aeson.Types
+import qualified Data.Text as T
+import Data.Time
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
@@ -11,10 +11,11 @@ import Database.PostgreSQL.Simple.ToField
 newtype UsersList = UsersList [User]
 
 instance ToJSON UsersList where
-    toJSON (UsersList list) = 
-        object  [ "usersList" .= list
-                ]
-                
+  toJSON (UsersList list) =
+    object
+      [ "usersList" .= list
+      ]
+
 data User = User
   { name :: T.Text,
     login :: T.Text,
@@ -22,30 +23,32 @@ data User = User
     createDate :: UTCTime,
     isAdmin :: Bool,
     isAbleToCreateNews :: Bool
-  } deriving Show
+  }
+  deriving (Show)
 
 instance FromJSON User where
-    parseJSON (Object inputJSON) = do
-        name <- inputJSON .: "name"
-        login <- inputJSON .: "login"
-        password <- inputJSON .: "password"
-        createDate <- inputJSON .: "createDate"
-        isAdmin <- inputJSON .: "isAdmin"
-        isAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
-        pure $ User {..}
+  parseJSON (Object inputJSON) = do
+    name <- inputJSON .: "name"
+    login <- inputJSON .: "login"
+    password <- inputJSON .: "password"
+    createDate <- inputJSON .: "createDate"
+    isAdmin <- inputJSON .: "isAdmin"
+    isAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
+    pure $ User {..}
 
 instance ToJSON User where
-    toJSON User {..} =
-        object  [ "name" .= name
-                , "login" .= login
-                --, "password" .= password
-                , "createDate" .= createDate
-                , "isAdmin" .= isAdmin
-                , "isAbleToCreateNews" .= isAbleToCreateNews
-                ] 
+  toJSON User {..} =
+    object
+      [ "name" .= name,
+        "login" .= login,
+        --, "password" .= password
+        "createDate" .= createDate,
+        "isAdmin" .= isAdmin,
+        "isAbleToCreateNews" .= isAbleToCreateNews
+      ]
 
 instance FromRow User where
-    fromRow = User <$> field <*> field <*> field <*> field <*> field <*> field
+  fromRow = User <$> field <*> field <*> field <*> field <*> field <*> field
 
 -- instance ToField User where
 --     toField = undefined

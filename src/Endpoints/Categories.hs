@@ -1,19 +1,19 @@
 module Endpoints.Categories where
 
-import qualified Types.Domain.Category as Domain
-import qualified Types.Database.Category as DBType
-import qualified Types.API.Category as API
-import Types.Domain.Environment
-import Database.PostgreSQL.Simple
-import Network.HTTP.Types (hContentType, status200, status400)
-import Network.Wai
+import Control.Monad (mapM)
+import Control.Monad.Reader
 import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById, writeCategory, rewriteCategory)
-import Control.Monad (mapM)
-import Control.Monad.Reader
+import Database.PostgreSQL.Simple
+import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById, rewriteCategory, writeCategory)
+import Network.HTTP.Types (hContentType, status200, status400)
+import Network.Wai
+import qualified Types.API.Category as API
+import qualified Types.Database.Category as DBType
+import qualified Types.Domain.Category as Domain
+import Types.Domain.Environment
 
 dbCategoryTransform :: Int -> ReaderT Environment IO Domain.Category
 dbCategoryTransform dbCatId = do
@@ -23,7 +23,7 @@ dbCategoryTransform dbCatId = do
   case mbDbCat of
     Nothing -> error "dbCategoryTransform didn't find dbCategory"
     Just DBType.Category {..} -> do
-      case parentID of 
+      case parentID of
         Nothing -> pure $ Domain.Category categoryID title Nothing
         Just parId -> do
           let mbDbParentCat = find (\c -> categoryID == 1) dbCategoriesList
@@ -42,7 +42,7 @@ getCategoriesList = do
   pure $ responseLBS status200 [(hContentType, "text/plain")] jsonNewsList
 
 fromDbCategoryList :: [DBType.Category] -> Domain.Category
-fromDbCategoryList (x:xs) = 
+fromDbCategoryList (x : xs) =
   case DBType.parentID x of
     Nothing -> Domain.Category (DBType.categoryID x) (DBType.title x) Nothing
     Just id -> Domain.Category (DBType.categoryID x) (DBType.title x) parentCategory
@@ -61,7 +61,7 @@ createCategory request = do
   rawJSON <- lift $ getRequestBodyChunk request
   let decodedReq = decodeStrict rawJSON :: Maybe API.CreateCategoryRequest
   case decodedReq of
-    Nothing -> do 
+    Nothing -> do
       lift $ putStrLn "Invalid JSON" -- log
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
     Just newCategory -> do
@@ -73,7 +73,7 @@ editCategory request = do
   conn <- asks dbConnection
   rawJSON <- lift $ getRequestBodyChunk request
   let decodedReq = decodeStrict rawJSON :: Maybe API.EditCategoryRequest
-  case decodedReq of 
+  case decodedReq of
     Nothing -> do
       lift $ putStrLn "Invalid JSON"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"

@@ -1,8 +1,8 @@
 module Endpoints.Handlers.EditNews where
 
+import qualified Types.API.News as API
 import qualified Types.Database.News as DBType
 import qualified Types.Database.User as DBType
-import qualified Types.API.News as API
 
 data EditNewsResult = NotAuthor | NewsNotExists | EditNewsSuccess deriving (Show, Eq)
 

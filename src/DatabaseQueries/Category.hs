@@ -1,12 +1,12 @@
 module DatabaseQueries.Category where
 
-import Types.Domain.Category
-import qualified Types.Database.Category as DBType
-import qualified Types.API.Category as API
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as T
+import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromRow
+import qualified Types.API.Category as API
+import qualified Types.Database.Category as DBType
+import Types.Domain.Category
 
 instance FromRow Int where
   fromRow = field
@@ -18,17 +18,17 @@ readCategoryById :: Connection -> Int -> IO (Maybe DBType.Category)
 readCategoryById conn catID = do
   let q = "SELECT * FROM categories WHERE id=?"
   res <- query conn q (Only catID)
-  case res of 
+  case res of
     [] -> pure Nothing
-    (c:xs) -> pure $ Just c
+    (c : xs) -> pure $ Just c
 
 readCategoryByTitle :: Connection -> T.Text -> IO (Maybe DBType.Category)
 readCategoryByTitle conn title = do
   let q = "SELECT * FROM categories WHERE title=?"
   res <- query conn q (Only title)
-  case res of 
+  case res of
     [] -> pure Nothing
-    (c:xs) -> pure $ Just c
+    (c : xs) -> pure $ Just c
 
 readCategoryWithParentsById :: Int -> Connection -> IO [DBType.Category]
 readCategoryWithParentsById id conn = do
@@ -37,8 +37,10 @@ readCategoryWithParentsById id conn = do
 
 writeCategory :: Connection -> API.CreateCategoryRequest -> IO ()
 writeCategory conn API.CreateCategoryRequest {..} = do
-  execute conn "INSERT INTO categories (title,parent_category_id) values (?,?)"
-          (title, parentCategoryID)
+  execute
+    conn
+    "INSERT INTO categories (title,parent_category_id) values (?,?)"
+    (title, parentCategoryID)
   pure ()
 
 rewriteCategory :: Connection -> API.EditCategoryRequest -> IO ()
@@ -46,7 +48,7 @@ rewriteCategory conn API.EditCategoryRequest {..} = do
   editTitle <- execTitle newTitle
   editParent <- execParent newParentCategoryID
   pure ()
-  where 
+  where
     execTitle (Just t) = execute conn "UPDATE categories SET title = ? WHERE id = ?" (t, processedCategoryID)
     execTitle Nothing = pure 0
 
@@ -57,6 +59,6 @@ rewriteCategory conn API.EditCategoryRequest {..} = do
 findCategoryIdByTitle :: Connection -> BS.ByteString -> IO (Maybe BS.ByteString)
 findCategoryIdByTitle conn title = do
   res <- query conn "SELECT id FROM categories WHERE title = ?" $ Only title
-  case res of 
+  case res of
     [] -> pure Nothing
-    (x:xs) -> pure $ Just (BS.pack . show $ ( x:: Int))
+    (x : xs) -> pure $ Just (BS.pack . show $ (x :: Int))

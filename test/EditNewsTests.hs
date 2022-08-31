@@ -1,34 +1,37 @@
 module EditNewsTests where
 
+import Data.Functor.Identity
 import Data.Time
 import Endpoints.Handlers.EditNews
-import Types.Domain.User
-import qualified Types.Database.User as DB (User(..)) 
-import Types.API.News
-import Types.Database.News (EditedNewsFields(..))
 import Test.Hspec
-import Data.Functor.Identity
+import Types.API.News
+import Types.Database.News (EditedNewsFields (..))
+import qualified Types.Database.User as DB (User (..))
+import Types.Domain.User
 
 testHandle :: Handle Identity
-testHandle = Handle
-  { hReadSpecificNews = \_ -> pure Nothing,
-    hRewriteNews = \_ _ -> pure ()
-  }
+testHandle =
+  Handle
+    { hReadSpecificNews = \_ -> pure Nothing,
+      hRewriteNews = \_ _ -> pure ()
+    }
 
 sampleUser :: IO DB.User
 sampleUser = do
   now <- getCurrentTime
-  pure $ DB.User
-    { userID = 1,
-      name = "Name",
-      login = "login",
-      password = "password",
-      createDate = now,
-      isAdmin = True,
-      isAbleToCreateNews = True
-    }
+  pure $
+    DB.User
+      { userID = 1,
+        name = "Name",
+        login = "login",
+        password = "password",
+        createDate = now,
+        isAdmin = True,
+        isAbleToCreateNews = True
+      }
 
-editNewsRequest = EditNewsRequest
+editNewsRequest =
+  EditNewsRequest
     { newsID = 1,
       newTitle = Nothing,
       newCategoryID = Nothing,
@@ -36,7 +39,8 @@ editNewsRequest = EditNewsRequest
       newPictures = Nothing
     }
 
-currNews = EditedNewsFields
+currNews =
+  EditedNewsFields
     { oldCreatorID = 1,
       oldTitle = "T.Text",
       oldCategoryID = 1,
@@ -44,7 +48,7 @@ currNews = EditedNewsFields
     }
 
 editNewsTest :: SpecWith ()
-editNewsTest = 
+editNewsTest =
   describe "editNewsTests" $ do
     it "Shouldn't edit news if post doesn't exist" $ do
       invoker <- sampleUser
