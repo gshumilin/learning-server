@@ -16,14 +16,14 @@ import Control.Monad.Reader (asks, ReaderT, lift)
 
 editNews :: Database.User -> API.EditNewsRequest -> ReaderT Environment IO Response
 editNews invoker editNewsRequest = do
-    conn <- asks dbConnection
-    res <- lift $ hEditNews (handle conn) invoker editNewsRequest
-    case res of
-        NotAuthor -> return $ responseLBS status403 [(hContentType, "text/plain")] $ "Forbidden"
-        NewsNotExists -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "Forbidden"
-        EditNewsSuccess -> return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
-    where 
-        handle :: Connection -> Handle IO
-        handle conn = Handle { hReadSpecificNews = \x -> readSpecificNews conn x,
-                               hRewriteNews = \editedNewsFields editNewsRequest -> rewriteNews conn editedNewsFields editNewsRequest
-                             }
+  conn <- asks dbConnection
+  res <- lift $ hEditNews (handle conn) invoker editNewsRequest
+  case res of
+    NotAuthor -> pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
+    NewsNotExists -> pure $ responseLBS status404 [(hContentType, "text/plain")] "Forbidden"
+    EditNewsSuccess -> pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
+  where 
+    handle :: Connection -> Handle IO
+    handle conn = Handle { hReadSpecificNews = readSpecificNews conn,
+                 hRewriteNews = rewriteNews conn
+               }

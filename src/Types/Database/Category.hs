@@ -18,4 +18,4 @@ instance FromRow Category where
         categoryID <- field
         title <- field
         parentID <- field
-        return Category {..}
+        pure Category {..}

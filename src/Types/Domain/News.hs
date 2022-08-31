@@ -11,7 +11,7 @@ import Data.Aeson.Types
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 
-data NewsList = NewsList [News]
+newtype NewsList = NewsList [News]
 
 instance ToJSON NewsList where
     toJSON (NewsList list) = 
@@ -41,7 +41,7 @@ instance FromJSON News where
         picturesLinks <- inputJSON .: "pictures"
         isPublished <- inputJSON .: "isPublished"
         numbersOfPictures <- inputJSON .: "numbersOfPictures"
-        return $ News {..}
+        pure $ News {..}
 
 instance ToJSON News where
     toJSON News {..} = 

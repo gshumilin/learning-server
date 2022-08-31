@@ -8,7 +8,7 @@ import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 
-data UsersList = UsersList [User]
+newtype UsersList = UsersList [User]
 
 instance ToJSON UsersList where
     toJSON (UsersList list) = 
@@ -32,7 +32,7 @@ instance FromJSON User where
         createDate <- inputJSON .: "createDate"
         isAdmin <- inputJSON .: "isAdmin"
         isAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
-        return $ User {..}
+        pure $ User {..}
 
 instance ToJSON User where
     toJSON User {..} =

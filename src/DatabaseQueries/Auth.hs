@@ -22,5 +22,5 @@ authentication conn (login, password) = do
     putStrLn $ show login ++ " = " ++ show password
     mbRes <- query conn q (login :: BS.ByteString, password :: BS.ByteString)
     case mbRes of
-        [] -> return (Left "Authentication fail")
-        [user] -> return (Right user)
+        [] -> pure (Left "Authentication fail")
+        [user] -> pure (Right user)

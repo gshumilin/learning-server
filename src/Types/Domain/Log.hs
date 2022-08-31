@@ -18,13 +18,13 @@ instance FromJSON LogInfo where
     parseJSON (Object inputJSON) = do
         logLvl <- inputJSON .: "logLvl"
         logPath <- inputJSON .: "logPath"
-        return LogInfo {..} 
+        pure LogInfo {..} 
 
 data LogLvl = DEBUG | WARNING | RELEASE deriving (Show, Eq, Ord)
 
 instance FromJSON LogLvl where
     parseJSON (String txt) 
-        | toUpper txt == "DEBUG" = return DEBUG
-        | toUpper txt == "WARNING" = return WARNING
-        | toUpper txt == "RELEASE" = return RELEASE
+        | toUpper txt == "DEBUG" = pure DEBUG
+        | toUpper txt == "WARNING" = pure WARNING
+        | toUpper txt == "RELEASE" = pure RELEASE
         | otherwise = mzero

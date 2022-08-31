@@ -9,45 +9,45 @@ import Database.PostgreSQL.Simple.ToField
 import Data.ByteString as BS
 import Control.Monad (mzero)
 
-data Pictures = Pictures [Picture] deriving Show
+newtype Pictures = Pictures [Picture] deriving Show
 
 instance FromJSON Pictures where 
-    parseJSON (Object inputJSON) = do
-        arr <- inputJSON .: "pictures"
-        return $ Pictures arr
-    parseJSON _ = mzero
+  parseJSON (Object inputJSON) = do
+    arr <- inputJSON .: "pictures"
+    pure $ Pictures arr
+  parseJSON _ = mzero
 
 instance ToJSON Pictures where
-    toJSON (Pictures arr) = 
-        object  [ "pictures" .= arr
-                ]
-                
+  toJSON (Pictures arr) = object  
+    [ "pictures" .= arr
+    ]
+        
 instance ToField Pictures where
-    toField = undefined
+  toField = undefined
 
 data Picture = Picture 
-    {   mime :: T.Text,
-        picData :: T.Text
-    } deriving Show
+  {   mime :: T.Text,
+    picData :: T.Text
+  } deriving Show
 
 instance FromJSON Picture where 
-    parseJSON (Object inputJSON) = do
-        picture <- inputJSON .: "image"
-        mime <- picture .: "mime"
-        picData <- picture .: "data"
-        return $ Picture mime picData
+  parseJSON (Object inputJSON) = do
+    picture <- inputJSON .: "image"
+    mime <- picture .: "mime"
+    picData <- picture .: "data"
+    pure $ Picture mime picData
 
 instance ToJSON Picture where
-    toJSON Picture {..} = 
-        object  [ "mime" .= mime
-                , "data" .= picData
-                ]
+  toJSON Picture {..} = 
+    object  [ "mime" .= mime
+        , "data" .= picData
+        ]
 
 instance FromRow Picture where
-    fromRow = do
-        picData <- field
-        mime <- field
-        return Picture {..}
+  fromRow = do
+    picData <- field
+    mime <- field
+    pure Picture {..}
 
 instance ToField Picture where
-    toField = undefined
+  toField = undefined

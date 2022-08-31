@@ -22,8 +22,8 @@ import Control.Monad.Reader
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 application req respond = do
-    addLog DEBUG ("----- got request:\n" ++ (show req) ++ "\n")
-    addLog DEBUG ("----- method : " ++ (show (rawPathInfo req)) ++ "\n")
+    addLog DEBUG ("----- got request:\n" ++ show req ++ "\n")
+    addLog DEBUG ("----- method : " ++ show (rawPathInfo req) ++ "\n")
     case rawPathInfo req of
         "/getUsers" -> do
             res <- Endpoints.User.getUsers

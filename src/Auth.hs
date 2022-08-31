@@ -15,17 +15,16 @@ import Data.List (find)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Internal as BS (packChars)
 import Data.ByteString.Base64 (decodeBase64)
-import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Control.Monad.Reader
 
 authFailResponse :: Response
-authFailResponse = responseLBS status404 [(hContentType, "text/plain")] $ "Not found"
+authFailResponse = responseLBS status404 [(hContentType, "text/plain")] "Not found"
 
 authorization :: Connection -> Request -> IO (Either T.Text Database.User)
 authorization conn req = do 
     case decodeAuthKey =<< findAuthKey req of
-        Left err -> return (Left err)
+        Left err -> pure (Left err)
         Right loginPassword -> authentication conn loginPassword
 
 findAuthKey :: Request -> Either T.Text BS.ByteString
@@ -34,7 +33,7 @@ findAuthKey req =
         Nothing -> Left "There is no authenticate header"
         Just auth -> Right auth
     where 
-        authHeader = (find (\(h,_) -> h == hAuthorization) (requestHeaders req))
+        authHeader = find (\(h,_) -> h == hAuthorization) (requestHeaders req)
 
 decodeAuthKey :: BS.ByteString -> Either T.Text (BS.ByteString, BS.ByteString)
 decodeAuthKey base64code = makeAuthTuple <$> decodeBase64 base64code

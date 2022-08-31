@@ -18,7 +18,7 @@ testHandle = Handle
 sampleUser :: IO DB.User
 sampleUser = do
   now <- getCurrentTime
-  return $ DB.User
+  pure $ DB.User
     { userID = 1,
       name = "Name",
       login = "login",
@@ -49,9 +49,9 @@ editNewsTest =
     it "Shouldn't edit news if post doesn't exist" $ do
       invoker <- sampleUser
       let result = hEditNews testHandle invoker editNewsRequest
-      result `shouldBe` return NewsNotExists
+      result `shouldBe` pure NewsNotExists
     it "Should successfully edit post" $ do
       invoker <- sampleUser
-      let successHandle = testHandle {hReadSpecificNews = \_ -> return $ Just currNews}
+      let successHandle = testHandle {hReadSpecificNews = \_ -> pure $ Just currNews}
       let result = hEditNews successHandle invoker editNewsRequest
-      result `shouldBe` return EditNewsSuccess
+      result `shouldBe` pure EditNewsSuccess

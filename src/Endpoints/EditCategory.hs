@@ -15,27 +15,27 @@ import Control.Monad.Reader (asks, ReaderT, lift)
 
 editCategory :: DB.User -> API.EditCategoryRequest -> ReaderT Environment IO Response
 editCategory invoker editCategoryRequest = do
-    conn <- asks dbConnection
-    res <- lift $ hEditCategory (handle conn) invoker editCategoryRequest
-    case res of
-        NotAdmin -> do
-            addLog DEBUG "editCategory-error: NotAdmin"
-            return $ responseLBS status403 [(hContentType, "text/plain")] $ "Forbidden"
-        CategoryNotExists -> do
-            addLog DEBUG "editCategory-error: CategoryNotExists"
-            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: There is no category with such ID"
-        IncorrectParentId -> do
-            addLog DEBUG "editCategory-error: IncorrectParentId"
-            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Incorrect Parent ID"
-        IncorrectTitle -> do
-            addLog DEBUG "editCategory-error: IncorrectTitle"
-            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Incorrect title"
-        EditCategorySuccess -> do
-            addLog DEBUG "editCategory: Success"
-            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
-    where 
-        handle :: Connection -> Handle IO
-        handle conn = Handle {  hReadCategoryById = \catId -> readCategoryById conn catId,
-                                hReadCategoryByTitle = \catTitle -> readCategoryByTitle conn catTitle,
-                                hRewriteCategory = \req -> rewriteCategory conn req
-                             }
+  conn <- asks dbConnection
+  res <- lift $ hEditCategory (handle conn) invoker editCategoryRequest
+  case res of
+    NotAdmin -> do
+      addLog DEBUG "editCategory-error: NotAdmin"
+      pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
+    CategoryNotExists -> do
+      addLog DEBUG "editCategory-error: CategoryNotExists"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such ID"
+    IncorrectParentId -> do
+      addLog DEBUG "editCategory-error: IncorrectParentId"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect Parent ID"
+    IncorrectTitle -> do
+      addLog DEBUG "editCategory-error: IncorrectTitle"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect title"
+    EditCategorySuccess -> do
+      addLog DEBUG "editCategory: Success"
+      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
+  where 
+    handle :: Connection -> Handle IO
+    handle conn = Handle {  hReadCategoryById = readCategoryById conn,
+                hReadCategoryByTitle = readCategoryByTitle conn,
+                hRewriteCategory = rewriteCategory conn
+               }

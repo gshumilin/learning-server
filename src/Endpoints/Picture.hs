@@ -23,43 +23,42 @@ import Data.Aeson (decodeStrict)
 --при запросе новостей клиент получает не картинку, а ссылку на неё в формате "localhost:3000/picture"
 --в ответ на запрос клиент получит либо текст с ошибкой "No such picture", либо раскодированную картинку.
 
-getPicture :: Request -> ReaderT Environment IO (Response)
+getPicture :: Request -> ReaderT Environment IO Response
 getPicture req = do
-    case findPicId req of
-        Left err -> return . responseLBS status400 [(hContentType, "text/plain")] $ err
-        Right picId -> do
-            conn <- asks dbConnection
-            mbPic <- lift $ readPicture conn picId
-            case mbPic of
-                Nothing -> return $ responseLBS status404 [(hContentType, "text/plain")] $ "Not Found 404"
-                Just pic@Picture {..} -> do
-                    case decodeBase64 . BS.pack . T.unpack $ picData of
-                        Left err -> do
-                            addLog WARNING $ "-----data decoding error: " ++ show err
-                            return $ responseLBS status404 [(hContentType, "text/plain")] $ "Not Found 404"
-                        Right decodedPic -> return $ responseLBS status200 [(hContentType, (T.encodeUtf8 mime))] . LBS.fromStrict $ decodedPic
+  case findPicId req of
+    Left err -> pure . responseLBS status400 [(hContentType, "text/plain")] $ err
+    Right picId -> do
+      conn <- asks dbConnection
+      mbPic <- lift $ readPicture conn picId
+      case mbPic of
+        Nothing -> pure $ responseLBS status404 [(hContentType, "text/plain")] "Not Found 404"
+        Just pic@Picture {..} -> do
+          case decodeBase64 . BS.pack . T.unpack $ picData of
+            Left err -> do
+              addLog WARNING $ "-----data decoding error: " ++ show err
+              pure $ responseLBS status404 [(hContentType, "text/plain")] "Not Found 404"
+            Right decodedPic -> pure $ responseLBS status200 [(hContentType, T.encodeUtf8 mime)] . LBS.fromStrict $ decodedPic
 
 findPicId :: Request -> Either LBS.ByteString Int
 findPicId req = 
-    case find (\(k,v) -> k == "id") $ queryString req of
-        Nothing -> Left $ "'id' parameter not specified"
-        Just (_, Nothing) -> Left $ "empty value of the 'id' parameter"
-        Just (_, Just bsPicID) -> do
-            case (readMaybe $ BS.unpack bsPicID :: Maybe Int) of
-                Nothing -> do
-                    Left $ "invalid 'id' parameter value"
-                Just picID -> Right picID     
+  case find (\(k,v) -> k == "id") $ queryString req of
+    Nothing -> Left "'id' parameter not specified"
+    Just (_, Nothing) -> Left "empty value of the 'id' parameter"
+    Just (_, Just bsPicID) -> do
+      case (readMaybe $ BS.unpack bsPicID :: Maybe Int) of
+        Nothing -> do
+          Left "invalid 'id' parameter value"
+        Just picID -> Right picID   
 
 putPicture :: Request -> ReaderT Environment IO Response
 putPicture request = do
-    conn <- asks dbConnection
-    rawJSON <- lift $ getRequestBodyChunk request
-    let decodedReq = decodeStrict rawJSON :: Maybe Picture
-    case decodedReq of
-        Nothing -> do 
-            lift $ putStrLn "Invalid JSON" -- log
-            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
-        Just newBase64 -> do
-            lift . putStrLn . show $ rawJSON
-            lift $ writePicture conn newBase64
-            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
+  conn <- asks dbConnection
+  rawJSON <- lift $ getRequestBodyChunk request
+  let decodedReq = decodeStrict rawJSON :: Maybe Picture
+  case decodedReq of
+    Nothing -> do 
+      lift $ putStrLn "Invalid JSON" -- log
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
+    Just newBase64 -> do
+      lift $ writePicture conn newBase64
+      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"

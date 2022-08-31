@@ -13,14 +13,14 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Control.Monad.Reader
 
-getUsers :: ReaderT Environment IO (Response)
+getUsers :: ReaderT Environment IO Response
 getUsers = do
     conn <- asks dbConnection
     usersList <- lift $ readUsers conn
     let jsonUsersList = encodePretty (UsersList usersList)
-    return $ responseLBS status200 [(hContentType, "text/plain")] $ jsonUsersList
+    pure $ responseLBS status200 [(hContentType, "text/plain")] jsonUsersList
 
-createUser :: Request -> ReaderT Environment IO (Response)
+createUser :: Request -> ReaderT Environment IO Response
 createUser req = do
     conn <- asks dbConnection
     rawJSON <- lift $ getRequestBodyChunk req
@@ -29,17 +29,16 @@ createUser req = do
         Nothing -> do 
             lift $ putStrLn "Invalid JSON"
             lift $ print rawJSON
-            return $ responseLBS status400 [(hContentType, "text/plain")] $ "Bad Request: Invalid JSON\n"
+            pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
         Just createUserReq -> do
-            lift . putStrLn . show $ rawJSON
             newUser <- lift $ apiUserTransform createUserReq
             lift $ writeUser conn newUser
-            return $ responseLBS status200 [(hContentType, "text/plain")] $ "all done"
+            pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
 
-apiUserTransform :: CreateUserRequest -> IO (User)
+apiUserTransform :: CreateUserRequest -> IO User
 apiUserTransform CreateUserRequest {..} = do
     currTime <- getCurrentTime
-    return $ 
+    pure $ 
         User { name = reqName,
                login = reqLogin,
                password = reqPassword,

@@ -15,10 +15,10 @@ hEditNews :: Monad m => Handle m -> DBType.User -> API.EditNewsRequest -> m Edit
 hEditNews Handle {..} invoker editNewsRequest@API.EditNewsRequest {..} = do
   mbCurrentNews <- hReadSpecificNews newsID
   case mbCurrentNews of
-    Nothing -> return NewsNotExists
+    Nothing -> pure NewsNotExists
     Just editedNewsFields@DBType.EditedNewsFields {..} -> do
       if DBType.userID invoker == oldCreatorID
         then do
           hRewriteNews editedNewsFields editNewsRequest
-          return EditNewsSuccess
-        else return NotAuthor
+          pure EditNewsSuccess
+        else pure NotAuthor

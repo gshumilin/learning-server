@@ -13,7 +13,7 @@ testHandle = Handle
   { hReadCategoryById = \catId -> case catId of
       1 -> pure (Just sampleCategory1)
       4 -> pure (Just sampleDoughterCategory)
-      42 -> pure (Nothing),
+      42 -> pure Nothing,
     hReadCategoryByTitle = \title -> case title of 
       "titleIsTaken" -> pure (Just sampleCategory2)
       _ -> pure Nothing,
@@ -23,7 +23,7 @@ testHandle = Handle
 sampleAdminUser :: IO DB.User
 sampleAdminUser = do
   now <- getCurrentTime
-  return $ DB.User
+  pure $ DB.User
     { userID = 1,
       name = "Name",
       login = "login",

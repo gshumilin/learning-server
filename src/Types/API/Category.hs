@@ -12,7 +12,7 @@ instance FromJSON CreateCategoryRequest where
     parseJSON (Object inputJSON) = do
         title <- inputJSON .: "title"
         parentCategoryID <- inputJSON .:? "parentCategoryID"
-        return CreateCategoryRequest {..}
+        pure CreateCategoryRequest {..}
 
 data EditCategoryRequest = EditCategoryRequest
     {   processedCategoryID :: Int,
@@ -25,4 +25,4 @@ instance FromJSON EditCategoryRequest where
         processedCategoryID <- inputJSON .: "categoryID"
         newTitle <- inputJSON .:? "newTitle"
         newParentCategoryID <- inputJSON .:? "newParentCategoryID"
-        return EditCategoryRequest {..}
+        pure EditCategoryRequest {..}

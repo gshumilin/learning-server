@@ -22,4 +22,4 @@ instance FromJSON CreateUserRequest where
         let reqPassword = passHashT reqPasswordUnhashed 
         reqIsAdmin <- inputJSON .: "isAdmin"
         reqIsAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
-        return $ CreateUserRequest {..}
+        pure $ CreateUserRequest {..}

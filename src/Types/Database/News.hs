@@ -11,7 +11,7 @@ import Data.Aeson.Types
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 
-data NewsList = NewsList [News]
+newtype NewsList = NewsList [News]
 
 data News = News
     { newsID :: Int,
@@ -38,7 +38,7 @@ instance FromRow News where
       textContent <- field
       isPublished <- field
       numbersOfPictures <- field
-      return News {..}
+      pure News {..}
 
 data EditedNewsFields = EditedNewsFields
     { oldCreatorID :: Int,
@@ -53,4 +53,4 @@ instance FromRow EditedNewsFields where
       oldTitle <- field
       oldCategoryID <- field
       oldTextContent <- field
-      return EditedNewsFields {..}
+      pure EditedNewsFields {..}

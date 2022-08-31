@@ -8,25 +8,23 @@ import qualified Data.ByteString.Char8 as BS
 instance FromRow Int where
     fromRow = field
 
-readUsers :: Connection -> IO [(Domain.User)]
-readUsers conn = do
-    res <- query_ conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users"
-    return res
+readUsers :: Connection -> IO [Domain.User]
+readUsers conn = query_ conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users"
     
 writeUser :: Connection -> Domain.User -> IO ()
 writeUser conn Domain.User {..} = do
     execute conn "INSERT INTO users (name,login,password,create_date,is_admin,is_able_to_create_news) values (?,?,?,?,?,?)"
                     (name, login, password, createDate, isAdmin, isAbleToCreateNews)
-    return ()
+    pure ()
 
-findUser :: Connection -> Int -> IO (Domain.User)
+findUser :: Connection -> Int -> IO Domain.User
 findUser conn userID = do
     res <- query conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users WHERE id = ?" $ Only userID
-    return $ head res
+    pure $ head res
 
 findUserIdByLogin :: Connection -> BS.ByteString -> IO (Maybe BS.ByteString)
 findUserIdByLogin conn login = do
     res <- query conn "SELECT id FROM users WHERE login = ?" $ Only login
     case res of 
-        [] -> return Nothing
-        (x:xs) -> return $ Just (BS.pack . show $ ( x:: Int))
+        [] -> pure Nothing
+        (x:xs) -> pure $ Just (BS.pack . show $ ( x:: Int))

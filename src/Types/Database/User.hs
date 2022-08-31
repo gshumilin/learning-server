@@ -8,7 +8,7 @@ import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 
-data UsersList = UsersList [User]
+newtype UsersList = UsersList [User]
 
 instance ToJSON UsersList where
     toJSON (UsersList list) = 

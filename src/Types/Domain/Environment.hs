@@ -20,7 +20,7 @@ instance FromJSON Config where
         serverPort <- inputJSON .: "serverPort"
         dbConnectInfo <- inputJSON .: "dbConnectInfo"
         logInfo <- inputJSON .: "logInfo"
-        return Config {..}
+        pure Config {..}
 
 instance FromJSON ConnectInfo where
     parseJSON (Object inputJSON) = do
@@ -29,4 +29,4 @@ instance FromJSON ConnectInfo where
         connectUser <- inputJSON .: "connectUser"
         connectPassword <- inputJSON .: "connectPassword"
         connectDatabase <- inputJSON .: "connectDatabase"
-        return ConnectInfo {..}
+        pure ConnectInfo {..}
