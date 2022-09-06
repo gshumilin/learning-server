@@ -1,14 +1,10 @@
 module Types.Domain.News where
 
+import Control.Monad (mzero)
 import Data.Aeson
-import Data.Aeson.Types
 import qualified Data.Text as T
 import Data.Time.Clock
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
-import qualified Types.Database.Category as DBType
-import Types.Domain.Category
-import Types.Domain.Picture
+import qualified Types.Domain.Category as Domain
 import Types.Domain.User
 
 newtype NewsList = NewsList [News]
@@ -24,7 +20,7 @@ data News = News
     title :: T.Text,
     createDate :: UTCTime,
     creator :: User,
-    category :: Category,
+    category :: Domain.Category,
     textContent :: T.Text,
     picturesLinks :: Maybe [T.Text],
     isPublished :: Bool,
@@ -44,6 +40,7 @@ instance FromJSON News where
     isPublished <- inputJSON .: "isPublished"
     numbersOfPictures <- inputJSON .: "numbersOfPictures"
     pure $ News {..}
+  parseJSON _ = mzero
 
 instance ToJSON News where
   toJSON News {..} =

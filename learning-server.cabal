@@ -64,6 +64,7 @@ library
       OverloadedStrings
       RecordWildCards
       DuplicateRecordFields
+  ghc-options: -Wall -Werror
   build-depends:
       aeson
     , aeson-pretty
@@ -91,7 +92,7 @@ executable learning-server-exe
       OverloadedStrings
       RecordWildCards
       DuplicateRecordFields
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
   build-depends:
       aeson
     , aeson-pretty

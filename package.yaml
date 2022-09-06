@@ -42,7 +42,9 @@ default-extensions:
 
 library:
   source-dirs: src
-
+  ghc-options:
+  - -Wall
+  - -Werror
 executables:
   learning-server-exe:
     main:                Main.hs
@@ -51,6 +53,8 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Werror
     dependencies:
     - learning-server
 
