@@ -3,12 +3,10 @@ module Utils where
 import Auth (authFailResponse, authorization)
 import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson (FromJSON, decodeStrict)
-import DatabaseQueries.Auth (authentication)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
 import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
-import qualified Types.API.News as API
-import qualified Types.Database.User as Database
+import qualified Types.DB.User as DB
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 
@@ -24,14 +22,14 @@ withParsedRequest f req = do
 
 withAuthAndParsedRequest ::
   FromJSON a =>
-  (Database.User -> a -> ReaderT Environment IO Response) ->
+  (DB.User -> a -> ReaderT Environment IO Response) ->
   Request ->
   ReaderT Environment IO Response
 withAuthAndParsedRequest f req = do
   conn <- asks dbConnection
   eiInvoker <- lift $ authorization conn req
   case eiInvoker of
-    Left err -> do
+    Left _ -> do
       addLog WARNING "Authorization fail"
       pure $ responseLBS status404 [(hContentType, "text/plain")] "404 : Not Found"
     Right invoker -> do
@@ -43,7 +41,7 @@ withAuthAndParsedRequest f req = do
         Just parsedReq -> f invoker parsedReq
 
 withAuth ::
-  (Database.User -> Bool) ->
+  (DB.User -> Bool) ->
   (Request -> ReaderT Environment IO Response) ->
   Request ->
   ReaderT Environment IO Response

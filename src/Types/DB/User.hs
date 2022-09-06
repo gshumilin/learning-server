@@ -1,12 +1,10 @@
-module Types.Database.User where
+module Types.DB.User where
 
 import Data.Aeson
-import Data.Aeson.Types
 import qualified Data.Text as T
 import Data.Time
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.ToField
 
 newtype UsersList = UsersList [User]
 

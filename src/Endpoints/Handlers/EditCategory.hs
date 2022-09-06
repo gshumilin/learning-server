@@ -5,8 +5,8 @@ module Endpoints.Handlers.EditCategory where
 import Data.Maybe (isJust, isNothing)
 import qualified Data.Text as T
 import qualified Types.API.Category as API
-import qualified Types.Database.Category as DB
-import qualified Types.Database.User as DB
+import qualified Types.DB.Category as DB
+import qualified Types.DB.User as DB
 
 data EditCategoryResult = NotAdmin | CategoryNotExists | IncorrectParentId | IncorrectTitle | EditCategorySuccess deriving (Show, Eq)
 
@@ -40,7 +40,7 @@ hEditCategory Handle {..} DB.User {..} req@API.EditCategoryRequest {..} = do
       pure (isJust mbSomeCat)
 
     isParentBadCheck Nothing _ = pure False
-    isParentBadCheck (Just 0) curId = pure False
+    isParentBadCheck (Just 0) _ = pure False
     isParentBadCheck (Just parId) curId = do
       if parId == curId
         then pure True

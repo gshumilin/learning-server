@@ -1,9 +1,6 @@
 module Routing where
 
--- import Auth
 import Control.Monad.Reader
--- import qualified Data.Text as T
--- import DatabaseQueries.Auth
 import Endpoints.Categories (createCategory, getCategoriesList)
 import Endpoints.EditCategory (editCategory)
 import Endpoints.EditNews (editNews)
@@ -11,13 +8,10 @@ import qualified Endpoints.News
 import qualified Endpoints.Picture
 import qualified Endpoints.User
 import Log (addLog)
--- import Network.HTTP.Types (hContentType, status404)
--- import Network.HTTP.Types.Header
 import Network.Wai
-import Types.Database.User (isAbleToCreateNews, isAdmin)
+import Types.DB.User (isAbleToCreateNews, isAdmin)
 import Types.Domain.Environment
 import Types.Domain.Log
--- import Types.Domain.User
 import Utils (withAuth, withAuthAndParsedRequest)
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived

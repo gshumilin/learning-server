@@ -20,7 +20,7 @@ data News = News
     title :: T.Text,
     createDate :: UTCTime,
     creator :: User,
-    category :: Domain.Category,
+    category :: Maybe Domain.Category,
     textContent :: T.Text,
     picturesLinks :: Maybe [T.Text],
     isPublished :: Bool,

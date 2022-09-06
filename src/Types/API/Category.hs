@@ -1,6 +1,7 @@
 module Types.API.Category where
 
-import Data.Aeson
+import Control.Monad (mzero)
+import Data.Aeson (FromJSON, Value (..), parseJSON, (.:), (.:?))
 import qualified Data.Text as T
 
 data CreateCategoryRequest = CreateCategoryRequest
@@ -13,6 +14,7 @@ instance FromJSON CreateCategoryRequest where
     title <- inputJSON .: "title"
     parentCategoryID <- inputJSON .:? "parentCategoryID"
     pure CreateCategoryRequest {..}
+  parseJSON _ = mzero
 
 data EditCategoryRequest = EditCategoryRequest
   { processedCategoryID :: Int,
@@ -26,3 +28,4 @@ instance FromJSON EditCategoryRequest where
     newTitle <- inputJSON .:? "newTitle"
     newParentCategoryID <- inputJSON .:? "newParentCategoryID"
     pure EditCategoryRequest {..}
+  parseJSON _ = mzero

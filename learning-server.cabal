@@ -46,9 +46,9 @@ library
       Types.API.Category
       Types.API.News
       Types.API.User
-      Types.Database.Category
-      Types.Database.News
-      Types.Database.User
+      Types.DB.Category
+      Types.DB.News
+      Types.DB.User
       Types.Domain.Category
       Types.Domain.Environment
       Types.Domain.Log

@@ -1,18 +1,18 @@
 module Endpoints.News where
 
-import Auth
-import Control.Monad.Reader
-import Data.Aeson
+import Auth (authorization)
+import Control.Monad.Reader (ReaderT, asks, lift)
+import Data.Aeson (decodeStrict)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import DatabaseQueries.News (readNews, writeNews)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status200, status400, status404)
-import Network.Wai
-import qualified Types.API.News as API
-import qualified Types.Database.User as DBType
-import Types.Domain.Environment
-import Types.Domain.Log
-import qualified Types.Domain.News as Domain
+import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
+import qualified Types.API.News as API (CreateNewsRequest (..))
+import qualified Types.DB.User as DB (User (..))
+import Types.Domain.Environment (Environment (..))
+import Types.Domain.Log (LogLvl (..))
+import qualified Types.Domain.News as Domain (NewsList (..))
 
 getNews :: Request -> ReaderT Environment IO Response
 getNews req = do
@@ -34,5 +34,5 @@ createNews req = do
           addLog DEBUG "----- createNews pureed \"Invalid JSON\""
           pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
         Just newNews -> do
-          lift $ writeNews conn (DBType.userID invoker) newNews
+          lift $ writeNews conn (DB.userID invoker) newNews
           pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"

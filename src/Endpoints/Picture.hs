@@ -1,27 +1,21 @@
 module Endpoints.Picture where
 
-import Control.Monad.Reader
+import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson (decodeStrict)
 import Data.ByteString.Base64 (decodeBase64)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Lazy.Internal as LBS
 import Data.List (find)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T (encodeUtf8)
 import DatabaseQueries.Picture (readPicture, writePicture)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status200, status400, status404)
-import Network.Wai
+import Network.Wai (Request, Response, getRequestBodyChunk, queryString, responseLBS)
 import Text.Read (readMaybe)
-import Types.Domain.Environment
-import Types.Domain.Log
-import Types.Domain.Picture
-
---подразумевается, что все картинки передаются в формате png
---параметр запроса картинки - айдишник картинки
---при запросе новостей клиент получает не картинку, а ссылку на неё в формате "localhost:3000/picture"
---в ответ на запрос клиент получит либо текст с ошибкой "No such picture", либо раскодированную картинку.
+import Types.Domain.Environment (Environment (..))
+import Types.Domain.Log (LogLvl (..))
+import qualified Types.Domain.Picture as Domain (Picture (..))
 
 getPicture :: Request -> ReaderT Environment IO Response
 getPicture req = do
@@ -32,7 +26,7 @@ getPicture req = do
       mbPic <- lift $ readPicture conn picId
       case mbPic of
         Nothing -> pure $ responseLBS status404 [(hContentType, "text/plain")] "Not Found 404"
-        Just pic@Picture {..} -> do
+        Just Domain.Picture {..} -> do
           case decodeBase64 . BS.pack . T.unpack $ picData of
             Left err -> do
               addLog WARNING $ "-----data decoding error: " ++ show err
@@ -41,7 +35,7 @@ getPicture req = do
 
 findPicId :: Request -> Either LBS.ByteString Int
 findPicId req =
-  case find (\(k, v) -> k == "id") $ queryString req of
+  case find (\(k, _) -> k == "id") $ queryString req of
     Nothing -> Left "'id' parameter not specified"
     Just (_, Nothing) -> Left "empty value of the 'id' parameter"
     Just (_, Just bsPicID) -> do
@@ -54,10 +48,10 @@ putPicture :: Request -> ReaderT Environment IO Response
 putPicture request = do
   conn <- asks dbConnection
   rawJSON <- lift $ getRequestBodyChunk request
-  let decodedReq = decodeStrict rawJSON :: Maybe Picture
+  let decodedReq = decodeStrict rawJSON :: Maybe Domain.Picture
   case decodedReq of
     Nothing -> do
-      lift $ putStrLn "Invalid JSON" -- log
+      addLog WARNING "Invalid JSON"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
     Just newBase64 -> do
       lift $ writePicture conn newBase64

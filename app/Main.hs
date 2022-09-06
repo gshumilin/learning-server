@@ -1,14 +1,14 @@
 module Main where
 
-import Control.Monad.Reader
+import Control.Monad.Reader (runReaderT)
 import Data.Aeson (decodeStrict)
 import qualified Data.ByteString.Char8 as BS
-import Database.PostgreSQL.Simple (connect)
+import Database.PostgreSQL.Simple (ConnectInfo (..), connect)
 import Log (addLog)
 import Network.Wai.Handler.Warp (run)
 import Routing (application)
-import Types.Domain.Environment
-import Types.Domain.Log
+import Types.Domain.Environment (Config (..), DbConnectInfo (..), Environment (..))
+import Types.Domain.Log (LogLvl (..))
 
 main :: IO ()
 main = do
@@ -22,7 +22,9 @@ main = do
 
 buildEnvironment :: Config -> IO Environment
 buildEnvironment Config {..} = do
-  conn <- connect dbConnectInfo
+  let DbConnectInfo {..} = dbConnectInfo
+  let connectInfo = ConnectInfo dbConnectHost dbConnectPort dbConnectUser dbConnectPassword dbConnectDatabase
+  conn <- connect connectInfo
   pure $ Environment conn logInfo
 
 getConfig :: IO Config

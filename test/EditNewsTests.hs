@@ -5,8 +5,8 @@ import Data.Time
 import Endpoints.Handlers.EditNews
 import Test.Hspec
 import Types.API.News
-import Types.Database.News (EditedNewsFields (..))
-import qualified Types.Database.User as DB (User (..))
+import Types.DB.News (EditedNewsFields (..))
+import qualified Types.DB.User as DB (User (..))
 import Types.Domain.User
 
 testHandle :: Handle Identity

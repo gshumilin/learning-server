@@ -1,15 +1,9 @@
-module Types.Database.News where
+module Types.DB.News where
 
-import Data.Aeson
-import Data.Aeson.Types
 import qualified Data.Text as T
 import Data.Time.Clock
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
-import qualified Types.Database.Category as DBType
-import Types.Domain.Category
-import Types.Domain.Picture
-import Types.Domain.User
 
 newtype NewsList = NewsList [News]
 

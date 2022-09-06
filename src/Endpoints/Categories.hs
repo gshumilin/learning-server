@@ -1,17 +1,15 @@
 module Endpoints.Categories where
 
-import Control.Monad (mapM)
-import Control.Monad.Reader
-import Data.Aeson
+import Control.Monad.Reader (ReaderT, asks, lift)
+import Data.Aeson (decodeStrict)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
-import Data.Maybe (fromMaybe)
-import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById, rewriteCategory, writeCategory)
 import Network.HTTP.Types (hContentType, status200, status400)
-import Network.Wai
+import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
 import qualified Types.API.Category as API
-import qualified Types.Database.Category as DBType
+import qualified Types.DB.Category as DBType
 import qualified Types.Domain.Category as Domain
 import Types.Domain.Environment
 
@@ -25,8 +23,8 @@ dbCategoryTransform dbCatId = do
     Just DBType.Category {..} -> do
       case parentID of
         Nothing -> pure $ Domain.Category categoryID title Nothing
-        Just parId -> do
-          let mbDbParentCat = find (\c -> categoryID == 1) dbCategoriesList
+        Just _ -> do
+          let mbDbParentCat = find (\_ -> categoryID == 1) dbCategoriesList
           case mbDbParentCat of
             Nothing -> pure $ Domain.Category categoryID title Nothing
             Just dbParentCat -> do
@@ -36,24 +34,24 @@ dbCategoryTransform dbCatId = do
 getCategoriesList :: ReaderT Environment IO Response
 getCategoriesList = do
   conn <- asks dbConnection
-  dbCatList <- lift $ parseCategoriesList conn -- :: [DBType.Categoy]
+  dbCatList <- lift $ parseCategoriesList conn
   catList <- mapM (dbCategoryTransform . DBType.categoryID) dbCatList
   let jsonNewsList = encodePretty catList
   pure $ responseLBS status200 [(hContentType, "text/plain")] jsonNewsList
 
-fromDbCategoryList :: [DBType.Category] -> Domain.Category
+fromDbCategoryList :: [DBType.Category] -> Maybe Domain.Category
+fromDbCategoryList [] = Nothing
 fromDbCategoryList (x : xs) =
   case DBType.parentID x of
-    Nothing -> Domain.Category (DBType.categoryID x) (DBType.title x) Nothing
-    Just id -> Domain.Category (DBType.categoryID x) (DBType.title x) parentCategory
+    Nothing -> Just $ Domain.Category (DBType.categoryID x) (DBType.title x) Nothing
+    Just _ -> Just $ Domain.Category (DBType.categoryID x) (DBType.title x) parentCategory
       where
-        parentCategory = if null xs then Nothing else Just $ fromDbCategoryList xs
+        parentCategory = fromDbCategoryList xs
 
-getSpecificCategory :: Connection -> Int -> IO Domain.Category
-getSpecificCategory conn id = do
-  categoryWithParrents <- readCategoryWithParentsById id conn
-  let domainCategory = fromDbCategoryList categoryWithParrents
-  pure domainCategory
+getSpecificCategory :: Connection -> Int -> IO (Maybe Domain.Category)
+getSpecificCategory conn cid = do
+  categoryWithParrents <- readCategoryWithParentsById cid conn
+  pure $ fromDbCategoryList categoryWithParrents
 
 createCategory :: Request -> ReaderT Environment IO Response
 createCategory request = do

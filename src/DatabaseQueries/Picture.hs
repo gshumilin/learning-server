@@ -1,23 +1,19 @@
 module DatabaseQueries.Picture where
 
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
-import Types.Domain.Picture
-
-instance FromRow Int where
-  fromRow = field
+import Database.PostgreSQL.Simple (Connection, Only (..), execute, query)
+import Types.Domain.Picture (Picture (..))
 
 parsePicturesLinks :: Connection -> Int -> IO (Maybe [T.Text])
 parsePicturesLinks conn newsID = do
   let q = "SELECT picture_id FROM news_pictures WHERE news_id = ?"
-  res <- query conn q $ Only newsID :: IO [Int]
+  res <- query conn q $ Only newsID :: IO [Only Int]
   if null res
     then pure Nothing
     else pure . Just $ map makeLinks res
   where
-    makeLinks :: Int -> T.Text
-    makeLinks picId = "localhost:3000/getPicture?id=" <> (T.pack . show $ picId)
+    makeLinks :: Only Int -> T.Text
+    makeLinks (Only picId) = "localhost:3000/getPicture?id=" <> (T.pack . show $ picId)
 
 readPicture :: Connection -> Int -> IO (Maybe Picture)
 readPicture conn pictureID = do
@@ -25,11 +21,11 @@ readPicture conn pictureID = do
   res <- query conn q $ Only pictureID
   case res of
     [] -> pure Nothing
-    [x] -> pure $ Just x
+    (x : _) -> pure $ Just x
 
 writePicture :: Connection -> Picture -> IO ()
 writePicture conn Picture {..} = do
-  execute conn "INSERT INTO pictures (data,mime) VALUES (?,?)" (picData, mime)
+  _ <- execute conn "INSERT INTO pictures (data,mime) VALUES (?,?)" (picData, mime)
   pure ()
 
 addPicturesToNews :: Connection -> Int -> [Picture] -> IO ()
@@ -45,5 +41,5 @@ addPicturesToNews conn newsId picArr = do
 
 deleteNewsPictures :: Connection -> Int -> IO ()
 deleteNewsPictures conn newsId = do
-  picIdArray <- query conn "DELETE FROM news_pictures WHERE news_id=? pureING picture_id" (Only newsId) :: IO [Int]
-  mapM_ (execute conn "DELETE FROM pictures WHERE id=?" . Only) picIdArray
+  picIdArray <- query conn "DELETE FROM news_pictures WHERE news_id=? pureING picture_id" (Only newsId) :: IO [Only Int]
+  mapM_ (execute conn "DELETE FROM pictures WHERE id=?") picIdArray

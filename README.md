@@ -2,17 +2,17 @@
 This is a learning web news server project with a REST API that accepts HTTP requests and responds in JSON format. You can imagine that this is a server for a mobile application.
 # Deployment
 1. Clone the repository.
-2. If desired, fill in the `config.json` file. By default, test values are entered there. They are consistent with the data in the scripts that create the database. For simple testing of the server, I recommend not changing the dbConnectInfo fields in config.json. This file contains a script for creating a test admin user, on whose behalf test curl-requests are called from the .testing-curl-commands folder
+2. If desired, fill in the `config.json` file. By default, test values are entered there. They are consistent with the data in the scripts that create the database. For simple testing of the server, I recommend not changing the dbConnectInfo fields in config.json. This file contains a script for creating a test admin user, on whose behalf test curl-requests are called from the .test-requests
 3. Create a database:
 
     3.1 Run the database creation script;
   
-    3.2 Run migrations and `fixtures.sql`. Again, running the `fixtures.sql` file is recommended when testing the server. This file contains a script for creating a test admin user, on whose behalf test curl requests are called from the .testing-curl-commands folder
+    3.2 Run migrations and `fixtures.sql`. Again, running the `fixtures.sql` file is recommended when testing the server. This file contains a script for creating a test admin user, on whose behalf test curl requests are called from the .test-requests
   4. The server is started by the `stack run` command from the terminal opened in the project folder.
 
 # Testing
-If you did not change the server data in `config.json` and ran `fixtures.sql`, then you have the opportunity to test the server using files in the `.testing-curl-commands folder`.  The file names match to the name of the endpoint. The files come in pairs: one with a .sh extension and one with a .json extension. They contain curl scripts and the request body necessary for executing, respectively.
-Start the server, open a terminal in the `.testing-curl-commands` folder and make requests to the server with the command “bash <endpoint_name.sh>”
+If you did not change the server data in `config.json` and ran `fixtures.sql`, then you have the opportunity to test the server using files in the `.test-requests`.  The file names match to the name of the endpoint. The files come in pairs: one with a .sh extension and one with a .json extension. They contain curl scripts and the request body necessary for executing, respectively.
+Start the server, open a terminal in the `.test-requests` folder and make requests to the server with the command “bash <endpoint_name.sh>”
 The optimal sequence of requests to the first launched server:
 1. `bash getNews.sh` — asking for news. We get an empty array.
 2. `bash createCategory.sh` — as an admin, create the first category.
@@ -44,9 +44,9 @@ Endpoint functions are grouped by entities and distributed by modules in the End
 The functions in the Endpoints folder call the functions in the DatabaseQueries folder to access the database. Next, the array from the database is transformed into a Haskell type, written in JSON format, and becomes the body of the response from the server. The response is constructed using the `responseLBS` function from `Network.Wai`.
 
 ## Types
-`API folder` — specifically designed to process the body of a request from a client.
-`Domain folder` —  fully describe an entity.
-`Database folder` — types into which the response from the database is parsed.
+`Types.API` — specifically designed to process the body of a request from a client.
+`Types.Domain` —  fully describe an entity.
+`Types.DB` — types into which the response from the database is parsed.
 
 ## Hashing
 The server supports password hashing. The hashing uses the **Blake2b_256** algorithm. The functions for hashing are implemented in the **Hash** module.

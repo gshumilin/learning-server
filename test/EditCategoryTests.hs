@@ -5,8 +5,8 @@ import Data.Time
 import Endpoints.Handlers.EditCategory
 import Test.Hspec
 import Types.API.Category
-import qualified Types.Database.Category as DB (Category (..))
-import qualified Types.Database.User as DB (User (..))
+import qualified Types.DB.Category as DB (Category (..))
+import qualified Types.DB.User as DB (User (..))
 
 testHandle :: Handle Identity
 testHandle =

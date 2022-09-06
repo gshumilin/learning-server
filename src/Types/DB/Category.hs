@@ -1,11 +1,8 @@
-module Types.Database.Category where
+module Types.DB.Category where
 
-import Data.Aeson
-import Data.Aeson.Types
 import qualified Data.Text as T
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.ToField
 
 data Category = Category
   { categoryID :: Int,

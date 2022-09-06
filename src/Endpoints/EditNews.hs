@@ -1,20 +1,16 @@
 module Endpoints.EditNews where
 
-import Auth (authorization)
 import Control.Monad.Reader (ReaderT, asks, lift)
-import Data.Aeson (FromJSON, decodeStrict)
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.News (readSpecificNews, rewriteNews)
 import Endpoints.Handlers.EditNews (EditNewsResult (..), Handle (..), hEditNews)
-import Log (addLog)
-import Network.HTTP.Types (hContentType, status200, status400, status403, status404)
-import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
-import qualified Types.API.News as API
-import qualified Types.Database.User as Database
+import Network.HTTP.Types (hContentType, status200, status403, status404)
+import Network.Wai (Response, responseLBS)
+import qualified Types.API.News as API (EditNewsRequest (..))
+import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
-import Types.Domain.Log (LogLvl (..))
 
-editNews :: Database.User -> API.EditNewsRequest -> ReaderT Environment IO Response
+editNews :: DB.User -> API.EditNewsRequest -> ReaderT Environment IO Response
 editNews invoker editNewsRequest = do
   conn <- asks dbConnection
   res <- lift $ hEditNews (handle conn) invoker editNewsRequest

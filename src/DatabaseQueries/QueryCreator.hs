@@ -1,21 +1,13 @@
 module DatabaseQueries.QueryCreator where
 
 import Auth (authorization)
-import Control.Monad.Reader
 import qualified Data.ByteString.Char8 as BS
-import Data.Maybe (isJust, isNothing)
+import Data.Maybe (isJust)
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple (Connection (..))
+import Database.PostgreSQL.Simple.Internal (Connection)
 import Database.PostgreSQL.Simple.Types (Query (..))
-import DatabaseQueries.Category (findCategoryIdByTitle)
-import DatabaseQueries.Picture (parsePicturesLinks)
-import DatabaseQueries.User (findUser, findUserIdByLogin)
-import Endpoints.Categories (getSpecificCategory)
 import Network.Wai (Request, queryString)
-import qualified Types.Database.News as DBType
-import qualified Types.Database.User as DBType
-import Types.Domain.Environment
-import qualified Types.Domain.News as Domain
+import qualified Types.DB.User as DB (User (..))
 
 --Запрос формируется из секций init, filters, group, sorts, limit, offset. Их тип Maybe Query.
 --программа игнорирует пустые поля и поля с некорректными названиями фильтров и параметров сортировки в запросе.
@@ -86,7 +78,7 @@ makeReadNewsQuery conn req = do
 findCompletedFields :: [BS.ByteString] -> [(BS.ByteString, Maybe BS.ByteString)] -> [(BS.ByteString, Maybe BS.ByteString)]
 findCompletedFields allowedNames = filter (\(fieldName, val) -> fieldName `elem` allowedNames && isJust val)
 
-makeInitReadNewsQuery :: Either T.Text DBType.User -> Query
+makeInitReadNewsQuery :: Either T.Text DB.User -> Query
 makeInitReadNewsQuery dbUser =
   Query $
     "   SELECT news.id,\n"
@@ -108,7 +100,7 @@ makeInitReadNewsQuery dbUser =
     initWhereSection = case dbUser of
       Left _ ->
         "   WHERE is_published = True\n"
-      Right DBType.User {..} ->
+      Right DB.User {..} ->
         "   WHERE (is_published = True OR creator_id = " <> BS.pack (show userID) <> ")\n"
 
 makeFiltersQuery :: [(BS.ByteString, Maybe BS.ByteString)] -> Maybe Query
@@ -125,9 +117,9 @@ makeFiltersQuery ls = Just $ Query $ "       AND " <> BS.intercalate " AND " (fo
     addParam ("created_since", Just val) acc = ("news.create_date" <> " >= '" <> val <> "'::timestamp") : acc
     addParam ("title", Just val) acc = ("news.title" <> " LIKE '%" <> val <> "%'") : acc
     addParam ("content", Just val) acc = ("news.text_content" <> " LIKE '%" <> val <> "%'") : acc
+    addParam _ _ = []
 
 makeSimpleQuery :: [(BS.ByteString, Maybe BS.ByteString)] -> Maybe Query
-makeSimpleQuery [] = Nothing
 makeSimpleQuery [("limit", Just val)] = Just $ Query $ " LIMIT " <> val
 makeSimpleQuery [("offset", Just val)] = Just $ Query $ " OFFSET " <> val
 makeSimpleQuery [("sort_by", Just "creator_login")] = Just $ Query " ORDER BY users.login\n"
@@ -135,3 +127,6 @@ makeSimpleQuery [("sort_by", Just "category_title")] = Just $ Query " ORDER BY c
 makeSimpleQuery [("sort_by", Just "create_date")] = Just $ Query " ORDER BY create_date\n"
 makeSimpleQuery [("sort_by", Just "number_of_pictures")] = Just $ Query "ORDER BY number_of_pictures\n"
 makeSimpleQuery [("sort_by", Just _)] = Nothing
+makeSimpleQuery [(_, Nothing)] = Nothing
+makeSimpleQuery [] = Nothing
+makeSimpleQuery _ = Nothing

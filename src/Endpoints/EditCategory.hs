@@ -1,15 +1,14 @@
 module Endpoints.EditCategory where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
-import Data.Aeson (FromJSON, decodeStrict)
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, rewriteCategory)
 import Endpoints.Handlers.EditCategory (EditCategoryResult (..), Handle (..), hEditCategory)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status200, status400, status403)
 import Network.Wai (Response, responseLBS)
-import qualified Types.API.Category as API
-import qualified Types.Database.User as DB
+import qualified Types.API.Category as API (EditCategoryRequest (..))
+import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 

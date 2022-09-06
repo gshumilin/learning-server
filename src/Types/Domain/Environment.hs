@@ -1,7 +1,9 @@
 module Types.Domain.Environment where
 
+import Control.Monad (mzero)
 import Data.Aeson.Types
-import Database.PostgreSQL.Simple (ConnectInfo (..), Connection)
+import Data.Word
+import Database.PostgreSQL.Simple (Connection)
 import Types.Domain.Log
 
 data Environment = Environment
@@ -11,7 +13,7 @@ data Environment = Environment
 
 data Config = Config
   { serverPort :: Int,
-    dbConnectInfo :: ConnectInfo,
+    dbConnectInfo :: DbConnectInfo,
     logInfo :: LogInfo
   }
 
@@ -21,12 +23,22 @@ instance FromJSON Config where
     dbConnectInfo <- inputJSON .: "dbConnectInfo"
     logInfo <- inputJSON .: "logInfo"
     pure Config {..}
+  parseJSON _ = mzero
 
-instance FromJSON ConnectInfo where
+data DbConnectInfo = DbConnectInfo
+  { dbConnectHost :: String,
+    dbConnectPort :: Word16,
+    dbConnectUser :: String,
+    dbConnectPassword :: String,
+    dbConnectDatabase :: String
+  }
+
+instance FromJSON DbConnectInfo where
   parseJSON (Object inputJSON) = do
-    connectHost <- inputJSON .: "connectHost"
-    connectPort <- inputJSON .: "connectPort"
-    connectUser <- inputJSON .: "connectUser"
-    connectPassword <- inputJSON .: "connectPassword"
-    connectDatabase <- inputJSON .: "connectDatabase"
-    pure ConnectInfo {..}
+    dbConnectHost <- inputJSON .: "connectHost"
+    dbConnectPort <- inputJSON .: "connectPort"
+    dbConnectUser <- inputJSON .: "connectUser"
+    dbConnectPassword <- inputJSON .: "connectPassword"
+    dbConnectDatabase <- inputJSON .: "connectDatabase"
+    pure DbConnectInfo {..}
+  parseJSON _ = mzero

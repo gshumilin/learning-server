@@ -1,27 +1,21 @@
 module Auth where
 
-import Control.Monad.Reader
 import Data.ByteString.Base64 (decodeBase64)
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.ByteString.Lazy.Internal as BS (packChars)
 import Data.List (find)
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Auth (authentication)
 import Hash (passHashBS)
-import Log (addLog)
-import Network.HTTP.Types (hContentType, status404)
+import Network.HTTP.Types (status404)
 import Network.HTTP.Types.Header
 import Network.Wai
-import qualified Types.Database.User as Database
-import Types.Domain.Environment
-import Types.Domain.Log
+import qualified Types.DB.User as DB
 
 authFailResponse :: Response
 authFailResponse = responseLBS status404 [(hContentType, "text/plain")] "Not found"
 
-authorization :: Connection -> Request -> IO (Either T.Text Database.User)
+authorization :: Connection -> Request -> IO (Either T.Text DB.User)
 authorization conn req = do
   case decodeAuthKey =<< findAuthKey req of
     Left err -> pure (Left err)
