@@ -1,5 +1,6 @@
 import CreateCategoryTests
 import CreateNewsTests
+import CreateUserTests
 import EditCategoryTests
 import EditNewsTests
 import Test.Hspec (hspec)
@@ -10,3 +11,4 @@ main = hspec $ do
   editCategoryTest
   createCategoryTest
   createNewsTest
+  createUserTest

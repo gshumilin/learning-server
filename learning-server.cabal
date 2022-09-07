@@ -34,12 +34,14 @@ library
       DatabaseQueries.User
       Endpoints.CreateCategory
       Endpoints.CreateNews
+      Endpoints.CreateUser
       Endpoints.EditCategory
       Endpoints.EditNews
       Endpoints.GetCategories
       Endpoints.GetNews
       Endpoints.Handlers.CreateCategory
       Endpoints.Handlers.CreateNews
+      Endpoints.Handlers.CreateUser
       Endpoints.Handlers.EditCategory
       Endpoints.Handlers.EditNews
       Endpoints.Picture
@@ -121,6 +123,7 @@ test-suite learning-server-test
   other-modules:
       CreateCategoryTests
       CreateNewsTests
+      CreateUserTests
       EditCategoryTests
       EditNewsTests
       Paths_learning_server

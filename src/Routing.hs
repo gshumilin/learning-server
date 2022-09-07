@@ -3,6 +3,7 @@ module Routing where
 import Control.Monad.Reader (ReaderT, lift)
 import Endpoints.CreateCategory (createCategory)
 import Endpoints.CreateNews (createNews)
+import Endpoints.CreateUser (createUser)
 import Endpoints.EditCategory (editCategory)
 import Endpoints.EditNews (editNews)
 import Endpoints.GetCategories (getCategories)
@@ -11,10 +12,9 @@ import qualified Endpoints.Picture
 import qualified Endpoints.User
 import Log (addLog)
 import Network.Wai (Request, Response, ResponseReceived, rawPathInfo)
-import Types.DB.User (isAdmin)
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
-import Utils (withAuth, withAuthAndParsedRequest)
+import Utils (withAuthAndParsedRequest)
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 application req respond = do
@@ -25,7 +25,7 @@ application req respond = do
       res <- Endpoints.User.getUsers
       lift $ respond res
     "/createUser" -> do
-      res <- withAuth isAdmin Endpoints.User.createUser req
+      res <- withAuthAndParsedRequest createUser req
       lift $ respond res
     "/getNews" -> do
       res <- getNews req
