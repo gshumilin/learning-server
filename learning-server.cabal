@@ -33,8 +33,10 @@ library
       DatabaseQueries.QueryCreator
       DatabaseQueries.User
       Endpoints.Categories
+      Endpoints.CreateCategory
       Endpoints.EditCategory
       Endpoints.EditNews
+      Endpoints.Handlers.CreateCategory
       Endpoints.Handlers.EditCategory
       Endpoints.Handlers.EditNews
       Endpoints.News
@@ -115,6 +117,7 @@ test-suite learning-server-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      CreateCategoryTests
       EditCategoryTests
       EditNewsTests
       Paths_learning_server

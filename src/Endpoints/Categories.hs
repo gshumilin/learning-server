@@ -1,14 +1,12 @@
 module Endpoints.Categories where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
-import Data.Aeson (decodeStrict)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.List (find)
 import Database.PostgreSQL.Simple (Connection)
-import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById, rewriteCategory, writeCategory)
-import Network.HTTP.Types (hContentType, status200, status400)
-import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
-import qualified Types.API.Category as API
+import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById)
+import Network.HTTP.Types (hContentType, status200)
+import Network.Wai (Response, responseLBS)
 import qualified Types.DB.Category as DBType
 import qualified Types.Domain.Category as Domain
 import Types.Domain.Environment
@@ -52,29 +50,3 @@ getSpecificCategory :: Connection -> Int -> IO (Maybe Domain.Category)
 getSpecificCategory conn cid = do
   categoryWithParrents <- readCategoryWithParentsById cid conn
   pure $ fromDbCategoryList categoryWithParrents
-
-createCategory :: Request -> ReaderT Environment IO Response
-createCategory request = do
-  conn <- asks dbConnection
-  rawJSON <- lift $ getRequestBodyChunk request
-  let decodedReq = decodeStrict rawJSON :: Maybe API.CreateCategoryRequest
-  case decodedReq of
-    Nothing -> do
-      lift $ putStrLn "Invalid JSON" -- log
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
-    Just newCategory -> do
-      lift $ writeCategory conn newCategory
-      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
-
-editCategory :: Request -> ReaderT Environment IO Response
-editCategory request = do
-  conn <- asks dbConnection
-  rawJSON <- lift $ getRequestBodyChunk request
-  let decodedReq = decodeStrict rawJSON :: Maybe API.EditCategoryRequest
-  case decodedReq of
-    Nothing -> do
-      lift $ putStrLn "Invalid JSON"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
-    Just editedCategory -> do
-      lift $ rewriteCategory conn editedCategory
-      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
