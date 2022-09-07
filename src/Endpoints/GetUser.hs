@@ -1,4 +1,4 @@
-module Endpoints.User where
+module Endpoints.GetUser where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson.Encode.Pretty (encodePretty)

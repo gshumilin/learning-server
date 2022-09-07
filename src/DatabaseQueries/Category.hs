@@ -26,7 +26,7 @@ readCategoryByTitle conn title = do
 
 readCategoryWithParentsById :: Int -> Connection -> IO [DB.Category]
 readCategoryWithParentsById catId conn = do
-  let q = "with recursive records_list as (select n.id as id, n.title as title, n.parent_category_id as parent_category_id, 1 as depth from categories as n where id = 1 union all select n.id as id, n.title as title, n.parent_category_id as parent_category_id, records_list.depth + 1 as depth from categories as n  join records_list on records_list.parent_category_id = n.id ) select records_list.id, records_list.title, records_list.parent_category_id from records_list order by depth;"
+  let q = "with recursive records_list as (select n.id as id, n.title as title, n.parent_category_id as parent_category_id, 1 as depth from categories as n where id = ? union all select n.id as id, n.title as title, n.parent_category_id as parent_category_id, records_list.depth + 1 as depth from categories as n  join records_list on records_list.parent_category_id = n.id ) select records_list.id, records_list.title, records_list.parent_category_id from records_list order by depth;"
   query conn q (Only catId)
 
 writeCategory :: Connection -> API.CreateCategoryRequest -> IO ()

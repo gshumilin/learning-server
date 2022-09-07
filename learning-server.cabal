@@ -39,13 +39,13 @@ library
       Endpoints.EditNews
       Endpoints.GetCategories
       Endpoints.GetNews
+      Endpoints.GetUser
       Endpoints.Handlers.CreateCategory
       Endpoints.Handlers.CreateNews
       Endpoints.Handlers.CreateUser
       Endpoints.Handlers.EditCategory
       Endpoints.Handlers.EditNews
       Endpoints.Picture
-      Endpoints.User
       Hash
       Log
       Routing

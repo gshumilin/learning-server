@@ -8,8 +8,8 @@ import Endpoints.EditCategory (editCategory)
 import Endpoints.EditNews (editNews)
 import Endpoints.GetCategories (getCategories)
 import Endpoints.GetNews (getNews)
-import qualified Endpoints.Picture
-import qualified Endpoints.User
+import Endpoints.GetUser (getUsers)
+import Endpoints.Picture (getPicture, putPicture)
 import Log (addLog)
 import Network.Wai (Request, Response, ResponseReceived, rawPathInfo)
 import Types.Domain.Environment (Environment (..))
@@ -22,7 +22,7 @@ application req respond = do
   addLog DEBUG ("----- method : " ++ show (rawPathInfo req) ++ "\n")
   case rawPathInfo req of
     "/getUsers" -> do
-      res <- Endpoints.User.getUsers
+      res <- getUsers
       lift $ respond res
     "/createUser" -> do
       res <- withAuthAndParsedRequest createUser req
@@ -46,9 +46,9 @@ application req respond = do
       res <- withAuthAndParsedRequest editCategory req
       lift $ respond res
     "/getPicture" -> do
-      res <- Endpoints.Picture.getPicture req
+      res <- getPicture req
       lift $ respond res
     "/putPicture" -> do
-      res <- Endpoints.Picture.putPicture req
+      res <- putPicture req
       lift $ respond res
     _ -> error "Unknown method"
