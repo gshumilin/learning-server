@@ -1,4 +1,4 @@
-module Endpoints.Categories where
+module Endpoints.GetCategories where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson.Encode.Pretty (encodePretty)
@@ -10,6 +10,19 @@ import Network.Wai (Response, responseLBS)
 import qualified Types.DB.Category as DBType
 import qualified Types.Domain.Category as Domain
 import Types.Domain.Environment
+
+getCategories :: ReaderT Environment IO Response
+getCategories = do
+  conn <- asks dbConnection
+  dbCatList <- lift $ parseCategoriesList conn
+  catList <- mapM (dbCategoryTransform . DBType.categoryID) dbCatList
+  let jsonNewsList = encodePretty catList
+  pure $ responseLBS status200 [(hContentType, "text/plain")] jsonNewsList
+
+getSpecificCategory :: Connection -> Int -> IO (Maybe Domain.Category)
+getSpecificCategory conn cid = do
+  categoryWithParrents <- readCategoryWithParentsById cid conn
+  pure $ fromDbCategoryList categoryWithParrents
 
 dbCategoryTransform :: Int -> ReaderT Environment IO Domain.Category
 dbCategoryTransform dbCatId = do
@@ -29,14 +42,6 @@ dbCategoryTransform dbCatId = do
               parentCat <- dbCategoryTransform (DBType.categoryID dbParentCat)
               pure $ Domain.Category categoryID title (Just parentCat)
 
-getCategoriesList :: ReaderT Environment IO Response
-getCategoriesList = do
-  conn <- asks dbConnection
-  dbCatList <- lift $ parseCategoriesList conn
-  catList <- mapM (dbCategoryTransform . DBType.categoryID) dbCatList
-  let jsonNewsList = encodePretty catList
-  pure $ responseLBS status200 [(hContentType, "text/plain")] jsonNewsList
-
 fromDbCategoryList :: [DBType.Category] -> Maybe Domain.Category
 fromDbCategoryList [] = Nothing
 fromDbCategoryList (x : xs) =
@@ -45,8 +50,3 @@ fromDbCategoryList (x : xs) =
     Just _ -> Just $ Domain.Category (DBType.categoryID x) (DBType.title x) parentCategory
       where
         parentCategory = fromDbCategoryList xs
-
-getSpecificCategory :: Connection -> Int -> IO (Maybe Domain.Category)
-getSpecificCategory conn cid = do
-  categoryWithParrents <- readCategoryWithParentsById cid conn
-  pure $ fromDbCategoryList categoryWithParrents

@@ -32,10 +32,10 @@ library
       DatabaseQueries.Picture
       DatabaseQueries.QueryCreator
       DatabaseQueries.User
-      Endpoints.Categories
       Endpoints.CreateCategory
       Endpoints.EditCategory
       Endpoints.EditNews
+      Endpoints.GetCategories
       Endpoints.Handlers.CreateCategory
       Endpoints.Handlers.EditCategory
       Endpoints.Handlers.EditNews

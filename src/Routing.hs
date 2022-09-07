@@ -1,10 +1,10 @@
 module Routing where
 
 import Control.Monad.Reader
-import Endpoints.Categories (getCategoriesList)
 import Endpoints.CreateCategory (createCategory)
 import Endpoints.EditCategory (editCategory)
 import Endpoints.EditNews (editNews)
+import Endpoints.GetCategories (getCategories)
 import qualified Endpoints.News
 import qualified Endpoints.Picture
 import qualified Endpoints.User
@@ -35,8 +35,8 @@ application req respond = do
     "/editNews" -> do
       res <- withAuthAndParsedRequest editNews req
       lift $ respond res
-    "/getCategoriesList" -> do
-      res <- Endpoints.Categories.getCategoriesList
+    "/getCategories" -> do
+      res <- getCategories
       lift $ respond res
     "/createCategory" -> do
       res <- withAuthAndParsedRequest createCategory req
