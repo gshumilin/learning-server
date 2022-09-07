@@ -1,5 +1,6 @@
 module Main where
 
+import Control.Exception (IOException, catch)
 import Control.Monad.Reader (runReaderT)
 import Data.Aeson (decodeStrict)
 import qualified Data.ByteString.Char8 as BS
@@ -12,13 +13,16 @@ import Types.Domain.Log (LogLvl (..))
 
 main :: IO ()
 main = do
-  conf <- getConfig
-  env <- buildEnvironment conf
-  let port = serverPort conf
-  let app req respond = runReaderT (application req respond) env
-  runReaderT (addLog RELEASE "_____ Server started _____") env
-  runReaderT (addLog DEBUG ("port = " ++ show port ++ "\n")) env
-  run port app
+  mbConf <- getConfig
+  case mbConf of
+    Nothing -> putStrLn "Config wasn't parsed! Server wasn't started"
+    Just conf -> do
+      env <- buildEnvironment conf
+      let port = serverPort conf
+      let app req respond = runReaderT (application req respond) env
+      runReaderT (addLog RELEASE "_____ Server started _____") env
+      runReaderT (addLog DEBUG ("port = " ++ show port ++ "\n")) env
+      run port app
 
 buildEnvironment :: Config -> IO Environment
 buildEnvironment Config {..} = do
@@ -27,9 +31,14 @@ buildEnvironment Config {..} = do
   conn <- connect connectInfo
   pure $ Environment conn logInfo
 
-getConfig :: IO Config
+getConfig :: IO (Maybe Config)
 getConfig = do
-  rawJSON <- BS.readFile "config.json"
-  case decodeStrict rawJSON of
-    Nothing -> error "Config cannot be read. Invalid JSON"
-    Just conf -> pure conf
+  rawJSON <-
+    catch
+      (BS.readFile "config.json")
+      ( \e -> do
+          let err = show (e :: IOException)
+          putStrLn $ "!!! Warning: Couldn't open: " ++ err
+          return ""
+      )
+  pure $ decodeStrict rawJSON
