@@ -33,13 +33,15 @@ library
       DatabaseQueries.QueryCreator
       DatabaseQueries.User
       Endpoints.CreateCategory
+      Endpoints.CreateNews
       Endpoints.EditCategory
       Endpoints.EditNews
       Endpoints.GetCategories
+      Endpoints.GetNews
       Endpoints.Handlers.CreateCategory
+      Endpoints.Handlers.CreateNews
       Endpoints.Handlers.EditCategory
       Endpoints.Handlers.EditNews
-      Endpoints.News
       Endpoints.Picture
       Endpoints.User
       Hash
@@ -118,6 +120,7 @@ test-suite learning-server-test
   main-is: Spec.hs
   other-modules:
       CreateCategoryTests
+      CreateNewsTests
       EditCategoryTests
       EditNewsTests
       Paths_learning_server

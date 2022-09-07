@@ -1,11 +1,8 @@
 module Types.API.News where
 
+import Control.Monad (mzero)
 import Data.Aeson
-import Data.Aeson.Types
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.ToField
 import Types.Domain.Picture
 
 data CreateNewsRequest = CreateNewsRequest
@@ -23,6 +20,7 @@ instance FromJSON CreateNewsRequest where
     textContent <- inputJSON .: "textContent"
     pictures <- inputJSON .:? "pictures"
     pure $ CreateNewsRequest {..}
+  parseJSON _ = mzero
 
 data EditNewsRequest = EditNewsRequest
   { newsID :: Int,
@@ -41,9 +39,4 @@ instance FromJSON EditNewsRequest where
     newTextContent <- inputJSON .:? "newTextContent"
     newPictures <- inputJSON .:? "newPictures"
     pure $ EditNewsRequest {..}
-
-newtype GetNewsRequest = GetNewsRequest
-  { sortBy :: Maybe SortBy
-  }
-
-data SortBy = NewsCreationDate | NewsCreator | NewsCategory | NewsNumbersOfPictures
+  parseJSON _ = mzero

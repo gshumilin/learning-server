@@ -1,16 +1,17 @@
 module Routing where
 
-import Control.Monad.Reader
+import Control.Monad.Reader (ReaderT, lift)
 import Endpoints.CreateCategory (createCategory)
+import Endpoints.CreateNews (createNews)
 import Endpoints.EditCategory (editCategory)
 import Endpoints.EditNews (editNews)
 import Endpoints.GetCategories (getCategories)
-import qualified Endpoints.News
+import Endpoints.GetNews (getNews)
 import qualified Endpoints.Picture
 import qualified Endpoints.User
 import Log (addLog)
 import Network.Wai
-import Types.DB.User (isAbleToCreateNews, isAdmin)
+import Types.DB.User (isAdmin)
 import Types.Domain.Environment
 import Types.Domain.Log
 import Utils (withAuth, withAuthAndParsedRequest)
@@ -27,10 +28,10 @@ application req respond = do
       res <- withAuth isAdmin Endpoints.User.createUser req
       lift $ respond res
     "/getNews" -> do
-      res <- Endpoints.News.getNews req
+      res <- getNews req
       lift $ respond res
     "/createNews" -> do
-      res <- withAuth isAbleToCreateNews Endpoints.News.createNews req
+      res <- withAuthAndParsedRequest createNews req
       lift $ respond res
     "/editNews" -> do
       res <- withAuthAndParsedRequest editNews req
