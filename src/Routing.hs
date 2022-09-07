@@ -11,7 +11,8 @@ import Endpoints.GetNews (getNews)
 import Endpoints.GetUser (getUsers)
 import Endpoints.Picture (getPicture, putPicture)
 import Log (addLog)
-import Network.Wai (Request, Response, ResponseReceived, rawPathInfo)
+import Network.HTTP.Types (hContentType, status404)
+import Network.Wai (Request, Response, ResponseReceived, rawPathInfo, responseLBS)
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 import Utils (withAuthAndParsedRequest)
@@ -51,4 +52,6 @@ application req respond = do
     "/putPicture" -> do
       res <- putPicture req
       lift $ respond res
-    _ -> error "Unknown method"
+    _ -> do
+      addLog WARNING "Unknown method"
+      lift . respond $ responseLBS status404 [(hContentType, "text/plain")] "Unknown method"
