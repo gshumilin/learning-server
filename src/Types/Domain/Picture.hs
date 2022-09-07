@@ -1,13 +1,9 @@
 module Types.Domain.Picture where
 
 import Control.Monad (mzero)
-import Data.Aeson
-import Data.Aeson.Types
-import Data.ByteString as BS
+import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON, (.:), (.=))
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.ToField
+import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
 
 newtype Pictures = Pictures [Picture] deriving (Show)
 
@@ -23,9 +19,6 @@ instance ToJSON Pictures where
       [ "pictures" .= arr
       ]
 
-instance ToField Pictures where
-  toField = undefined
-
 data Picture = Picture
   { mime :: T.Text,
     picData :: T.Text
@@ -38,6 +31,7 @@ instance FromJSON Picture where
     mime <- picture .: "mime"
     picData <- picture .: "data"
     pure $ Picture mime picData
+  parseJSON _ = mzero
 
 instance ToJSON Picture where
   toJSON Picture {..} =
@@ -51,6 +45,3 @@ instance FromRow Picture where
     picData <- field
     mime <- field
     pure Picture {..}
-
-instance ToField Picture where
-  toField = undefined

@@ -1,10 +1,10 @@
 module Types.Domain.Environment where
 
 import Control.Monad (mzero)
-import Data.Aeson.Types
-import Data.Word
+import Data.Aeson.Types (FromJSON, Value (..), parseJSON, (.:))
+import Data.Word (Word16)
 import Database.PostgreSQL.Simple (Connection)
-import Types.Domain.Log
+import Types.Domain.Log (LogInfo (..))
 
 data Environment = Environment
   { dbConnection :: Connection,

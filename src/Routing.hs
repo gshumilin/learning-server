@@ -10,10 +10,10 @@ import Endpoints.GetNews (getNews)
 import qualified Endpoints.Picture
 import qualified Endpoints.User
 import Log (addLog)
-import Network.Wai
+import Network.Wai (Request, Response, ResponseReceived, rawPathInfo)
 import Types.DB.User (isAdmin)
-import Types.Domain.Environment
-import Types.Domain.Log
+import Types.Domain.Environment (Environment (..))
+import Types.Domain.Log (LogLvl (..))
 import Utils (withAuth, withAuthAndParsedRequest)
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived

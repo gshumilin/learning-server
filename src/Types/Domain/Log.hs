@@ -1,7 +1,7 @@
 module Types.Domain.Log where
 
 import Control.Monad (mzero)
-import Data.Aeson.Types
+import Data.Aeson.Types (FromJSON, Value (..), parseJSON, (.:))
 import Data.Text (toUpper)
 import qualified Data.Text as T
 
@@ -19,6 +19,7 @@ instance FromJSON LogInfo where
     logLvl <- inputJSON .: "logLvl"
     logPath <- inputJSON .: "logPath"
     pure LogInfo {..}
+  parseJSON _ = mzero
 
 data LogLvl = DEBUG | WARNING | RELEASE deriving (Show, Eq, Ord)
 
@@ -28,3 +29,4 @@ instance FromJSON LogLvl where
     | toUpper txt == "WARNING" = pure WARNING
     | toUpper txt == "RELEASE" = pure RELEASE
     | otherwise = mzero
+  parseJSON _ = mzero

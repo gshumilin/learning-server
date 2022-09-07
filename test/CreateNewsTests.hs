@@ -3,7 +3,7 @@ module CreateNewsTests where
 import Data.Functor.Identity (Identity)
 import Data.Time (getCurrentTime)
 import Endpoints.Handlers.CreateNews (CreateNewsResult (..), Handle (..), hCreateNews)
-import Test.Hspec
+import Test.Hspec (SpecWith, describe, it, shouldBe)
 import Types.API.News (CreateNewsRequest (..))
 import qualified Types.DB.Category as DB (Category (..))
 import qualified Types.DB.User as DB (User (..))

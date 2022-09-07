@@ -1,9 +1,8 @@
 module Types.API.User where
 
-import Data.Aeson
-import Data.Aeson.Types
+import Control.Monad (mzero)
+import Data.Aeson.Types (FromJSON, Value (..), parseJSON, (.:))
 import qualified Data.Text as T
-import Data.Time (Day)
 import Hash (passHashT)
 
 data CreateUserRequest = CreateUserRequest
@@ -24,3 +23,4 @@ instance FromJSON CreateUserRequest where
     reqIsAdmin <- inputJSON .: "isAdmin"
     reqIsAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
     pure $ CreateUserRequest {..}
+  parseJSON _ = mzero

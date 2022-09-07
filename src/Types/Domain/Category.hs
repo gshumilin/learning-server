@@ -1,11 +1,8 @@
 module Types.Domain.Category where
 
-import Data.Aeson
-import Data.Aeson.Types
+import Control.Monad (mzero)
+import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON, (.:), (.=))
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.ToField
 
 data Category = Category
   { categoryID :: Int,
@@ -15,7 +12,12 @@ data Category = Category
   deriving (Show)
 
 instance FromJSON Category where
-  parseJSON (Object inputJSON) = undefined
+  parseJSON (Object o) = do
+    categoryID <- o .: "categoryID"
+    title <- o .: "title"
+    parent <- o .: "parent"
+    pure Category {..}
+  parseJSON _ = mzero
 
 instance ToJSON Category where
   toJSON Category {..} = do
@@ -24,6 +26,3 @@ instance ToJSON Category where
         "title" .= title,
         "parent" .= parent
       ]
-
-instance ToField Category where
-  toField = undefined

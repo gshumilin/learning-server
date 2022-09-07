@@ -4,9 +4,9 @@ module Endpoints.Handlers.EditCategory where
 
 import Data.Maybe (isJust, isNothing)
 import qualified Data.Text as T
-import qualified Types.API.Category as API
-import qualified Types.DB.Category as DB
-import qualified Types.DB.User as DB
+import qualified Types.API.Category as API (EditCategoryRequest (..))
+import qualified Types.DB.Category as DB (Category (..))
+import qualified Types.DB.User as DB (User (..))
 
 data EditCategoryResult = NotAdmin | CategoryNotExists | IncorrectParentId | IncorrectTitle | EditCategorySuccess deriving (Show, Eq)
 

@@ -1,7 +1,7 @@
 module Endpoints.Handlers.CreateNews where
 
 import Data.Maybe (isNothing)
-import qualified Types.API.News as API
+import qualified Types.API.News as API (CreateNewsRequest (..))
 import qualified Types.DB.Category as DB (Category (..))
 import qualified Types.DB.User as DB (User (..))
 

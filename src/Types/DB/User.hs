@@ -1,10 +1,9 @@
 module Types.DB.User where
 
-import Data.Aeson
+import Data.Aeson.Types (ToJSON, object, toJSON, (.=))
 import qualified Data.Text as T
-import Data.Time
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
+import Data.Time.Clock (UTCTime)
+import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
 
 newtype UsersList = UsersList [User]
 

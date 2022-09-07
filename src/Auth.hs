@@ -7,9 +7,8 @@ import qualified Data.Text as T
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Auth (authentication)
 import Hash (passHashBS)
-import Network.HTTP.Types (status404)
-import Network.HTTP.Types.Header
-import Network.Wai
+import Network.HTTP.Types (hAuthorization, hContentType, status404)
+import Network.Wai (Request, Response, requestHeaders, responseLBS)
 import qualified Types.DB.User as DB
 
 authFailResponse :: Response

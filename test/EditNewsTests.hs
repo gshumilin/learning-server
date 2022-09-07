@@ -1,10 +1,10 @@
 module EditNewsTests where
 
-import Data.Functor.Identity
-import Data.Time
-import Endpoints.Handlers.EditNews
-import Test.Hspec
-import Types.API.News
+import Data.Functor.Identity (Identity)
+import Data.Time (getCurrentTime)
+import Endpoints.Handlers.EditNews (EditNewsResult (..), Handle (..), hEditNews)
+import Test.Hspec (SpecWith, describe, it, shouldBe)
+import Types.API.News (EditNewsRequest (..))
 import Types.DB.News (EditedNewsFields (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.User

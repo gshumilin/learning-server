@@ -1,10 +1,10 @@
 module EditCategoryTests where
 
-import Data.Functor.Identity
-import Data.Time
-import Endpoints.Handlers.EditCategory
-import Test.Hspec
-import Types.API.Category
+import Data.Functor.Identity (Identity)
+import Data.Time (getCurrentTime)
+import Endpoints.Handlers.EditCategory (EditCategoryResult (..), Handle (..), hEditCategory)
+import Test.Hspec (SpecWith, describe, it, shouldBe)
+import Types.API.Category (EditCategoryRequest (..))
 import qualified Types.DB.Category as DB (Category (..))
 import qualified Types.DB.User as DB (User (..))
 

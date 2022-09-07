@@ -1,11 +1,11 @@
 module Types.Domain.News where
 
 import Control.Monad (mzero)
-import Data.Aeson
+import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON, (.:), (.=))
 import qualified Data.Text as T
-import Data.Time.Clock
-import qualified Types.Domain.Category as Domain
-import Types.Domain.User
+import Data.Time.Clock (UTCTime)
+import qualified Types.Domain.Category as Domain (Category (..))
+import qualified Types.Domain.User as Domain (User (..))
 
 newtype NewsList = NewsList [News]
 
@@ -19,7 +19,7 @@ data News = News
   { newsID :: Int,
     title :: T.Text,
     createDate :: UTCTime,
-    creator :: User,
+    creator :: Domain.User,
     category :: Maybe Domain.Category,
     textContent :: T.Text,
     picturesLinks :: Maybe [T.Text],

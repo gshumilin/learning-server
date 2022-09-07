@@ -1,9 +1,8 @@
 module Types.DB.News where
 
 import qualified Data.Text as T
-import Data.Time.Clock
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
+import Data.Time.Clock (UTCTime)
+import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
 
 newtype NewsList = NewsList [News]
 

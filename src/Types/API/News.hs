@@ -3,13 +3,13 @@ module Types.API.News where
 import Control.Monad (mzero)
 import Data.Aeson
 import qualified Data.Text as T
-import Types.Domain.Picture
+import qualified Types.Domain.Picture as Domain (Picture (..))
 
 data CreateNewsRequest = CreateNewsRequest
   { title :: T.Text,
     categoryID :: Int,
     textContent :: T.Text,
-    pictures :: Maybe [Picture]
+    pictures :: Maybe [Domain.Picture]
   }
   deriving (Show)
 
@@ -27,7 +27,7 @@ data EditNewsRequest = EditNewsRequest
     newTitle :: Maybe T.Text,
     newCategoryID :: Maybe Int,
     newTextContent :: Maybe T.Text,
-    newPictures :: Maybe [Picture]
+    newPictures :: Maybe [Domain.Picture]
   }
   deriving (Show)
 

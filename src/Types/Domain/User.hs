@@ -1,12 +1,10 @@
 module Types.Domain.User where
 
-import Data.Aeson
-import Data.Aeson.Types
+import Control.Monad (mzero)
+import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON, (.:), (.=))
 import qualified Data.Text as T
-import Data.Time
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.ToField
+import Data.Time (UTCTime)
+import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
 
 newtype UsersList = UsersList [User]
 
@@ -35,6 +33,7 @@ instance FromJSON User where
     isAdmin <- inputJSON .: "isAdmin"
     isAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
     pure $ User {..}
+  parseJSON _ = mzero
 
 instance ToJSON User where
   toJSON User {..} =
@@ -49,6 +48,3 @@ instance ToJSON User where
 
 instance FromRow User where
   fromRow = User <$> field <*> field <*> field <*> field <*> field <*> field
-
--- instance ToField User where
---     toField = undefined

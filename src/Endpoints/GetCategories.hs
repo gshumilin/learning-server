@@ -7,15 +7,15 @@ import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById)
 import Network.HTTP.Types (hContentType, status200)
 import Network.Wai (Response, responseLBS)
-import qualified Types.DB.Category as DBType
-import qualified Types.Domain.Category as Domain
-import Types.Domain.Environment
+import qualified Types.DB.Category as DB (Category (..))
+import qualified Types.Domain.Category as Domain (Category (..))
+import Types.Domain.Environment (Environment (..))
 
 getCategories :: ReaderT Environment IO Response
 getCategories = do
   conn <- asks dbConnection
   dbCatList <- lift $ parseCategoriesList conn
-  catList <- mapM (dbCategoryTransform . DBType.categoryID) dbCatList
+  catList <- mapM (dbCategoryTransform . DB.categoryID) dbCatList
   let jsonNewsList = encodePretty catList
   pure $ responseLBS status200 [(hContentType, "text/plain")] jsonNewsList
 
@@ -28,10 +28,10 @@ dbCategoryTransform :: Int -> ReaderT Environment IO Domain.Category
 dbCategoryTransform dbCatId = do
   conn <- asks dbConnection
   dbCategoriesList <- lift $ parseCategoriesList conn
-  let mbDbCat = find (\c -> DBType.categoryID c == dbCatId) dbCategoriesList
+  let mbDbCat = find (\c -> DB.categoryID c == dbCatId) dbCategoriesList
   case mbDbCat of
     Nothing -> error "dbCategoryTransform didn't find dbCategory"
-    Just DBType.Category {..} -> do
+    Just DB.Category {..} -> do
       case parentID of
         Nothing -> pure $ Domain.Category categoryID title Nothing
         Just _ -> do
@@ -39,14 +39,14 @@ dbCategoryTransform dbCatId = do
           case mbDbParentCat of
             Nothing -> pure $ Domain.Category categoryID title Nothing
             Just dbParentCat -> do
-              parentCat <- dbCategoryTransform (DBType.categoryID dbParentCat)
+              parentCat <- dbCategoryTransform (DB.categoryID dbParentCat)
               pure $ Domain.Category categoryID title (Just parentCat)
 
-fromDbCategoryList :: [DBType.Category] -> Maybe Domain.Category
+fromDbCategoryList :: [DB.Category] -> Maybe Domain.Category
 fromDbCategoryList [] = Nothing
 fromDbCategoryList (x : xs) =
-  case DBType.parentID x of
-    Nothing -> Just $ Domain.Category (DBType.categoryID x) (DBType.title x) Nothing
-    Just _ -> Just $ Domain.Category (DBType.categoryID x) (DBType.title x) parentCategory
+  case DB.parentID x of
+    Nothing -> Just $ Domain.Category (DB.categoryID x) (DB.title x) Nothing
+    Just _ -> Just $ Domain.Category (DB.categoryID x) (DB.title x) parentCategory
       where
         parentCategory = fromDbCategoryList xs

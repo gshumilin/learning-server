@@ -1,9 +1,9 @@
 module Log where
 
-import Control.Monad.Reader
+import Control.Monad.Reader (ReaderT, asks, lift)
 import qualified Data.Text as T
 import Types.Domain.Environment (Environment (..))
-import Types.Domain.Log
+import Types.Domain.Log (LogInfo (..), LogLvl)
 
 addLog :: LogLvl -> String -> ReaderT Environment IO ()
 addLog lvl logMsg = do

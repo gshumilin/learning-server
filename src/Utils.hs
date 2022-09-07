@@ -6,7 +6,7 @@ import Data.Aeson (FromJSON, decodeStrict)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
 import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
-import qualified Types.DB.User as DB
+import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 

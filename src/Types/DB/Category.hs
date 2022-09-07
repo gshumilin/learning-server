@@ -1,8 +1,7 @@
 module Types.DB.Category where
 
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow
+import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
 
 data Category = Category
   { categoryID :: Int,
