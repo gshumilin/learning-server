@@ -2,8 +2,8 @@
 This is a learning web news server project with a REST API that accepts HTTP requests and responds in JSON format. You can imagine that this is a server for a mobile application.
 # Deployment
 1. Clone the repository.
-2. If desired, fill in the `config.json` file. By default, test values are entered there. They are consistent with the data in the scripts that create the database. For simple testing of the server, I recommend not changing the dbConnectInfo fields in config.json. This file contains a script for creating a test admin user, on whose behalf test curl-requests are called from the .test-requests
-3. Create a database and specify host, port, user name, password, database name in config. 
+2. Create a database.
+3. Fill in the `config.json` file. Pay special attention to database info: host, port, user name, password, database name. Еhe values of these fields must match the values you specified when you created your database.
 4. It is recommended to start the server for the first time with the `stack run m f` command from the terminal opened in the project folder. Command has two flags:
     `m` - create the `schema_migrations` table in your database and run the migration;
     `f` - run fixtures. Function create for you admin user (his name is Oleg) and fill others tables with tests values.
