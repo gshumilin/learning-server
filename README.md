@@ -3,12 +3,11 @@ This is a learning web news server project with a REST API that accepts HTTP req
 # Deployment
 1. Clone the repository.
 2. If desired, fill in the `config.json` file. By default, test values are entered there. They are consistent with the data in the scripts that create the database. For simple testing of the server, I recommend not changing the dbConnectInfo fields in config.json. This file contains a script for creating a test admin user, on whose behalf test curl-requests are called from the .test-requests
-3. Create a database:
-
-    3.1 Run the database creation script;
-  
-    3.2 Run migrations and `fixtures.sql`. Again, running the `fixtures.sql` file is recommended when testing the server. This file contains a script for creating a test admin user, on whose behalf test curl requests are called from the .test-requests
-  4. The server is started by the `stack run` command from the terminal opened in the project folder.
+3. Create a database and specify host, port, user name, password, database name in config. 
+4. It is recommended to start the server for the first time with the `stack run m f` command from the terminal opened in the project folder. Command has two flags:
+    `m` - create the `schema_migrations` table in your database and run the migration;
+    `f` - run fixtures. Function create for you admin user (his name is Oleg) and fill others tables with tests values.
+The server is usually started by the `stack run` command.
 
 # Testing
 If you did not change the server data in `config.json` and ran `fixtures.sql`, then you have the opportunity to test the server using files in the `.test-requests`.  The file names match to the name of the endpoint. The files come in pairs: one with a .sh extension and one with a .json extension. They contain curl scripts and the request body necessary for executing, respectively.

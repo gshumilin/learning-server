@@ -82,6 +82,7 @@ library
     , http-types
     , mtl
     , postgresql-simple
+    , postgresql-simple-migration
     , text
     , time
     , wai
@@ -111,6 +112,7 @@ executable learning-server-exe
     , learning-server
     , mtl
     , postgresql-simple
+    , postgresql-simple-migration
     , text
     , time
     , wai
@@ -146,6 +148,7 @@ test-suite learning-server-test
     , learning-server
     , mtl
     , postgresql-simple
+    , postgresql-simple-migration
     , text
     , time
     , wai

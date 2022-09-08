@@ -1,6 +1,6 @@
 module Hash where
 
-import Crypto.Hash (Blake2b_256, Digest (..), hash)
+import Crypto.Hash (Blake2b_256, Digest, hash)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T (encodeUtf8)
