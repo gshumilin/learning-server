@@ -1,16 +1,19 @@
 # learning-server
 This is a learning web news server project with a REST API that accepts HTTP requests and responds in JSON format. You can imagine that this is a server for a mobile application.
 # Deployment
-1. Clone the repository.
-2. Create a database.
-3. Fill in the `config.json` file. Pay special attention to database info: host, port, user name, password, database name. Еhe values of these fields must match the values you specified when you created your database.
+1. Clone the repository;
+2. Create a database. For simplicity, you can use database info from the `config.json` file;
+3. Fill in the `config.json` file. Pay special attention to database info: host, port, user name, password, database name. Еhe values of these fields must match the values you specified when you created your database;
 4. It is recommended to start the server for the first time with the `stack run m f` command from the terminal opened in the project folder. Command has two flags:
+
     `m` - create the `schema_migrations` table in your database and run the migration;
-    `f` - run fixtures. Function create for you admin user (his name is Oleg) and fill others tables with tests values.
+
+    `f` - run fixtures. Function create for you admin user (his name is Oleg) and fill others tables with tests values;
+    
 The server is usually started by the `stack run` command.
 
 # Testing
-If you did not change the server data in `config.json` and ran `fixtures.sql`, then you have the opportunity to test the server using files in the `.test-requests`.  The file names match to the name of the endpoint. The files come in pairs: one with a .sh extension and one with a .json extension. They contain curl scripts and the request body necessary for executing, respectively.
+If you ran `fixtures.sql`, then you have the opportunity to test the server using files in the `.test-requests`.  The file names match to the name of the endpoint. The files come in pairs: one with a .sh extension and one with a .json extension. They contain curl scripts and the request body necessary for executing, respectively.
 Start the server, open a terminal in the `.test-requests` folder and make requests to the server with the command “bash <endpoint_name.sh>”
 The optimal sequence of requests to the first launched server:
 1. `bash getNews.sh` — asking for news. We get an empty array.
