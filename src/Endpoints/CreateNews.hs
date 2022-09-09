@@ -23,7 +23,7 @@ createNews invoker req = do
       pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
     CategoryNotExists -> do
       addLog DEBUG "createNews-error: CategoryNotExists"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such ID"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such Id"
     CreateNewsSuccess -> do
       addLog DEBUG "createNews: Success"
       pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"

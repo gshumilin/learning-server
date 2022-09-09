@@ -9,9 +9,9 @@ parseCategoriesList :: Connection -> IO [DB.Category]
 parseCategoriesList conn = query_ conn "SELECT * FROM categories"
 
 readCategoryById :: Connection -> Int -> IO (Maybe DB.Category)
-readCategoryById conn catID = do
+readCategoryById conn catId = do
   let q = "SELECT * FROM categories WHERE id=?"
-  res <- query conn q (Only catID)
+  res <- query conn q (Only catId)
   case res of
     [] -> pure Nothing
     (c : _) -> pure $ Just c
@@ -35,18 +35,18 @@ writeCategory conn API.CreateCategoryRequest {..} = do
     execute
       conn
       "INSERT INTO categories (title,parent_category_id) values (?,?)"
-      (title, parentCategoryID)
+      (title, parentCategoryId)
   pure ()
 
 rewriteCategory :: Connection -> API.EditCategoryRequest -> IO ()
 rewriteCategory conn API.EditCategoryRequest {..} = do
   _ <- execTitle newTitle
-  _ <- execParent newParentCategoryID
+  _ <- execParent newParentCategoryId
   pure ()
   where
-    execTitle (Just t) = execute conn "UPDATE categories SET title = ? WHERE id = ?" (t, processedCategoryID)
+    execTitle (Just t) = execute conn "UPDATE categories SET title = ? WHERE id = ?" (t, processedCategoryId)
     execTitle Nothing = pure 0
 
-    execParent (Just 0) = execute conn "UPDATE categories SET parent_category_id = NULL WHERE id = ?" (Only processedCategoryID)
-    execParent (Just parID) = execute conn "UPDATE categories SET parent_category_id = ? WHERE id = ?" (parID, processedCategoryID)
+    execParent (Just 0) = execute conn "UPDATE categories SET parent_category_id = NULL WHERE id = ?" (Only processedCategoryId)
+    execParent (Just parId) = execute conn "UPDATE categories SET parent_category_id = ? WHERE id = ?" (parId, processedCategoryId)
     execParent Nothing = pure 0

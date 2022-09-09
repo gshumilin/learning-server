@@ -25,8 +25,8 @@ getSpecificCategory conn cid = do
 fromDbCategoryList :: [DB.Category] -> Maybe Domain.Category
 fromDbCategoryList [] = Nothing
 fromDbCategoryList (x : xs) =
-  case DB.parentID x of
-    Nothing -> Just $ Domain.Category (DB.categoryID x) (DB.title x) Nothing
-    Just _ -> Just $ Domain.Category (DB.categoryID x) (DB.title x) parentCategory
+  case DB.parentId x of
+    Nothing -> Just $ Domain.Category (DB.categoryId x) (DB.title x) Nothing
+    Just _ -> Just $ Domain.Category (DB.categoryId x) (DB.title x) parentCategory
       where
         parentCategory = fromDbCategoryList xs

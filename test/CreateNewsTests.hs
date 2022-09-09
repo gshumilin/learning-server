@@ -13,7 +13,7 @@ sampleUser = do
   now <- getCurrentTime
   pure $
     DB.User
-      { userID = 1,
+      { userId = 1,
         name = "Name",
         login = "login",
         password = "password",
@@ -25,16 +25,16 @@ sampleUser = do
 sampleCategory :: DB.Category
 sampleCategory =
   DB.Category
-    { categoryID = 1,
+    { categoryId = 1,
       title = "title1",
-      parentID = Just 3
+      parentId = Just 3
     }
 
 createNewsRequest :: CreateNewsRequest
 createNewsRequest =
   CreateNewsRequest
     { title = "someTitle",
-      categoryID = 1,
+      categoryId = 1,
       textContent = "someContent",
       pictures = Nothing
     }
@@ -59,7 +59,7 @@ createNewsTest =
       result `shouldBe` pure NotAbleToCreateNews
     it "Shouldn't create news if there is no such category" $ do
       invoker <- sampleUser
-      let req = createNewsRequest {categoryID = 42}
+      let req = createNewsRequest {categoryId = 42}
       let result = hCreateNews testHandle invoker req
       result `shouldBe` pure CategoryNotExists
     it "Should succwssfully create news" $ do

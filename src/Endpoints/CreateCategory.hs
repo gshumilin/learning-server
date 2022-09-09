@@ -22,7 +22,7 @@ createCategory invoker createCategoryRequest = do
       pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
     IncorrectParentId -> do
       addLog DEBUG "createCategory-error: IncorrectParentId"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect Parent ID"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect Parent Id"
     IncorrectTitle -> do
       addLog DEBUG "createCategory-error: IncorrectTitle"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect title"

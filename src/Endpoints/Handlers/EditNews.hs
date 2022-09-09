@@ -13,11 +13,11 @@ data Handle m = Handle
 
 hEditNews :: Monad m => Handle m -> DB.User -> API.EditNewsRequest -> m EditNewsResult
 hEditNews Handle {..} invoker editNewsRequest@API.EditNewsRequest {..} = do
-  mbCurrentNews <- hReadSpecificNews newsID
+  mbCurrentNews <- hReadSpecificNews newsId
   case mbCurrentNews of
     Nothing -> pure NewsNotExists
     Just editedNewsFields@DB.EditedNewsFields {..} -> do
-      if DB.userID invoker == oldCreatorID
+      if DB.userId invoker == oldCreatorId
         then do
           hRewriteNews editedNewsFields editNewsRequest
           pure EditNewsSuccess

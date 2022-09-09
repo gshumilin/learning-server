@@ -12,7 +12,7 @@ sampleAdminUser = do
   now <- getCurrentTime
   pure $
     DB.User
-      { userID = 1,
+      { userId = 1,
         name = "Name",
         login = "login",
         password = "password",

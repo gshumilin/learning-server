@@ -5,9 +5,9 @@ import Database.PostgreSQL.Simple (Connection, Only (..), execute, query)
 import Types.Domain.Picture (Picture (..))
 
 parsePicturesLinks :: Connection -> Int -> IO (Maybe [T.Text])
-parsePicturesLinks conn newsID = do
+parsePicturesLinks conn newsId = do
   let q = "SELECT picture_id FROM news_pictures WHERE news_id = ?"
-  res <- query conn q $ Only newsID :: IO [Only Int]
+  res <- query conn q $ Only newsId :: IO [Only Int]
   if null res
     then pure Nothing
     else pure . Just $ map makeLinks res
@@ -16,9 +16,9 @@ parsePicturesLinks conn newsID = do
     makeLinks (Only picId) = "localhost:3000/getPicture?id=" <> (T.pack . show $ picId)
 
 readPicture :: Connection -> Int -> IO (Maybe Picture)
-readPicture conn pictureID = do
+readPicture conn pictureId = do
   let q = "SELECT data, mime FROM pictures WHERE id = ?"
-  res <- query conn q $ Only pictureID
+  res <- query conn q $ Only pictureId
   case res of
     [] -> pure Nothing
     (x : _) -> pure $ Just x
@@ -33,9 +33,9 @@ addPicturesToNews conn newsId picArr = do
   mapM_
     ( \Picture {..} -> do
         let q = "INSERT INTO pictures (data,mime) values (?,?) pureING id"
-        [Only picID] <- query conn q (picData, mime) :: IO [Only Int]
+        [Only picId] <- query conn q (picData, mime) :: IO [Only Int]
         let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
-        execute conn q' (newsId, picID)
+        execute conn q' (newsId, picId)
     )
     picArr
 

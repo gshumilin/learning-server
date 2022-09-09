@@ -21,7 +21,7 @@ sampleUser = do
   now <- getCurrentTime
   pure $
     DB.User
-      { userID = 1,
+      { userId = 1,
         name = "Name",
         login = "login",
         password = "password",
@@ -32,18 +32,18 @@ sampleUser = do
 
 editNewsRequest =
   EditNewsRequest
-    { newsID = 1,
+    { newsId = 1,
       newTitle = Nothing,
-      newCategoryID = Nothing,
+      newCategoryId = Nothing,
       newTextContent = Nothing,
       newPictures = Nothing
     }
 
 currNews =
   EditedNewsFields
-    { oldCreatorID = 1,
+    { oldCreatorId = 1,
       oldTitle = "T.Text",
-      oldCategoryID = 1,
+      oldCategoryId = 1,
       oldTextContent = "T.Text"
     }
 

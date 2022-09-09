@@ -26,7 +26,7 @@ sampleAdminUser = do
   now <- getCurrentTime
   pure $
     DB.User
-      { userID = 1,
+      { userId = 1,
         name = "Name",
         login = "login",
         password = "password",
@@ -43,32 +43,32 @@ sampleNotAdminUser = do
 sampleCategory1 :: DB.Category
 sampleCategory1 =
   DB.Category
-    { categoryID = 1,
+    { categoryId = 1,
       title = "title1",
-      parentID = Just 3
+      parentId = Just 3
     }
 
 sampleCategory2 :: DB.Category
 sampleCategory2 =
   DB.Category
-    { categoryID = 2,
+    { categoryId = 2,
       title = "titleIsTaken",
-      parentID = Just 3
+      parentId = Just 3
     }
 
 sampleDoughterCategory :: DB.Category
 sampleDoughterCategory =
   DB.Category
-    { categoryID = 4,
+    { categoryId = 4,
       title = "Doughter",
-      parentID = Just 1
+      parentId = Just 1
     }
 
 editCategoryRequest =
   EditCategoryRequest
-    { processedCategoryID = 1,
+    { processedCategoryId = 1,
       newTitle = Nothing,
-      newParentCategoryID = Nothing
+      newParentCategoryId = Nothing
     }
 
 editCategoryTest :: SpecWith ()
@@ -80,7 +80,7 @@ editCategoryTest =
       result `shouldBe` return NotAdmin
     it "Shouldn't edit category if there is no such category" $ do
       invoker <- sampleAdminUser
-      let req = editCategoryRequest {processedCategoryID = 42}
+      let req = editCategoryRequest {processedCategoryId = 42}
       let result = hEditCategory testHandle invoker req
       result `shouldBe` return CategoryNotExists
     it "Shouldn't edit category if title is taken" $ do
@@ -90,17 +90,17 @@ editCategoryTest =
       result `shouldBe` return IncorrectTitle
     it "Shouldn't edit category if new parent category doesn't exist" $ do
       invoker <- sampleAdminUser
-      let req = editCategoryRequest {newParentCategoryID = Just 42}
+      let req = editCategoryRequest {newParentCategoryId = Just 42}
       let result = hEditCategory testHandle invoker req
       result `shouldBe` return IncorrectParentId
     it "Shouldn't edit category if new parent category is equal processed category" $ do
       invoker <- sampleAdminUser
-      let req = editCategoryRequest {newParentCategoryID = Just 1}
+      let req = editCategoryRequest {newParentCategoryId = Just 1}
       let result = hEditCategory testHandle invoker req
       result `shouldBe` return IncorrectParentId
     it "Shouldn't edit category if new parent category is a child of the processed category" $ do
       invoker <- sampleAdminUser
-      let req = editCategoryRequest {newParentCategoryID = Just 4}
+      let req = editCategoryRequest {newParentCategoryId = Just 4}
       let result = hEditCategory testHandle invoker req
       result `shouldBe` return IncorrectParentId
     it "Should successfully edit category" $ do

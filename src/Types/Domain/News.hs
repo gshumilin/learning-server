@@ -16,7 +16,7 @@ instance ToJSON NewsList where
       ]
 
 data News = News
-  { newsID :: Int,
+  { newsId :: Int,
     title :: T.Text,
     createDate :: UTCTime,
     creator :: Domain.User,
@@ -30,7 +30,7 @@ data News = News
 
 instance FromJSON News where
   parseJSON (Object inputJSON) = do
-    newsID <- inputJSON .: "newsID"
+    newsId <- inputJSON .: "newsId"
     title <- inputJSON .: "title"
     createDate <- inputJSON .: "createDate"
     creator <- inputJSON .: "creator"
@@ -45,7 +45,7 @@ instance FromJSON News where
 instance ToJSON News where
   toJSON News {..} =
     object
-      [ "newsID" .= newsID,
+      [ "newsId" .= newsId,
         "title" .= title,
         "createDate" .= createDate,
         "creator" .= creator,

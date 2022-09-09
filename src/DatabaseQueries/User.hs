@@ -18,8 +18,8 @@ writeUser conn API.CreateUserRequest {..} = do
   pure ()
 
 findUser :: Connection -> Int -> IO Domain.User
-findUser conn userID = do
-  res <- query conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users WHERE id = ?" $ Only userID
+findUser conn userId = do
+  res <- query conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users WHERE id = ?" $ Only userId
   pure $ head res
 
 findUserIdByLogin :: Connection -> T.Text -> IO (Maybe Int)

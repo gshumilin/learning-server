@@ -17,9 +17,9 @@ hCreateNews Handle {..} invoker req = do
   if not (DB.isAbleToCreateNews invoker)
     then pure NotAbleToCreateNews
     else do
-      mbSomeCat <- hReadCategoryById $ API.categoryID req
+      mbSomeCat <- hReadCategoryById $ API.categoryId req
       if isNothing mbSomeCat
         then pure CategoryNotExists
         else do
-          hWriteNews (DB.userID invoker) req
+          hWriteNews (DB.userId invoker) req
           pure CreateNewsSuccess

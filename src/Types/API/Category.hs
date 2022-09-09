@@ -6,26 +6,26 @@ import qualified Data.Text as T
 
 data CreateCategoryRequest = CreateCategoryRequest
   { title :: T.Text,
-    parentCategoryID :: Maybe Int
+    parentCategoryId :: Maybe Int
   }
 
 instance FromJSON CreateCategoryRequest where
   parseJSON (Object inputJSON) = do
     title <- inputJSON .: "title"
-    parentCategoryID <- inputJSON .:? "parentCategoryID"
+    parentCategoryId <- inputJSON .:? "parentCategoryId"
     pure CreateCategoryRequest {..}
   parseJSON _ = mzero
 
 data EditCategoryRequest = EditCategoryRequest
-  { processedCategoryID :: Int,
+  { processedCategoryId :: Int,
     newTitle :: Maybe T.Text,
-    newParentCategoryID :: Maybe Int
+    newParentCategoryId :: Maybe Int
   }
 
 instance FromJSON EditCategoryRequest where
   parseJSON (Object inputJSON) = do
-    processedCategoryID <- inputJSON .: "categoryID"
+    processedCategoryId <- inputJSON .: "categoryId"
     newTitle <- inputJSON .:? "newTitle"
-    newParentCategoryID <- inputJSON .:? "newParentCategoryID"
+    newParentCategoryId <- inputJSON .:? "newParentCategoryId"
     pure EditCategoryRequest {..}
   parseJSON _ = mzero

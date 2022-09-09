@@ -38,11 +38,11 @@ findPicId req =
   case find (\(k, _) -> k == "id") $ queryString req of
     Nothing -> Left "'id' parameter not specified"
     Just (_, Nothing) -> Left "empty value of the 'id' parameter"
-    Just (_, Just bsPicID) -> do
-      case (readMaybe $ BS.unpack bsPicID :: Maybe Int) of
+    Just (_, Just bsPicId) -> do
+      case (readMaybe $ BS.unpack bsPicId :: Maybe Int) of
         Nothing -> do
           Left "invalid 'id' parameter value"
-        Just picID -> Right picID
+        Just picId -> Right picId
 
 putPicture :: Request -> ReaderT Environment IO Response
 putPicture request = do

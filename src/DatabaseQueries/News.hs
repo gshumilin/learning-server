@@ -35,12 +35,12 @@ readNews req = do
 
 fromDbNews :: Connection -> DB.News -> IO Domain.News
 fromDbNews conn DB.News {..} = do
-  newsCategory <- getSpecificCategory conn categoryID
-  newsCreator <- findUser conn creatorID
-  newsPictures <- parsePicturesLinks conn newsID
+  newsCategory <- getSpecificCategory conn categoryId
+  newsCreator <- findUser conn creatorId
+  newsPictures <- parsePicturesLinks conn newsId
   pure $
     Domain.News
-      { newsID = newsID,
+      { newsId = newsId,
         title = title,
         createDate = createDate,
         creator = newsCreator,
@@ -52,29 +52,29 @@ fromDbNews conn DB.News {..} = do
       }
 
 readSpecificNews :: Connection -> Int -> IO (Maybe DB.EditedNewsFields)
-readSpecificNews conn newsID = do
+readSpecificNews conn newsId = do
   let q = "SELECT creator_id, title, category_id, text_content FROM news WHERE id=?"
-  res <- query conn q (Only newsID) :: IO [DB.EditedNewsFields]
+  res <- query conn q (Only newsId) :: IO [DB.EditedNewsFields]
   case res of
     [] -> pure Nothing
     [news] -> pure $ Just news
     (news : _) -> pure $ Just news
 
 writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
-writeNews conn newsCreatorID API.CreateNewsRequest {..} = do
+writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
   currTime <- getCurrentTime
   let isPublished = False
   let q = "INSERT INTO news (title, create_date, creator_id, category_id, text_content, is_published) values (?,?,?,?,?,?) pureING id"
-  [Only newsId] <- query conn q (title, currTime, newsCreatorID, categoryID, textContent, isPublished) :: IO [Only Int]
+  [Only newsId] <- query conn q (title, currTime, newsCreatorId, categoryId, textContent, isPublished) :: IO [Only Int]
   case pictures of
     Nothing -> pure ()
     Just picArr -> do
       mapM_
         ( \Domain.Picture {..} -> do
             let insertingQ = "INSERT INTO pictures (data,mime) values (?,?) pureING id"
-            [Only picID] <- query conn insertingQ (picData, mime) :: IO [Only Int]
+            [Only picId] <- query conn insertingQ (picData, mime) :: IO [Only Int]
             let insertingQ' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
-            execute conn insertingQ' (newsId, picID)
+            execute conn insertingQ' (newsId, picId)
         )
         picArr
 
@@ -86,16 +86,16 @@ rewriteNews conn editedNewsFields editNewsRequest = do
       conn
       q
       ( fromMaybe (DB.oldTitle editedNewsFields) (API.newTitle editNewsRequest),
-        fromMaybe (DB.oldCategoryID editedNewsFields) (API.newCategoryID editNewsRequest),
+        fromMaybe (DB.oldCategoryId editedNewsFields) (API.newCategoryId editNewsRequest),
         fromMaybe (DB.oldTextContent editedNewsFields) (API.newTextContent editNewsRequest),
-        API.newsID editNewsRequest
+        API.newsId editNewsRequest
       )
   case API.newPictures editNewsRequest of
     Nothing -> pure ()
     Just [] -> do
-      deleteNewsPictures conn (API.newsID editNewsRequest)
+      deleteNewsPictures conn (API.newsId editNewsRequest)
       pure ()
     Just picArr -> do
-      deleteNewsPictures conn (API.newsID editNewsRequest)
-      addPicturesToNews conn (API.newsID editNewsRequest) picArr
+      deleteNewsPictures conn (API.newsId editNewsRequest)
+      addPicturesToNews conn (API.newsId editNewsRequest) picArr
       pure ()

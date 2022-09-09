@@ -5,7 +5,7 @@ import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON
 import qualified Data.Text as T
 
 data Category = Category
-  { categoryID :: Int,
+  { categoryId :: Int,
     title :: T.Text,
     parent :: Maybe Category
   }
@@ -13,7 +13,7 @@ data Category = Category
 
 instance FromJSON Category where
   parseJSON (Object o) = do
-    categoryID <- o .: "categoryID"
+    categoryId <- o .: "categoryId"
     title <- o .: "title"
     parent <- o .: "parent"
     pure Category {..}
@@ -22,7 +22,7 @@ instance FromJSON Category where
 instance ToJSON Category where
   toJSON Category {..} = do
     object
-      [ "categoryID" .= categoryID,
+      [ "categoryId" .= categoryId,
         "title" .= title,
         "parent" .= parent
       ]

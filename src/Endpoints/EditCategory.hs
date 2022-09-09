@@ -22,10 +22,10 @@ editCategory invoker editCategoryRequest = do
       pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
     CategoryNotExists -> do
       addLog DEBUG "editCategory-error: CategoryNotExists"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such ID"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such Id"
     IncorrectParentId -> do
       addLog DEBUG "editCategory-error: IncorrectParentId"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect Parent ID"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect Parent Id"
     IncorrectTitle -> do
       addLog DEBUG "editCategory-error: IncorrectTitle"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect title"

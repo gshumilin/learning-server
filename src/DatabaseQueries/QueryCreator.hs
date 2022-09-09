@@ -101,7 +101,7 @@ makeInitReadNewsQuery dbUser =
       Left _ ->
         "   WHERE is_published = True\n"
       Right DB.User {..} ->
-        "   WHERE (is_published = True OR creator_id = " <> BS.pack (show userID) <> ")\n"
+        "   WHERE (is_published = True OR creator_id = " <> BS.pack (show userId) <> ")\n"
 
 makeFiltersQuery :: [(BS.ByteString, Maybe BS.ByteString)] -> Maybe Query
 makeFiltersQuery [] = Nothing

@@ -7,12 +7,12 @@ import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
 newtype NewsList = NewsList [News]
 
 data News = News
-  { newsID :: Int,
+  { newsId :: Int,
     title :: T.Text,
     createDate :: UTCTime,
-    creatorID :: Int,
+    creatorId :: Int,
     creatorLogin :: T.Text,
-    categoryID :: Int,
+    categoryId :: Int,
     categoryTitle :: T.Text,
     textContent :: T.Text,
     isPublished :: Bool,
@@ -22,12 +22,12 @@ data News = News
 
 instance FromRow News where
   fromRow = do
-    newsID <- field
+    newsId <- field
     title <- field
     createDate <- field
-    creatorID <- field
+    creatorId <- field
     creatorLogin <- field
-    categoryID <- field
+    categoryId <- field
     categoryTitle <- field
     textContent <- field
     isPublished <- field
@@ -35,17 +35,17 @@ instance FromRow News where
     pure News {..}
 
 data EditedNewsFields = EditedNewsFields
-  { oldCreatorID :: Int,
+  { oldCreatorId :: Int,
     oldTitle :: T.Text,
-    oldCategoryID :: Int,
+    oldCategoryId :: Int,
     oldTextContent :: T.Text
   }
   deriving (Show)
 
 instance FromRow EditedNewsFields where
   fromRow = do
-    oldCreatorID <- field
+    oldCreatorId <- field
     oldTitle <- field
-    oldCategoryID <- field
+    oldCategoryId <- field
     oldTextContent <- field
     pure EditedNewsFields {..}

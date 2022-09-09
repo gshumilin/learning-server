@@ -18,9 +18,9 @@ data Handle m = Handle
 
 hEditCategory :: Monad m => Handle m -> DB.User -> API.EditCategoryRequest -> m EditCategoryResult
 hEditCategory Handle {..} DB.User {..} req@API.EditCategoryRequest {..} = do
-  isNotExist <- isNotExistCheck processedCategoryID
+  isNotExist <- isNotExistCheck processedCategoryId
   isTitleBad <- isNewTitleBadCheck newTitle
-  isParentBad <- isParentBadCheck newParentCategoryID processedCategoryID
+  isParentBad <- isParentBadCheck newParentCategoryId processedCategoryId
   if
       | not isAdmin -> pure NotAdmin
       | isNotExist -> pure CategoryNotExists
@@ -48,4 +48,4 @@ hEditCategory Handle {..} DB.User {..} req@API.EditCategoryRequest {..} = do
           mbParCat <- hReadCategoryById parId
           case mbParCat of
             Nothing -> pure True
-            Just parCat -> pure $ DB.parentID parCat == Just curId
+            Just parCat -> pure $ DB.parentId parCat == Just curId

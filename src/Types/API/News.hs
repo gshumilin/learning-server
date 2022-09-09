@@ -7,7 +7,7 @@ import qualified Types.Domain.Picture as Domain (Picture (..))
 
 data CreateNewsRequest = CreateNewsRequest
   { title :: T.Text,
-    categoryID :: Int,
+    categoryId :: Int,
     textContent :: T.Text,
     pictures :: Maybe [Domain.Picture]
   }
@@ -16,16 +16,16 @@ data CreateNewsRequest = CreateNewsRequest
 instance FromJSON CreateNewsRequest where
   parseJSON (Object inputJSON) = do
     title <- inputJSON .: "title"
-    categoryID <- inputJSON .: "categoryID"
+    categoryId <- inputJSON .: "categoryId"
     textContent <- inputJSON .: "textContent"
     pictures <- inputJSON .:? "pictures"
     pure $ CreateNewsRequest {..}
   parseJSON _ = mzero
 
 data EditNewsRequest = EditNewsRequest
-  { newsID :: Int,
+  { newsId :: Int,
     newTitle :: Maybe T.Text,
-    newCategoryID :: Maybe Int,
+    newCategoryId :: Maybe Int,
     newTextContent :: Maybe T.Text,
     newPictures :: Maybe [Domain.Picture]
   }
@@ -33,9 +33,9 @@ data EditNewsRequest = EditNewsRequest
 
 instance FromJSON EditNewsRequest where
   parseJSON (Object inputJSON) = do
-    newsID <- inputJSON .: "newsID"
+    newsId <- inputJSON .: "newsId"
     newTitle <- inputJSON .:? "newTitle"
-    newCategoryID <- inputJSON .:? "newCategoryID"
+    newCategoryId <- inputJSON .:? "newCategoryId"
     newTextContent <- inputJSON .:? "newTextContent"
     newPictures <- inputJSON .:? "newPictures"
     pure $ EditNewsRequest {..}

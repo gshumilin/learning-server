@@ -13,23 +13,23 @@ instance ToJSON Categories where
       ]
 
 data Category = Category
-  { categoryID :: Int,
+  { categoryId :: Int,
     title :: T.Text,
-    parentID :: Maybe Int
+    parentId :: Maybe Int
   }
   deriving (Show)
 
 instance ToJSON Category where
   toJSON Category {..} =
     object
-      [ "categoryID" .= categoryID,
+      [ "categoryId" .= categoryId,
         "title" .= title,
-        "parentID" .= parentID
+        "parentId" .= parentId
       ]
 
 instance FromRow Category where
   fromRow = do
-    categoryID <- field
+    categoryId <- field
     title <- field
-    parentID <- field
+    parentId <- field
     pure Category {..}

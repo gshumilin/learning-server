@@ -1,6 +1,6 @@
 {
     "title" : "unpublished_+_pictures_2",
-    "categoryID" : 2,
+    "categoryId" : 2,
     "textContent" : "Test_textContent",
     "pictures":[{"image":{"mime":"image/png","data":"123123123"}}]
 }

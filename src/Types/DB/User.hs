@@ -14,7 +14,7 @@ instance ToJSON UsersList where
       ]
 
 data User = User
-  { userID :: Int,
+  { userId :: Int,
     name :: T.Text,
     login :: T.Text,
     password :: T.Text,
@@ -27,7 +27,7 @@ data User = User
 instance ToJSON User where
   toJSON User {..} =
     object
-      [ "userID" .= userID,
+      [ "userId" .= userId,
         "name" .= name,
         "login" .= login,
         --, "password" .= password

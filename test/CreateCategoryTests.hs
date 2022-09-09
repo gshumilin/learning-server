@@ -25,7 +25,7 @@ sampleAdminUser = do
   now <- getCurrentTime
   pure $
     DB.User
-      { userID = 1,
+      { userId = 1,
         name = "Name",
         login = "login",
         password = "password",
@@ -42,15 +42,15 @@ sampleNotAdminUser = do
 sampleCategory :: DB.Category
 sampleCategory =
   DB.Category
-    { categoryID = 1,
+    { categoryId = 1,
       title = "titleIsTaken",
-      parentID = Just 3
+      parentId = Just 3
     }
 
 createCategoryRequest =
   CreateCategoryRequest
     { title = "someTitle",
-      parentCategoryID = Nothing
+      parentCategoryId = Nothing
     }
 
 createCategoryTest :: SpecWith ()
@@ -62,7 +62,7 @@ createCategoryTest =
       result `shouldBe` return NotAdmin
     it "Shouldn't create category if parent category doesn't exist" $ do
       invoker <- sampleAdminUser
-      let req = createCategoryRequest {parentCategoryID = Just 42}
+      let req = createCategoryRequest {parentCategoryId = Just 42}
       let result = hCreateCategory testHandle invoker req
       result `shouldBe` return IncorrectParentId
     it "Shouldn't create category if title is taken" $ do
@@ -72,6 +72,6 @@ createCategoryTest =
       result `shouldBe` return IncorrectTitle
     it "Should successfully create category" $ do
       invoker <- sampleAdminUser
-      let req = createCategoryRequest {parentCategoryID = Just 1}
+      let req = createCategoryRequest {parentCategoryId = Just 1}
       let result = hCreateCategory testHandle invoker req
       result `shouldBe` return CreateCategorySuccess
