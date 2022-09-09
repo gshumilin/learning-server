@@ -71,17 +71,27 @@ The logging function itself is implemented in the Log module.
 
 # SERVER API / Endpoint
 
-### Category
-  `getCategories` - GET-request. Returns categories list;
+## Category
+### /getCategories
+GET-request. Returns categories list
   
-  `createCategory` - POST-request; Available to authorized admin-users;
-    Parameters: 
-      `title` - Text - Required;
-      `parentCategoryId` - Int - Optional;
+### /createCategory
+POST-request. Available to authorized admin-users.
 
-  `editCategories` - POST-request; Available to authorized admin-users;
-    Parameters:
-      `categoryId` - Int - Required;
-      `newTitle` - Text - Optional;
-      `newParentCategoryId` - Int - Optional - specify "0" to set a null parent category;
+Parameters:
+
+`title` - Text - Required;
+
+`parentCategoryId` - Int - Optional;
+
+### /editCategories
+POST-request. Available to authorized admin-users
+
+Parameters:
+
+`categoryId` - Int - Required;
+
+`newTitle` - Text - Optional;
+      
+`newParentCategoryId` - Int - Optional - specify "0" to set a null parent category;
   
