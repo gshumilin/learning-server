@@ -68,3 +68,20 @@ The server supports three-level logging:
 * RELEASE - logging only total errors (for example, "there is no connection to the database")
 The logging level is specified in the config.json file. Enabling one level means that all messages will be logged, including those logged at a higher level. Logging levels are described in Types.Domain.Log.
 The logging function itself is implemented in the Log module.
+
+# SERVER API / Endpoint
+
+### Category
+  `getCategories` - GET-request. Returns categories list;
+  
+  `createCategory` - POST-request; Available to authorized admin-users;
+    Parameters: 
+      `title` - Text - Required;
+      `parentCategoryId` - Int - Optional;
+
+  `editCategories` - POST-request; Available to authorized admin-users;
+    Parameters:
+      `categoryId` - Int - Required;
+      `newTitle` - Text - Optional;
+      `newParentCategoryId` - Int - Optional - specify "0" to set a null parent category;
+  
