@@ -1,0 +1,8 @@
+{
+    "name" : "USERNAME",
+    "login" : "testAuthorUser",
+    "password" : "password1",
+    "isAdmin": false,
+    "isAbleToCreateNews" : true
+}
+

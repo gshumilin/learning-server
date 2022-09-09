@@ -1,5 +1,4 @@
 .stack-work/
-.test-requests/
 .postgreSQL-commands.txt
 config.json
 logFile.txt
