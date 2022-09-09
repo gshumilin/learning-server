@@ -18,7 +18,7 @@ data Handle m = Handle
 
 hCreateCategory :: Monad m => Handle m -> DB.User -> API.CreateCategoryRequest -> m CreateCategoryResult
 hCreateCategory Handle {..} DB.User {..} req@API.CreateCategoryRequest {..} = do
-  isParentBad <- isParentBadCheck parentCategoryID
+  isParentBad <- isParentBadCheck parentCategoryId
   isTitleBad <- isTitleBadCheck title
   if
       | not isAdmin -> pure NotAdmin
@@ -38,8 +38,3 @@ hCreateCategory Handle {..} DB.User {..} req@API.CreateCategoryRequest {..} = do
     isTitleBadCheck t = do
       someCat <- hReadCategoryByTitle t
       pure $ isJust someCat
-
--- data CreateCategoryRequest = CreateCategoryRequest
---   { title :: T.Text,
---     parentCategoryID :: Maybe Int
---   }
