@@ -130,21 +130,16 @@ Example: "http://localhost:3000/getPicture?id=42"
 POST-request.
 
 Request body:
-
+```
 {
-
   "image": 
-  
     { 
-    
      "mime: <Text. Image format. Example: "image/png">,
-     
      "data": <Text. Image encoded in base64>
-     
     }
-    
 }
 
+```
 
 ## News
 
