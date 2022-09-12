@@ -3,18 +3,18 @@ This is a learning web news server project with a REST API that accepts HTTP req
 # Deployment
 1. Clone the repository;
 2. Create a database. For simplicity, you can use database info from the `config.json` file;
-3. Fill in the `config.json` file. Pay special attention to database info: host, port, user name, password, database name. Еhe values of these fields must match the values you specified when you created your database;
-4. It is recommended to start the server for the first time with the `stack run m f` command from the terminal opened in the project folder. Command has two flags:
+3. Fill in the `config.json` file. Pay special attention to database info: host, port, user name, password, database name. Values of these fields must match the values you specified when you created your database;
+4. It's recommended to start server for the first time with the `stack run m f` command from the terminal opened in the project folder. Command has two flags:
 
-    `m` - create the `schema_migrations` table in your database and run the migration;
+    `m` - create `schema_migrations` table in your database and run migrations;
 
-    `f` - run fixtures. Function create for you admin user (his name is Oleg) and fill others tables with tests values;
+    `f` - run fixtures. Function create for you admin user and fill others tables with tests values;
     
-The server is usually started by the `stack run` command.
+Server is usually started by the `stack run` command.
 
 # Testing
-If you ran `fixtures.sql`, then you have the opportunity to test the server using files in the `.test-requests`.  The file names match to the name of the endpoint. The files come in pairs: one with a .sh extension and one with a .json extension. They contain curl scripts and the request body necessary for executing, respectively.
-Start the server, open a terminal in the `.test-requests` folder and make requests to the server with the command “bash <endpoint_name.sh>”
+If you ran `fixtures.sql`, then you have the opportunity to test the server using files in the `.test-requests`. File names match to name of the endpoint. Files come in pairs: one with a .sh extension and one with a .json extension. They contain curl scripts and the request body necessary for executing, respectively.
+Start the server, open a terminal in the `.test-requests` folder and make requests to server with command “bash <endpoint_name.sh>”
 The optimal sequence of requests to the first launched server:
 1. `bash getNews.sh` — asking for news. We get an empty array.
 2. `bash createCategory.sh` — as an admin, create the first category.
@@ -38,7 +38,7 @@ The optimal sequence of requests to the first launched server:
 8. In the browser, you can check the link to which picture is returned in the news we recorded. Paste the link to the picture from the received news into the browser. It will look like this: “localhost:3000/getPicture?id=34" 
 
 # Architecture
-main reads the config, creates an environment, and runs the application function from the Routing module in it. application is written in the ReaderT monad. The environment contains information for logging and the Connection type for contacting the database.
+main reads the config, creates an environment, and runs application function from the Routing module in it. application is written in the ReaderT monad. Environment contains information for logging and Connection type for contacting the database.
 The application function is a standard routing function. It receives a request from the client and, depending on the passed endpoint, calls one of the functions from the Endpoints folder with this request.
 
 ## Endpoints folder
@@ -73,7 +73,7 @@ The logging function itself is implemented in the Log module.
 
 ## Category
 ### /getCategories
-GET-request. Returns categories list
+GET-request. Returns categories list.
   
 ### /createCategory
 POST-request. Available to authorized admin-users.
@@ -94,4 +94,109 @@ Parameters:
 `newTitle` - Text - Optional;
       
 `newParentCategoryId` - Int - Optional - specify "0" to set a null parent category;
-  
+
+## User
+
+### /getUsers
+GET-request. Returns users list.
+
+### /createUser
+POST-request. Available to authorized admin-users.
+
+Parameters:
+
+`name` - Text - Required;
+
+`login` - Text - Required;
+
+`password` - Text - Required;
+
+`isAdmin` - Bool - Required;
+
+`isAbleToCreateNews` - Bool - Required;
+
+## Picture
+
+### /getPicture
+GET-request. Returns picture.
+
+Parameters:
+
+`id` - Int - Required;
+
+Example: "http://localhost:3000/getPicture?id=42"
+
+### /putPicture
+POST-request.
+
+Request body:
+{
+  "image": 
+    { 
+     "mime: <Text. Image format. Example: "image/png">,
+     "data": <Text. Image encoded in base64>
+    }
+}
+
+## News
+
+### getNews
+GET request. Returns news list.
+
+Optional Text Parameters for filtering:
+
+`creator_login` 
+
+`category_title`
+
+`created_at` - example: 2020-12-21;
+
+`created_until`
+
+`created_since`
+
+`title`
+
+`content`
+
+Other oprtional parameters:
+
+`limit` - Int value for pagination. 10 by default;
+
+`offset` - Int value for offset;
+
+`sort_by` - Text. The following options are available:
+
+    `creator_login`
+    
+    `category_title`
+    
+    `create_date`
+    
+    `number_of_pictures`
+    
+### /createNews
+POST-request. Available to able to create news users.
+
+Parameters:
+
+`title` - Text - Required;
+
+`categoryId` - Int - Required;
+
+`textContent` - Text - Required;
+
+`pictures` - Array of pictures. See "/putPicture" section - Required;
+
+### /editNews
+POST-request. Available to author.
+
+`newsId` - Int - Required;
+
+`newTitle` - Text - Optional;
+
+`newCategoryId` - Text - Optional;
+
+`newTextContent` - Text - Optional;
+
+`newPictures` - Array of pictures. See "/putPicture" section - Optional;
