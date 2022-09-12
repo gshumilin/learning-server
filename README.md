@@ -59,7 +59,7 @@ Authorization is implemented using **Basic Auth**. To authorize, the client must
 
 The Auth.hs file implements functions for authorization. The main authorization function takes a request from the client, finds the header there, decodes it from base64 and calls the function from DatabaseQueries.Auth to query the database and get the user data. At the output, the function will provide user data with information about all permissions, or an error.
 
-Most of the endpoints in the application function are called with the higher-order function **withAuth**. It takes a function to check the user's right to call an endpoint and an endpoint function. The endpoint function will only be called if the validation succeeds. Otherwise, the user will receive a **404 error** in the response.
+Most of the endpoints in the application function are called with the higher-order function **withAuthAndParsedRequest**. It takes endpoint function and request, makes API-type-request and User-info from database and return result of endpoint function.
 
 ## Logging
 The server supports three-level logging:
