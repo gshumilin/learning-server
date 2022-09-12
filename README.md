@@ -36,6 +36,7 @@ The optimal sequence of requests to the first launched server:
     6.1. `bash getNews.sh` — optional. 
 
 8. In the browser, you can check the link to which picture is returned in the news we recorded. Paste the link to the picture from the received news into the browser. It will look like this: “localhost:3000/getPicture?id=1" 
+* There is **logins-passwords-base64.txt** file in which it is convenient to store encoded logins and passwords for testing endpoints with authorization.
 
 # Architecture
 main reads the config, creates an environment, and runs application function from the Routing module in it. application is written in the ReaderT monad. Environment contains information for logging and Connection type for contacting the database.
