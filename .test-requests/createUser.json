@@ -1,6 +1,6 @@
 {
-    "name" : "USERNAME_1",
-    "login" : "AUTOR_1",
+    "name" : "Oleg",
+    "login" : "Oleg_1",
     "password" : "password_1",
     "isAdmin": false,
     "isAbleToCreateNews" : true
