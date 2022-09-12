@@ -8,7 +8,7 @@ This is a learning web news server project with a REST API that accepts HTTP req
 
     `m` - create `schema_migrations` table in your database and run migrations;
 
-    `f` - run fixtures. Function create for you admin user and fill others tables with tests values;
+    `f` - run fixtures. Function create for you admin user;
     
 Server is usually started by the `stack run` command.
 
@@ -43,8 +43,7 @@ main reads the config, creates an environment, and runs application function fro
 The application function is a standard routing function. It receives a request from the client and, depending on the passed endpoint, calls one of the functions from the Endpoints folder with this request.
 
 ## Endpoints folder
-Endpoint functions are grouped by entities and distributed by modules in the Endpoints folder. Thus, all endpoints for working with news are in the News.hs file, all endpoints for categories are in the Categories.hs file, and so on.
-The functions in the Endpoints folder call the functions in the DatabaseQueries folder to access the database. Next, the array from the database is transformed into a Haskell type, written in JSON format, and becomes the body of the response from the server. The response is constructed using the `responseLBS` function from `Network.Wai`.
+Almost all endpoints are written using the handle pattern. A separate file is allocated for each such endpoint.
 
 ## Types
 `Types.API` — specifically designed to process the body of a request from a client.
