@@ -130,13 +130,21 @@ Example: "http://localhost:3000/getPicture?id=42"
 POST-request.
 
 Request body:
+
 {
+
   "image": 
+  
     { 
+    
      "mime: <Text. Image format. Example: "image/png">,
+     
      "data": <Text. Image encoded in base64>
+     
     }
+    
 }
+
 
 ## News
 
@@ -167,13 +175,13 @@ Other oprtional parameters:
 
 `sort_by` - Text. The following options are available:
 
-    `creator_login`
+  `creator_login`
     
-    `category_title`
+   `category_title`
     
-    `create_date`
+  `create_date`
     
-    `number_of_pictures`
+  `number_of_pictures`
     
 ### /createNews
 POST-request. Available to able to create news users.
