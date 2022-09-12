@@ -19,7 +19,7 @@ The optimal sequence of requests to the first launched server:
 1. `bash getNews.sh` — asking for news. We get an empty array.
 2. `bash createCategory.sh` — as an admin, create the first category.
 
-    2.1 bash getCategories.sh — optionally, check the list of categories.
+    2.1. `bash getCategories.sh` — optionally, check the list of categories.
 
 3. `bash editCategory.sh` — modify the newly created category.
 
