@@ -1,0 +1,1 @@
+ALTER TABLE users ALTER COLUMN create_date SET DEFAULT Now();

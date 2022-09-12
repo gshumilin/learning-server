@@ -1,5 +1,5 @@
 curl -H "Content-type: application/json"\
-     -H "Authorization: dGVzdEF1dGhvclVzZXI6cGFzc3dvcmQx"\
+     -H "Authorization: YWRtaW46YWRtaW4="\
      -X POST\
      -d @createNews.json\
      localhost:3000/createNews

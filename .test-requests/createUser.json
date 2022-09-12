@@ -1,7 +1,7 @@
 {
-    "name" : "USERNAME",
-    "login" : "testAuthorUser",
-    "password" : "password1",
+    "name" : "USERNAME_1",
+    "login" : "AUTOR_1",
+    "password" : "password_1",
     "isAdmin": false,
     "isAbleToCreateNews" : true
 }

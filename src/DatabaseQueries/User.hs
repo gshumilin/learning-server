@@ -13,7 +13,7 @@ writeUser conn API.CreateUserRequest {..} = do
   _ <-
     execute
       conn
-      "INSERT INTO users (name,login,password,create_date,is_admin,is_able_to_create_news) values (?,?,?,?,?,?)"
+      "INSERT INTO users (name,login,password,is_admin,is_able_to_create_news) values (?,?,?,?,?)"
       (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
   pure ()
 

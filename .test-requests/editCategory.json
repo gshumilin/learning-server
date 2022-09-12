@@ -1,5 +1,5 @@
 {
     "categoryId" : 1,
-    "newTitle" : "Category",
-    "newParentCategoryId":1
+    "newTitle" : "EditedCategory_1",
+    "newParentCategoryId": 0
 }
