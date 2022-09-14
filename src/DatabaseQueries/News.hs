@@ -1,8 +1,9 @@
 module DatabaseQueries.News where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
-import qualified Data.ByteString.Char8 as BS
 import Data.Maybe (fromMaybe)
+import qualified Data.Text as T (pack)
+import qualified Data.Text.Encoding as T (decodeUtf8)
 import Data.Time (getCurrentTime)
 import Database.PostgreSQL.Simple (Connection, Only (..), execute, query, query_)
 import Database.PostgreSQL.Simple.Types (Query (..))
@@ -28,9 +29,9 @@ readNews req = do
     Nothing -> pure []
     Just q -> do
       let (Query bsQ) = q
-      addLog DEBUG $ "----- made this psql-request: \n\"" ++ BS.unpack bsQ ++ "\"\n"
+      addLog DEBUG $ "----- made this psql-request: \n\"" <> T.decodeUtf8 bsQ
       dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DB.News]
-      addLog DEBUG $ "----- got this psql News List: \"" ++ show dbNews ++ "\"\n"
+      addLog DEBUG $ "----- got this psql News List: \"" <> T.pack (show dbNews)
       lift $ mapM (fromDbNews conn) dbNews
 
 fromDbNews :: Connection -> DB.News -> IO Domain.News

@@ -3,7 +3,7 @@ This is a learning web news server project with a REST API that accepts HTTP req
 # Deployment
 1. Clone the repository;
 2. Create a database. For simplicity, you can use database info from the `config.json` file;
-3. Fill in the `config.json` file. Pay special attention to database info: host, port, user name, password, database name. Values of these fields must match the values you specified when you created your database;
+3. Fill in the `config.json` file. Pay special attention to database info: host, port, user name, password, database name. Values of these fields must match the values you specified when you created your database. `logDescType` field accepts either "stderr", "stdout" or file-name/file-path
 4. It's recommended to start server for the first time with the `stack run m f` command from the terminal opened in the project folder. Command has two flags:
 
     `m` - create `schema_migrations` table in your database and run migrations;

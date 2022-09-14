@@ -1,6 +1,7 @@
 module Routing where
 
 import Control.Monad.Reader (ReaderT, lift)
+import qualified Data.Text as T (pack)
 import Endpoints.CreateCategory (createCategory)
 import Endpoints.CreateNews (createNews)
 import Endpoints.CreateUser (createUser)
@@ -19,8 +20,8 @@ import Utils (withAuthAndParsedRequest)
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 application req respond = do
-  addLog DEBUG ("----- got request:\n" ++ show req ++ "\n")
-  addLog DEBUG ("----- method : " ++ show (rawPathInfo req) ++ "\n")
+  addLog DEBUG ("----- got request:\n" <> T.pack (show req))
+  addLog DEBUG ("----- method : " <> T.pack (show (rawPathInfo req)))
   case rawPathInfo req of
     "/getUsers" -> do
       res <- getUsers

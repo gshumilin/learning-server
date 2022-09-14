@@ -3,6 +3,7 @@ module Utils where
 import Auth (authFailResponse, authorization)
 import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson (FromJSON, decodeStrict)
+import qualified Data.Text as T (pack)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
 import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
@@ -50,11 +51,11 @@ withAuth isFunc endpointFunc req = do
   auth <- lift $ authorization conn req
   case auth of
     Left err -> do
-      addLog WARNING $ "----- There is authError: \"" ++ show err ++ "\"\n"
+      addLog WARNING $ "----- There is authError: \"" <> T.pack (show err)
       pure authFailResponse
     Right user ->
       if isFunc user
         then endpointFunc req
         else do
-          addLog WARNING "----- There is authError: \"authentication fail\" \n"
+          addLog WARNING "----- There is authError: \"authentication fail\""
           pure authFailResponse

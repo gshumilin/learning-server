@@ -1,0 +1,13 @@
+{
+    "serverPort": 3000,
+    "dbConnectInfo": 
+        { 
+            "connectHost": "localhost",
+            "connectPort": 5432,
+            "connectUser": "server_user",
+            "connectPassword": "12345",
+            "connectDatabase": "server"
+        },
+    "logLvl": "DEBug",
+    "logDescType": "Logs.txt"
+}

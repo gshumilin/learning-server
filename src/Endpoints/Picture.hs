@@ -6,7 +6,7 @@ import Data.ByteString.Base64 (decodeBase64)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as LBS
 import Data.List (find)
-import qualified Data.Text as T
+import qualified Data.Text as T (pack, unpack)
 import qualified Data.Text.Encoding as T (encodeUtf8)
 import DatabaseQueries.Picture (readPicture, writePicture)
 import Log (addLog)
@@ -29,7 +29,7 @@ getPicture req = do
         Just Domain.Picture {..} -> do
           case decodeBase64 . BS.pack . T.unpack $ picData of
             Left err -> do
-              addLog WARNING $ "-----data decoding error: " ++ show err
+              addLog WARNING $ "-----data decoding error: " <> T.pack (show err)
               pure $ responseLBS status404 [(hContentType, "text/plain")] "Not Found 404"
             Right decodedPic -> pure $ responseLBS status200 [(hContentType, T.encodeUtf8 mime)] . LBS.fromStrict $ decodedPic
 

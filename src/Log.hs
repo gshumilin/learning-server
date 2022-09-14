@@ -1,14 +1,24 @@
 module Log where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
-import qualified Data.Text as T
+import Control.Monad.Reader (ReaderT, ask, lift)
+import qualified Data.Text as T (Text, pack)
+import Data.Text.IO (hPutStrLn)
+import Data.Time (getCurrentTime)
+import System.IO (Handle, IOMode (AppendMode), openFile, stderr, stdout)
 import Types.Domain.Environment (Environment (..))
-import Types.Domain.Log (LogInfo (..), LogLvl)
+import Types.Domain.Log (LogDescType (..), LogLvl (..))
 
-addLog :: LogLvl -> String -> ReaderT Environment IO ()
+addLog :: LogLvl -> T.Text -> ReaderT Environment IO ()
 addLog lvl logMsg = do
-  LogInfo {..} <- asks logInfo
-  lift $ putStrLn logMsg
+  Environment {..} <- ask
   if lvl >= logLvl
-    then lift $ appendFile (T.unpack logPath) (logMsg ++ "\n")
+    then do
+      time <- lift getCurrentTime
+      let msg = T.pack (show time) <> " :: " <> T.pack (show lvl) <> " :: " <> logMsg
+      lift $ hPutStrLn logDesc msg
     else pure ()
+
+makeLogDesc :: LogDescType -> IO Handle
+makeLogDesc (LogFile logFilePath) = openFile logFilePath AppendMode
+makeLogDesc StdErr = pure stderr
+makeLogDesc StdOut = pure stdout
