@@ -2,7 +2,6 @@ module Endpoints.GetUser where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson.Encode.Pretty (encodePretty)
-import Data.Time (getCurrentTime)
 import DatabaseQueries.User (readUsers)
 import Network.HTTP.Types (hContentType, status200)
 import Network.Wai (Response, responseLBS)
@@ -16,16 +15,3 @@ getUsers = do
   usersList <- lift $ readUsers conn
   let jsonUsersList = encodePretty (Domain.UsersList usersList)
   pure $ responseLBS status200 [(hContentType, "text/plain")] jsonUsersList
-
-apiUserTransform :: API.CreateUserRequest -> IO Domain.User
-apiUserTransform API.CreateUserRequest {..} = do
-  currTime <- getCurrentTime
-  pure $
-    Domain.User
-      { name = reqName,
-        login = reqLogin,
-        password = reqPassword,
-        createDate = currTime,
-        isAdmin = reqIsAdmin,
-        isAbleToCreateNews = reqIsAbleToCreateNews
-      }
