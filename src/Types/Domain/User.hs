@@ -1,18 +1,16 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Types.Domain.User where
 
-import Control.Monad (mzero)
-import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON, (.:), (.=))
+import Data.Aeson.Types (FromJSON, ToJSON, object, toJSON, (.=))
 import qualified Data.Text as T
 import Data.Time (UTCTime)
 import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
+import GHC.Generics (Generic)
 
-newtype UsersList = UsersList [User]
+newtype UsersList = UsersList [User] deriving (Generic, Show)
 
-instance ToJSON UsersList where
-  toJSON (UsersList list) =
-    object
-      [ "usersList" .= list
-      ]
+instance ToJSON UsersList
 
 data User = User
   { name :: T.Text,
@@ -22,25 +20,16 @@ data User = User
     isAdmin :: Bool,
     isAbleToCreateNews :: Bool
   }
-  deriving (Show)
+  deriving (Generic, Show)
 
-instance FromJSON User where
-  parseJSON (Object inputJSON) = do
-    name <- inputJSON .: "name"
-    login <- inputJSON .: "login"
-    password <- inputJSON .: "password"
-    createDate <- inputJSON .: "createDate"
-    isAdmin <- inputJSON .: "isAdmin"
-    isAbleToCreateNews <- inputJSON .: "isAbleToCreateNews"
-    pure $ User {..}
-  parseJSON _ = mzero
+instance FromJSON User
 
 instance ToJSON User where
   toJSON User {..} =
     object
       [ "name" .= name,
         "login" .= login,
-        --, "password" .= password
+        --"password" .= password,
         "createDate" .= createDate,
         "isAdmin" .= isAdmin,
         "isAbleToCreateNews" .= isAbleToCreateNews

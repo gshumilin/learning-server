@@ -1,31 +1,24 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Types.DB.Category where
 
-import Data.Aeson.Types (ToJSON, object, toJSON, (.=))
+import Data.Aeson.Types (ToJSON)
 import qualified Data.Text as T
 import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
+import GHC.Generics (Generic)
 
-newtype Categories = Categories [Category]
+newtype Categories = Categories [Category] deriving (Generic, Show)
 
-instance ToJSON Categories where
-  toJSON (Categories arr) =
-    object
-      [ "categories" .= arr
-      ]
+instance ToJSON Categories
 
 data Category = Category
   { categoryId :: Int,
     title :: T.Text,
     parentId :: Maybe Int
   }
-  deriving (Show)
+  deriving (Generic, Show)
 
-instance ToJSON Category where
-  toJSON Category {..} =
-    object
-      [ "categoryId" .= categoryId,
-        "title" .= title,
-        "parentId" .= parentId
-      ]
+instance ToJSON Category
 
 instance FromRow Category where
   fromRow = do

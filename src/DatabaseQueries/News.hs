@@ -47,7 +47,7 @@ fromDbNews conn DB.News {..} = do
         creator = newsCreator,
         category = newsCategory,
         textContent = textContent,
-        picturesLinks = newsPictures,
+        pictures = newsPictures,
         isPublished = isPublished,
         numbersOfPictures = numbersOfPictures
       }

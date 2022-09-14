@@ -1,8 +1,10 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Types.API.News where
 
-import Control.Monad (mzero)
-import Data.Aeson
+import Data.Aeson (FromJSON)
 import qualified Data.Text as T
+import GHC.Generics (Generic)
 import qualified Types.Domain.Picture as Domain (Picture (..))
 
 data CreateNewsRequest = CreateNewsRequest
@@ -11,16 +13,9 @@ data CreateNewsRequest = CreateNewsRequest
     textContent :: T.Text,
     pictures :: Maybe [Domain.Picture]
   }
-  deriving (Show)
+  deriving (Generic, Show)
 
-instance FromJSON CreateNewsRequest where
-  parseJSON (Object inputJSON) = do
-    title <- inputJSON .: "title"
-    categoryId <- inputJSON .: "categoryId"
-    textContent <- inputJSON .: "textContent"
-    pictures <- inputJSON .:? "pictures"
-    pure $ CreateNewsRequest {..}
-  parseJSON _ = mzero
+instance FromJSON CreateNewsRequest
 
 data EditNewsRequest = EditNewsRequest
   { newsId :: Int,
@@ -29,14 +24,6 @@ data EditNewsRequest = EditNewsRequest
     newTextContent :: Maybe T.Text,
     newPictures :: Maybe [Domain.Picture]
   }
-  deriving (Show)
+  deriving (Generic, Show)
 
-instance FromJSON EditNewsRequest where
-  parseJSON (Object inputJSON) = do
-    newsId <- inputJSON .: "newsId"
-    newTitle <- inputJSON .:? "newTitle"
-    newCategoryId <- inputJSON .:? "newCategoryId"
-    newTextContent <- inputJSON .:? "newTextContent"
-    newPictures <- inputJSON .:? "newPictures"
-    pure $ EditNewsRequest {..}
-  parseJSON _ = mzero
+instance FromJSON EditNewsRequest

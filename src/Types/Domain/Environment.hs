@@ -2,8 +2,7 @@
 
 module Types.Domain.Environment where
 
-import Control.Monad (mzero)
-import Data.Aeson.Types (FromJSON, Value (..), parseJSON, (.:))
+import Data.Aeson.Types (FromJSON)
 import Data.Word (Word16)
 import Database.PostgreSQL.Simple (Connection)
 import GHC.Generics (Generic)
@@ -33,14 +32,6 @@ data DbConnectInfo = DbConnectInfo
     dbConnectPassword :: String,
     dbConnectDatabase :: String
   }
-  deriving (Show)
+  deriving (Generic, Show)
 
-instance FromJSON DbConnectInfo where
-  parseJSON (Object inputJSON) = do
-    dbConnectHost <- inputJSON .: "connectHost"
-    dbConnectPort <- inputJSON .: "connectPort"
-    dbConnectUser <- inputJSON .: "connectUser"
-    dbConnectPassword <- inputJSON .: "connectPassword"
-    dbConnectDatabase <- inputJSON .: "connectDatabase"
-    pure DbConnectInfo {..}
-  parseJSON _ = mzero
+instance FromJSON DbConnectInfo

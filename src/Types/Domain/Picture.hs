@@ -1,23 +1,18 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Types.Domain.Picture where
 
 import Control.Monad (mzero)
 import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON, (.:), (.=))
 import qualified Data.Text as T
 import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
+import GHC.Generics (Generic)
 
-newtype Pictures = Pictures [Picture] deriving (Show)
+newtype Pictures = Pictures [Picture] deriving (Generic, Show)
 
-instance FromJSON Pictures where
-  parseJSON (Object inputJSON) = do
-    arr <- inputJSON .: "pictures"
-    pure $ Pictures arr
-  parseJSON _ = mzero
+instance FromJSON Pictures
 
-instance ToJSON Pictures where
-  toJSON (Pictures arr) =
-    object
-      [ "pictures" .= arr
-      ]
+instance ToJSON Pictures
 
 data Picture = Picture
   { mime :: T.Text,

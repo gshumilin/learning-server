@@ -89,7 +89,7 @@ POST-request. Available to authorized admin-users
 
 Parameters:
 
-`categoryId` - Int - Required;
+`processedCategoryId` - Int - Required;
 
 `newTitle` - Text - Optional;
       
