@@ -38,7 +38,8 @@ data EditedNewsFields = EditedNewsFields
   { creatorId :: Int,
     oldTitle :: T.Text,
     oldCategoryId :: Int,
-    oldTextContent :: T.Text
+    oldTextContent :: T.Text,
+    oldPublishStatus :: Bool
   }
   deriving (Show)
 
@@ -48,4 +49,5 @@ instance FromRow EditedNewsFields where
     oldTitle <- field
     oldCategoryId <- field
     oldTextContent <- field
+    oldPublishStatus <- field
     pure EditedNewsFields {..}
