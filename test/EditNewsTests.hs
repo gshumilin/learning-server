@@ -36,7 +36,8 @@ editNewsRequest =
       newTitle = Nothing,
       newCategoryId = Nothing,
       newTextContent = Nothing,
-      newPictures = Nothing
+      newPictures = Nothing,
+      newPublishStatus = Nothing
     }
 
 currNews =
@@ -51,11 +52,9 @@ editNewsTest :: SpecWith ()
 editNewsTest =
   describe "editNewsTests" $ do
     it "Shouldn't edit news if post doesn't exist for this author" $ do
-      invoker <- sampleUser
-      let result = hEditNews testHandle invoker editNewsRequest
+      let result = hEditNews testHandle editNewsRequest
       result `shouldBe` pure NewsNotExistsForThisAuthor
     it "Should successfully edit post" $ do
-      invoker <- sampleUser
       let successHandle = testHandle {hReadSpecificNews = \_ -> pure $ Just currNews}
-      let result = hEditNews successHandle invoker editNewsRequest
+      let result = hEditNews successHandle editNewsRequest
       result `shouldBe` pure EditNewsSuccess
