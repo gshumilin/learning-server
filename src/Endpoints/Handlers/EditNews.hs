@@ -17,7 +17,7 @@ hEditNews Handle {..} invoker editNewsRequest@API.EditNewsRequest {..} = do
   case mbCurrentNews of
     Nothing -> pure NewsNotExists
     Just editedNewsFields@DB.EditedNewsFields {..} -> do
-      if DB.userId invoker == oldCreatorId
+      if DB.userId invoker == creatorId
         then do
           hRewriteNews editedNewsFields editNewsRequest
           pure EditNewsSuccess

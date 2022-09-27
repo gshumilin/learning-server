@@ -35,7 +35,7 @@ instance FromRow News where
     pure News {..}
 
 data EditedNewsFields = EditedNewsFields
-  { oldCreatorId :: Int,
+  { creatorId :: Int,
     oldTitle :: T.Text,
     oldCategoryId :: Int,
     oldTextContent :: T.Text
@@ -44,7 +44,7 @@ data EditedNewsFields = EditedNewsFields
 
 instance FromRow EditedNewsFields where
   fromRow = do
-    oldCreatorId <- field
+    creatorId <- field
     oldTitle <- field
     oldCategoryId <- field
     oldTextContent <- field

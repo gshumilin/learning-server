@@ -41,7 +41,7 @@ editNewsRequest =
 
 currNews =
   EditedNewsFields
-    { oldCreatorId = 1,
+    { creatorId = 1,
       oldTitle = "T.Text",
       oldCategoryId = 1,
       oldTextContent = "T.Text"
