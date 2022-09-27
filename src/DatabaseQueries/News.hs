@@ -48,8 +48,7 @@ fromDbNews conn DB.News {..} = do
         category = newsCategory,
         textContent = textContent,
         pictures = newsPictures,
-        isPublished = isPublished,
-        numbersOfPictures = numbersOfPictures
+        isPublished = isPublished
       }
 
 readSpecificNews :: Connection -> Int -> IO (Maybe DB.EditedNewsFields)
