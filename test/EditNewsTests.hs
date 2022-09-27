@@ -41,19 +41,19 @@ editNewsRequest =
 
 currNews =
   EditedNewsFields
-    { creatorId = 1,
-      oldTitle = "T.Text",
+    { oldTitle = "T.Text",
       oldCategoryId = 1,
-      oldTextContent = "T.Text"
+      oldTextContent = "T.Text",
+      oldPublishStatus = False
     }
 
 editNewsTest :: SpecWith ()
 editNewsTest =
   describe "editNewsTests" $ do
-    it "Shouldn't edit news if post doesn't exist" $ do
+    it "Shouldn't edit news if post doesn't exist for this author" $ do
       invoker <- sampleUser
       let result = hEditNews testHandle invoker editNewsRequest
-      result `shouldBe` pure NewsNotExists
+      result `shouldBe` pure NewsNotExistsForThisAuthor
     it "Should successfully edit post" $ do
       invoker <- sampleUser
       let successHandle = testHandle {hReadSpecificNews = \_ -> pure $ Just currNews}

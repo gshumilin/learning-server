@@ -51,10 +51,12 @@ fromDbNews conn DB.News {..} = do
         isPublished = isPublished
       }
 
-readSpecificNews :: Connection -> Int -> IO (Maybe DB.EditedNewsFields)
-readSpecificNews conn newsId = do
-  let q = "SELECT creator_id, title, category_id, text_content, is_published FROM news WHERE id=?"
-  res <- query conn q (Only newsId) :: IO [DB.EditedNewsFields]
+readSpecificNews :: Connection -> Int -> Int -> IO (Maybe DB.EditedNewsFields)
+readSpecificNews conn userId newsId = do
+  let q =
+        " SELECT title, category_id, text_content, is_published \
+        \ FROM news WHERE id=? AND creator_id=?"
+  res <- query conn q (newsId, userId) :: IO [DB.EditedNewsFields]
   case res of
     [] -> pure Nothing
     [news] -> pure $ Just news
