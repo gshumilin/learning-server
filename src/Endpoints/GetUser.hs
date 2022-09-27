@@ -5,9 +5,8 @@ import Data.Aeson.Encode.Pretty (encodePretty)
 import DatabaseQueries.User (readUsers)
 import Network.HTTP.Types (hContentType, status200)
 import Network.Wai (Response, responseLBS)
-import qualified Types.API.User as API (CreateUserRequest (..))
 import Types.Domain.Environment (Environment (..))
-import qualified Types.Domain.User as Domain (User (..), UsersList (..))
+import qualified Types.Domain.User as Domain (UsersList (..))
 
 getUsers :: ReaderT Environment IO Response
 getUsers = do
