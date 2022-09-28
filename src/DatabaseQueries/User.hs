@@ -6,20 +6,27 @@ import qualified Types.API.User as API (CreateUserRequest (..))
 import qualified Types.Domain.User as Domain (User (..))
 
 readUsers :: Connection -> IO [Domain.User]
-readUsers conn = query_ conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users"
+readUsers conn =
+  let q =
+        " SELECT name, login, password, create_date, is_admin, is_able_to_create_news \
+        \ FROM users"
+   in query_ conn q
 
 writeUser :: Connection -> API.CreateUserRequest -> IO ()
 writeUser conn API.CreateUserRequest {..} = do
-  _ <-
-    execute
-      conn
-      "INSERT INTO users (name,login,password,is_admin,is_able_to_create_news) values (?,?,?,?,?)"
-      (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
+  let q =
+        " INSERT INTO users \
+        \ (name, login, password, is_admin, is_able_to_create_news) \
+        \ VALUES (?,?,?,?,?)"
+  _ <- execute conn q (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
   pure ()
 
 findUser :: Connection -> Int -> IO Domain.User
 findUser conn userId = do
-  res <- query conn "SELECT name,login,password,create_date,is_admin,is_able_to_create_news FROM users WHERE id = ?" $ Only userId
+  let q =
+        " SELECT name, login, password, create_date, is_admin, is_able_to_create_news \
+        \ FROM users WHERE id = ?"
+  res <- query conn q $ Only userId
   pure $ head res
 
 findUserIdByLogin :: Connection -> T.Text -> IO (Maybe Int)

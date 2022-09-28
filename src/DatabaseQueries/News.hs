@@ -66,17 +66,21 @@ writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
 writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
   currTime <- getCurrentTime
   let isPublished = False
-  let q = "INSERT INTO news (title, create_date, creator_id, category_id, text_content, is_published) values (?,?,?,?,?,?) RETURNING id"
+  let q =
+        " INSERT INTO news \
+        \ (title, create_date, creator_id, category_id, text_content, is_published) \
+        \ VALUES (?,?,?,?,?,?) \
+        \ RETURNING id"
   [Only newsId] <- query conn q (title, currTime, newsCreatorId, categoryId, textContent, isPublished) :: IO [Only Int]
   case pictures of
     Nothing -> pure ()
     Just picArr -> do
       mapM_
         ( \Domain.Picture {..} -> do
-            let insertingQ = "INSERT INTO pictures (data,mime) values (?,?) RETURNING id"
-            [Only picId] <- query conn insertingQ (picData, mime) :: IO [Only Int]
-            let insertingQ' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
-            execute conn insertingQ' (newsId, picId)
+            let picQ = "INSERT INTO pictures (data, mime) VALUES (?,?) RETURNING id"
+            [Only picId] <- query conn picQ (picData, mime) :: IO [Only Int]
+            let newsPicQ = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
+            execute conn newsPicQ (newsId, picId)
         )
         picArr
 

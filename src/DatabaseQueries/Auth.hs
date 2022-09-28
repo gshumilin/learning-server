@@ -7,7 +7,9 @@ import qualified Types.DB.User as DB (User (..))
 
 authentication :: Connection -> (BS.ByteString, BS.ByteString) -> IO (Either T.Text DB.User)
 authentication conn (login, password) = do
-  let q = "SELECT * FROM users WHERE login = ? AND password = ?"
+  let q =
+        " SELECT * FROM users \
+        \ WHERE login = ? AND password = ?"
   mbRes <- query conn q (login :: BS.ByteString, password :: BS.ByteString)
   case mbRes of
     [] -> pure (Left "Authentication fail")
