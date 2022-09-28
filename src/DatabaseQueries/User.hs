@@ -1,7 +1,7 @@
 module DatabaseQueries.User where
 
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple (Connection, Only (..), execute, query, query_)
+import Database.PostgreSQL.Simple (Connection, Only (..), query, query_)
 import qualified Types.API.User as API (CreateUserRequest (..))
 import qualified Types.Domain.User as Domain (User (..))
 
@@ -12,14 +12,15 @@ readUsers conn =
         \ FROM users"
    in query_ conn q
 
-writeUser :: Connection -> API.CreateUserRequest -> IO ()
+writeUser :: Connection -> API.CreateUserRequest -> IO Int
 writeUser conn API.CreateUserRequest {..} = do
   let q =
         " INSERT INTO users \
         \ (name, login, password, is_admin, is_able_to_create_news) \
-        \ VALUES (?,?,?,?,?)"
-  _ <- execute conn q (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
-  pure ()
+        \ VALUES (?,?,?,?,?) \
+        \ RETURNING id"
+  [Only resId] <- query conn q (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
+  pure resId
 
 findUser :: Connection -> Int -> IO Domain.User
 findUser conn userId = do

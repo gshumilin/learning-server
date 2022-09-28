@@ -10,6 +10,7 @@ import qualified Types.API.User as API (CreateUserRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
+import Utils (intToLBS)
 
 createUser :: DB.User -> API.CreateUserRequest -> ReaderT Environment IO Response
 createUser invoker req = do
@@ -22,9 +23,10 @@ createUser invoker req = do
     LoginIsTaken -> do
       addLog DEBUG "createUser-error: LoginIsTaken"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect title"
-    CreateUserSuccess -> do
+    CreateUserSuccess resId -> do
+      let reqRes = intToLBS resId
       addLog DEBUG "createUser: CreateUserSuccess"
-      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
+      pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
   where
     handle conn =
       Handle
