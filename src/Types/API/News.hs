@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Types.API.News where
@@ -13,9 +14,7 @@ data CreateNewsRequest = CreateNewsRequest
     textContent :: T.Text,
     pictures :: Maybe [Domain.Picture]
   }
-  deriving (Generic, Show)
-
-instance FromJSON CreateNewsRequest
+  deriving (Generic, FromJSON, Show)
 
 data EditNewsRequest = EditNewsRequest
   { newsId :: Int,
@@ -25,6 +24,4 @@ data EditNewsRequest = EditNewsRequest
     newPictures :: Maybe [Domain.Picture],
     newPublishStatus :: Maybe Bool
   }
-  deriving (Generic, Show)
-
-instance FromJSON EditNewsRequest
+  deriving (Generic, FromJSON, Show)

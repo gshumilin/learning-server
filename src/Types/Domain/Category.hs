@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Types.Domain.Category where
@@ -11,8 +12,4 @@ data Category = Category
     title :: T.Text,
     parent :: Maybe Category
   }
-  deriving (Show, Generic)
-
-instance FromJSON Category
-
-instance ToJSON Category
+  deriving (Show, Generic, FromJSON, ToJSON)

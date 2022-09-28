@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Types.Domain.Picture where
@@ -5,20 +6,16 @@ module Types.Domain.Picture where
 import Control.Monad (mzero)
 import Data.Aeson.Types (FromJSON, ToJSON, Value (..), object, parseJSON, toJSON, (.:), (.=))
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
+import Database.PostgreSQL.Simple.FromRow (FromRow)
 import GHC.Generics (Generic)
 
-newtype Pictures = Pictures [Picture] deriving (Generic, Show)
-
-instance FromJSON Pictures
-
-instance ToJSON Pictures
+newtype Pictures = Pictures [Picture] deriving (Generic, Show, FromJSON, ToJSON)
 
 data Picture = Picture
   { mime :: T.Text,
     picData :: T.Text
   }
-  deriving (Show)
+  deriving (Show, Generic, FromRow)
 
 instance FromJSON Picture where
   parseJSON (Object inputJSON) = do
@@ -34,9 +31,3 @@ instance ToJSON Picture where
       [ "mime" .= mime,
         "data" .= picData
       ]
-
-instance FromRow Picture where
-  fromRow = do
-    picData <- field
-    mime <- field
-    pure Picture {..}
