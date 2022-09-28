@@ -127,7 +127,7 @@ Parameters:
 Example: "http://localhost:3000/getPicture?id=42"
 
 ### /putPicture
-POST-request.
+POST-request. Returns picture id or error message
 
 Request body:
 ```
@@ -179,7 +179,7 @@ Other oprtional parameters:
   `number_of_pictures`
     
 ### /createNews
-POST-request. Available to able to create news users.
+POST-request. Returns news id or error message. Available to able to create news users.
 
 Parameters:
 
