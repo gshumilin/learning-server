@@ -46,7 +46,7 @@ testHandle =
         case cId of
           1 -> pure (Just sampleCategory)
           _ -> pure Nothing,
-      hWriteNews = \_ _ -> pure ()
+      hWriteNews = \_ _ -> pure 1
     }
 
 createNewsTest :: SpecWith ()
@@ -65,4 +65,4 @@ createNewsTest =
     it "Should succwssfully create news" $ do
       invoker <- sampleUser
       let result = hCreateNews testHandle invoker createNewsRequest
-      result `shouldBe` pure CreateNewsSuccess
+      result `shouldBe` pure (CreateNewsSuccess 1)

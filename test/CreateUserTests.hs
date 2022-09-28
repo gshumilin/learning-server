@@ -37,7 +37,7 @@ testHandle =
         case l of
           "takenLogin" -> pure (Just 2)
           _ -> pure Nothing,
-      hWriteUser = \_ -> pure ()
+      hWriteUser = \_ -> pure 1
     }
 
 createUserTest :: SpecWith ()
@@ -56,4 +56,4 @@ createUserTest =
     it "Should create user" $ do
       invoker <- sampleAdminUser
       let result = hCreateUser testHandle invoker createUserRequest
-      result `shouldBe` return CreateUserSuccess
+      result `shouldBe` return (CreateUserSuccess 1)
