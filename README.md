@@ -203,3 +203,5 @@ POST-request. Available to author.
 `newTextContent` - Text - Optional;
 
 `newPictures` - Array of pictures. See "/putPicture" section - Optional;
+
+`newPublishStatus` - Bool - Optional;

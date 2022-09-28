@@ -22,7 +22,8 @@ data EditNewsRequest = EditNewsRequest
     newTitle :: Maybe T.Text,
     newCategoryId :: Maybe Int,
     newTextContent :: Maybe T.Text,
-    newPictures :: Maybe [Domain.Picture]
+    newPictures :: Maybe [Domain.Picture],
+    newPublishStatus :: Maybe Bool
   }
   deriving (Generic, Show)
 
