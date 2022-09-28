@@ -76,7 +76,7 @@ The logging function itself is implemented in the Log module.
 GET-request. Returns categories list.
   
 ### /createCategory
-POST-request. Available to authorized admin-users.
+POST-request. Returns id of the created category or error message. Available to authorized admin-users.
 
 Parameters:
 
