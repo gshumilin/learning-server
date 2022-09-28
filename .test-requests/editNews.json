@@ -1,5 +1,6 @@
 {
     "newsId" : 1,
     "newTitle" : "Edited_Oleg_unpublished_with_pictures",
-    "newTextContent" : "1_Test_Text_text_text_text_text"
+    "newTextContent" : "1_Test_Text_text_text_text_text",
+    "newPublishStatus" : true
 }

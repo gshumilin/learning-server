@@ -17,7 +17,7 @@ testHandle =
       hReadCategoryByTitle = \title -> case title of
         "titleIsTaken" -> pure (Just sampleCategory)
         _ -> pure Nothing,
-      hWriteCategory = \_ -> pure ()
+      hWriteCategory = \_ -> pure 1
     }
 
 sampleAdminUser :: IO DB.User
@@ -74,4 +74,4 @@ createCategoryTest =
       invoker <- sampleAdminUser
       let req = createCategoryRequest {parentCategoryId = Just 1}
       let result = hCreateCategory testHandle invoker req
-      result `shouldBe` return CreateCategorySuccess
+      result `shouldBe` return (CreateCategorySuccess 1)

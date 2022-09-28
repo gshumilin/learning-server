@@ -55,14 +55,15 @@ readCategoryWithParentsById catId conn = do
         \ FROM records_list ORDER BY depth;"
   query conn q (Only catId)
 
-writeCategory :: Connection -> API.CreateCategoryRequest -> IO ()
+writeCategory :: Connection -> API.CreateCategoryRequest -> IO Int
 writeCategory conn API.CreateCategoryRequest {..} = do
   let q =
         " INSERT INTO categories \
         \ (title,parent_category_id) \
-        \ VALUES (?,?)"
-  _ <- execute conn q (title, parentCategoryId)
-  pure ()
+        \ VALUES (?,?) \
+        \ RETURNING id"
+  (Only resId : _) <- query conn q (title, parentCategoryId)
+  pure resId
 
 rewriteCategory :: Connection -> API.EditCategoryRequest -> IO ()
 rewriteCategory conn API.EditCategoryRequest {..} = do

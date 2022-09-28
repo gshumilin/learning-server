@@ -25,9 +25,9 @@ data News = News
   deriving (Show, FromRow, Generic)
 
 data EditedNewsFields = EditedNewsFields
-  { oldCreatorId :: Int,
-    oldTitle :: T.Text,
+  { oldTitle :: T.Text,
     oldCategoryId :: Int,
-    oldTextContent :: T.Text
+    oldTextContent :: T.Text,
+    oldPublishStatus :: Bool
   }
   deriving (Show, Generic, FromRow)

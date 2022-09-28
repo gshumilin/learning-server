@@ -20,7 +20,6 @@ data News = News
     category :: Maybe Domain.Category,
     textContent :: T.Text,
     pictures :: Maybe [T.Text],
-    isPublished :: Bool,
-    numbersOfPictures :: Int
+    isPublished :: Bool
   }
   deriving (Generic, Show, FromJSON, ToJSON)

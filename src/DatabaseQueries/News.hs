@@ -48,22 +48,21 @@ fromDbNews conn DB.News {..} = do
         category = newsCategory,
         textContent = textContent,
         pictures = newsPictures,
-        isPublished = isPublished,
-        numbersOfPictures = numbersOfPictures
+        isPublished = isPublished
       }
 
-readSpecificNews :: Connection -> Int -> IO (Maybe DB.EditedNewsFields)
-readSpecificNews conn newsId = do
+readSpecificNews :: Connection -> Int -> Int -> IO (Maybe DB.EditedNewsFields)
+readSpecificNews conn userId newsId = do
   let q =
-        " SELECT creator_id, title, category_id, text_content \
-        \ FROM news WHERE id=?"
-  res <- query conn q (Only newsId) :: IO [DB.EditedNewsFields]
+        " SELECT title, category_id, text_content, is_published \
+        \ FROM news WHERE id=? AND creator_id=?"
+  res <- query conn q (newsId, userId) :: IO [DB.EditedNewsFields]
   case res of
     [] -> pure Nothing
     [news] -> pure $ Just news
     (news : _) -> pure $ Just news
 
-writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
+writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO Int
 writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
   currTime <- getCurrentTime
   let isPublished = False
@@ -74,7 +73,7 @@ writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
         \ RETURNING id"
   [Only newsId] <- query conn q (title, currTime, newsCreatorId, categoryId, textContent, isPublished) :: IO [Only Int]
   case pictures of
-    Nothing -> pure ()
+    Nothing -> pure newsId
     Just picArr -> do
       mapM_
         ( \Domain.Picture {..} -> do
@@ -84,10 +83,11 @@ writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
             execute conn newsPicQ (newsId, picId)
         )
         picArr
+      pure newsId
 
 rewriteNews :: Connection -> DB.EditedNewsFields -> API.EditNewsRequest -> IO ()
 rewriteNews conn editedNewsFields editNewsRequest = do
-  let q = "UPDATE news SET title=?, category_id=?, text_content=? WHERE id=?"
+  let q = "UPDATE news SET title=?, category_id=?, text_content=?, is_published=? WHERE id=?"
   _ <-
     execute
       conn
@@ -95,6 +95,7 @@ rewriteNews conn editedNewsFields editNewsRequest = do
       ( fromMaybe (DB.oldTitle editedNewsFields) (API.newTitle editNewsRequest),
         fromMaybe (DB.oldCategoryId editedNewsFields) (API.newCategoryId editNewsRequest),
         fromMaybe (DB.oldTextContent editedNewsFields) (API.newTextContent editNewsRequest),
+        fromMaybe (DB.oldPublishStatus editedNewsFields) (API.newPublishStatus editNewsRequest),
         API.newsId editNewsRequest
       )
   case API.newPictures editNewsRequest of

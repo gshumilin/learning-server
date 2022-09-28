@@ -1,5 +1,6 @@
 module DatabaseQueries.User where
 
+import Control.Monad (void)
 import qualified Data.Text as T
 import Database.PostgreSQL.Simple (Connection, Only (..), execute, query, query_)
 import qualified Types.API.User as API (CreateUserRequest (..))
@@ -18,8 +19,7 @@ writeUser conn API.CreateUserRequest {..} = do
         " INSERT INTO users \
         \ (name, login, password, is_admin, is_able_to_create_news) \
         \ VALUES (?,?,?,?,?)"
-  _ <- execute conn q (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
-  pure ()
+  void $ execute conn q (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
 
 findUser :: Connection -> Int -> IO Domain.User
 findUser conn userId = do

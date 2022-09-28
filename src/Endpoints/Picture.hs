@@ -16,6 +16,7 @@ import Text.Read (readMaybe)
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 import qualified Types.Domain.Picture as Domain (Picture (..))
+import Utils (intToLBS)
 
 getPicture :: Request -> ReaderT Environment IO Response
 getPicture req = do
@@ -54,5 +55,6 @@ putPicture request = do
       addLog WARNING "Invalid JSON"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
     Just newBase64 -> do
-      lift $ writePicture conn newBase64
-      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
+      resId <- lift $ writePicture conn newBase64
+      let reqRes = intToLBS resId
+      pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes

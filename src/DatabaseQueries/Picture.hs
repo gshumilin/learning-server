@@ -23,10 +23,13 @@ readPicture conn pictureId = do
     [] -> pure Nothing
     (x : _) -> pure $ Just x
 
-writePicture :: Connection -> Picture -> IO ()
+writePicture :: Connection -> Picture -> IO Int
 writePicture conn Picture {..} = do
-  _ <- execute conn "INSERT INTO pictures (data,mime) VALUES (?,?)" (picData, mime)
-  pure ()
+  let q =
+        " INSERT INTO pictures (data,mime) \
+        \ VALUES (?,?) RETURNING id"
+  [Only resId] <- query conn q (picData, mime)
+  pure resId
 
 addPicturesToNews :: Connection -> Int -> [Picture] -> IO ()
 addPicturesToNews conn newsId picArr = do
