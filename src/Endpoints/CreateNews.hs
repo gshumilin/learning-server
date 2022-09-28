@@ -12,6 +12,7 @@ import qualified Types.API.News as API (CreateNewsRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
+import Utils (intToLBS)
 
 createNews :: DB.User -> API.CreateNewsRequest -> ReaderT Environment IO Response
 createNews invoker req = do
@@ -24,9 +25,10 @@ createNews invoker req = do
     CategoryNotExists -> do
       addLog DEBUG "createNews-error: CategoryNotExists"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such Id"
-    CreateNewsSuccess -> do
+    CreateNewsSuccess resId -> do
+      let reqRes = intToLBS resId
       addLog DEBUG "createNews: Success"
-      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
+      pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
   where
     handle :: Connection -> Handle IO
     handle conn =

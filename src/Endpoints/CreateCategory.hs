@@ -1,6 +1,8 @@
 module Endpoints.CreateCategory where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
+import Data.ByteString.Char8 (pack)
+import Data.ByteString.Lazy (fromStrict)
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, writeCategory)
 import Endpoints.Handlers.CreateCategory (CreateCategoryResult (..), Handle (..), hCreateCategory)
@@ -26,9 +28,10 @@ createCategory invoker createCategoryRequest = do
     IncorrectTitle -> do
       addLog DEBUG "createCategory-error: IncorrectTitle"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect title"
-    CreateCategorySuccess -> do
+    CreateCategorySuccess resId -> do
       addLog DEBUG "createCategory: Success"
-      pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
+      let reqRes = fromStrict . pack . show $ resId
+      pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
   where
     handle :: Connection -> Handle IO
     handle conn =
