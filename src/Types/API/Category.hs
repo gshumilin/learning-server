@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Types.API.Category where
@@ -10,15 +11,11 @@ data CreateCategoryRequest = CreateCategoryRequest
   { title :: T.Text,
     parentCategoryId :: Maybe Int
   }
-  deriving (Generic, Show)
-
-instance FromJSON CreateCategoryRequest
+  deriving (Generic, Show, FromJSON)
 
 data EditCategoryRequest = EditCategoryRequest
   { processedCategoryId :: Int,
     newTitle :: Maybe T.Text,
     newParentCategoryId :: Maybe Int
   }
-  deriving (Generic, Show)
-
-instance FromJSON EditCategoryRequest
+  deriving (Generic, Show, FromJSON)

@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Types.Domain.Environment where
@@ -21,9 +22,7 @@ data Config = Config
     logLvl :: LogLvl,
     logDescType :: LogDescType
   }
-  deriving (Show, Generic)
-
-instance FromJSON Config
+  deriving (Show, Generic, FromJSON)
 
 data DbConnectInfo = DbConnectInfo
   { dbConnectHost :: String,
@@ -32,6 +31,4 @@ data DbConnectInfo = DbConnectInfo
     dbConnectPassword :: String,
     dbConnectDatabase :: String
   }
-  deriving (Generic, Show)
-
-instance FromJSON DbConnectInfo
+  deriving (Generic, Show, FromJSON)

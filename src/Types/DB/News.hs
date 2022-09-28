@@ -1,8 +1,12 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+
 module Types.DB.News where
 
 import qualified Data.Text as T
 import Data.Time.Clock (UTCTime)
-import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
+import Database.PostgreSQL.Simple.FromRow (FromRow)
+import GHC.Generics (Generic)
 
 newtype NewsList = NewsList [News]
 
@@ -18,21 +22,7 @@ data News = News
     isPublished :: Bool,
     numbersOfPictures :: Int
   }
-  deriving (Show)
-
-instance FromRow News where
-  fromRow = do
-    newsId <- field
-    title <- field
-    createDate <- field
-    creatorId <- field
-    creatorLogin <- field
-    categoryId <- field
-    categoryTitle <- field
-    textContent <- field
-    isPublished <- field
-    numbersOfPictures <- field
-    pure News {..}
+  deriving (Show, FromRow, Generic)
 
 data EditedNewsFields = EditedNewsFields
   { oldCreatorId :: Int,
@@ -40,12 +30,4 @@ data EditedNewsFields = EditedNewsFields
     oldCategoryId :: Int,
     oldTextContent :: T.Text
   }
-  deriving (Show)
-
-instance FromRow EditedNewsFields where
-  fromRow = do
-    oldCreatorId <- field
-    oldTitle <- field
-    oldCategoryId <- field
-    oldTextContent <- field
-    pure EditedNewsFields {..}
+  deriving (Show, Generic, FromRow)

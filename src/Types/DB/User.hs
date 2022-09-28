@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Types.DB.User where
@@ -5,12 +6,10 @@ module Types.DB.User where
 import Data.Aeson.Types (ToJSON, object, toJSON, (.=))
 import qualified Data.Text as T
 import Data.Time.Clock (UTCTime)
-import Database.PostgreSQL.Simple.FromRow (FromRow, field, fromRow)
+import Database.PostgreSQL.Simple.FromRow (FromRow)
 import GHC.Generics (Generic)
 
-newtype UsersList = UsersList [User] deriving (Generic, Show)
-
-instance ToJSON UsersList
+newtype UsersList = UsersList [User] deriving (Generic, ToJSON, Show)
 
 data User = User
   { userId :: Int,
@@ -21,7 +20,7 @@ data User = User
     isAdmin :: Bool,
     isAbleToCreateNews :: Bool
   }
-  deriving (Show)
+  deriving (Show, Generic, FromRow)
 
 instance ToJSON User where
   toJSON User {..} =
@@ -29,11 +28,7 @@ instance ToJSON User where
       [ "userId" .= userId,
         "name" .= name,
         "login" .= login,
-        --, "password" .= password
         "createDate" .= createDate,
         "isAdmin" .= isAdmin,
         "isAbleToCreateNews" .= isAbleToCreateNews
       ]
-
-instance FromRow User where
-  fromRow = User <$> field <*> field <*> field <*> field <*> field <*> field <*> field

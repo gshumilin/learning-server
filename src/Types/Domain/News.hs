@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Types.Domain.News where
@@ -9,9 +10,7 @@ import GHC.Generics (Generic)
 import qualified Types.Domain.Category as Domain (Category (..))
 import qualified Types.Domain.User as Domain (User (..))
 
-newtype NewsList = NewsList [News] deriving (Generic, Show)
-
-instance ToJSON NewsList
+newtype NewsList = NewsList [News] deriving (Generic, Show, ToJSON)
 
 data News = News
   { newsId :: Int,
@@ -24,8 +23,4 @@ data News = News
     isPublished :: Bool,
     numbersOfPictures :: Int
   }
-  deriving (Generic, Show)
-
-instance FromJSON News
-
-instance ToJSON News
+  deriving (Generic, Show, FromJSON, ToJSON)
