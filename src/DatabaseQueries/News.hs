@@ -63,7 +63,7 @@ readSpecificNews conn newsId = do
     [news] -> pure $ Just news
     (news : _) -> pure $ Just news
 
-writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO ()
+writeNews :: Connection -> Int -> API.CreateNewsRequest -> IO Int
 writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
   currTime <- getCurrentTime
   let isPublished = False
@@ -74,7 +74,7 @@ writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
         \ RETURNING id"
   [Only newsId] <- query conn q (title, currTime, newsCreatorId, categoryId, textContent, isPublished) :: IO [Only Int]
   case pictures of
-    Nothing -> pure ()
+    Nothing -> pure newsId
     Just picArr -> do
       mapM_
         ( \Domain.Picture {..} -> do
@@ -84,6 +84,7 @@ writeNews conn newsCreatorId API.CreateNewsRequest {..} = do
             execute conn newsPicQ (newsId, picId)
         )
         picArr
+      pure newsId
 
 rewriteNews :: Connection -> DB.EditedNewsFields -> API.EditNewsRequest -> IO ()
 rewriteNews conn editedNewsFields editNewsRequest = do

@@ -3,6 +3,8 @@ module Utils where
 import Auth (authFailResponse, authorization)
 import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson (FromJSON, decodeStrict)
+import Data.ByteString.Char8 (pack)
+import Data.ByteString.Lazy (ByteString, fromStrict)
 import qualified Data.Text as T (pack)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
@@ -59,3 +61,6 @@ withAuth isFunc endpointFunc req = do
         else do
           addLog WARNING "----- There is authError: \"authentication fail\""
           pure authFailResponse
+
+intToLBS :: Int -> ByteString
+intToLBS = fromStrict . pack . show
