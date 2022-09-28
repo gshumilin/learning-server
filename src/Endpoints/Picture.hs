@@ -6,7 +6,7 @@ import Data.ByteString.Base64 (decodeBase64)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as LBS
 import Data.List (find)
-import qualified Data.Text as T (pack, unpack)
+import qualified Data.Text as T (pack, toLower, unpack)
 import qualified Data.Text.Encoding as T (encodeUtf8)
 import DatabaseQueries.Picture (readPicture, writePicture)
 import Log (addLog)
@@ -54,7 +54,16 @@ putPicture request = do
     Nothing -> do
       addLog WARNING "Invalid JSON"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
-    Just newBase64 -> do
-      resId <- lift $ writePicture conn newBase64
-      let reqRes = intToLBS resId
-      pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
+    Just pic ->
+      if not $ isMimeValid pic
+        then do
+          addLog DEBUG "putPicture-error: Invalid Picture Format"
+          pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: invalid picture format"
+        else do
+          resId <- lift $ writePicture conn pic
+          let reqRes = intToLBS resId
+          pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
+  where
+    isMimeValid Domain.Picture {..} =
+      let validList = ["image/png", "image/jpeg", "image/bmp"]
+       in T.toLower mime `elem` validList
