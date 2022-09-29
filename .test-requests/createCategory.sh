@@ -1,5 +1,5 @@
 curl -H "Content-type: application/json"\
      -H "Authorization: YWRtaW46YWRtaW4="\
      -X POST\
-     -d @createCategory.json\
+     -d @category.json\
      localhost:3000/createCategory
