@@ -10,7 +10,7 @@ import Endpoints.EditNews (editNews)
 import Endpoints.GetCategories (getCategories)
 import Endpoints.GetNews (getNews)
 import Endpoints.GetUser (getUsers)
-import Endpoints.Picture (getPicture, putPicture)
+import Endpoints.Picture (getPicture)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status404)
 import Network.Wai (Request, Response, ResponseReceived, rawPathInfo, responseLBS)
@@ -49,9 +49,6 @@ application req respond = do
       lift $ respond res
     "/getPicture" -> do
       res <- getPicture req
-      lift $ respond res
-    "/putPicture" -> do
-      res <- putPicture req
       lift $ respond res
     _ -> do
       addLog WARNING "Unknown method"
