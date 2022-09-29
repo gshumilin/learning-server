@@ -4,7 +4,7 @@ import Control.Exception (IOException, catch)
 import Control.Monad.Reader (ReaderT, lift, runReaderT)
 import Data.Aeson (decodeStrict)
 import qualified Data.ByteString.Char8 as BS
-import Data.Pool
+import Data.Pool (PoolConfig (..), newPool)
 import qualified Data.Text as T (pack)
 import Database.PostgreSQL.Simple (ConnectInfo (..), close, connect, withTransaction)
 import Database.PostgreSQL.Simple.Migration (MigrationCommand (..), MigrationContext (..), runMigration)
