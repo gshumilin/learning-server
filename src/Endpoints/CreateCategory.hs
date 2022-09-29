@@ -1,6 +1,6 @@
 module Endpoints.CreateCategory where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT, lift)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (fromStrict)
 import Database.PostgreSQL.Simple (Connection)
@@ -13,10 +13,11 @@ import qualified Types.API.Category as API (CreateCategoryRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
+import Utils (askConnection)
 
 createCategory :: DB.User -> API.CreateCategoryRequest -> ReaderT Environment IO Response
 createCategory invoker createCategoryRequest = do
-  conn <- asks dbConnection
+  conn <- askConnection
   res <- lift $ hCreateCategory (handle conn) invoker createCategoryRequest
   case res of
     NotAdmin -> do

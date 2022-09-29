@@ -1,6 +1,6 @@
 module Endpoints.Picture where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT, lift)
 import Data.ByteString.Base64 (decodeBase64)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as LBS
@@ -15,13 +15,14 @@ import Text.Read (readMaybe)
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 import qualified Types.Domain.Picture as Domain (Picture (..))
+import Utils (askConnection)
 
 getPicture :: Request -> ReaderT Environment IO Response
 getPicture req = do
   case findPicId req of
     Left err -> pure . responseLBS status400 [(hContentType, "text/plain")] $ err
     Right picId -> do
-      conn <- asks dbConnection
+      conn <- askConnection
       mbPic <- lift $ readPicture conn picId
       case mbPic of
         Nothing -> pure $ responseLBS status404 [(hContentType, "text/plain")] "Not Found 404"

@@ -4,6 +4,7 @@
 module Types.Domain.Environment where
 
 import Data.Aeson.Types (FromJSON)
+import Data.Pool (Pool)
 import Data.Word (Word16)
 import Database.PostgreSQL.Simple (Connection)
 import GHC.Generics (Generic)
@@ -11,7 +12,7 @@ import System.IO (Handle)
 import Types.Domain.Log (LogDescType (..), LogLvl (..))
 
 data Environment = Environment
-  { dbConnection :: Connection,
+  { dbPool :: Pool Connection,
     logLvl :: LogLvl,
     logDesc :: Handle
   }

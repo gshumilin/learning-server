@@ -5,7 +5,9 @@ import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson (FromJSON, decodeStrict)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (ByteString, fromStrict)
+import Data.Pool (takeResource)
 import qualified Data.Text as T (pack)
+import Database.PostgreSQL.Simple (Connection)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
 import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
@@ -29,7 +31,7 @@ withAuthAndParsedRequest ::
   Request ->
   ReaderT Environment IO Response
 withAuthAndParsedRequest f req = do
-  conn <- asks dbConnection
+  conn <- askConnection
   eiInvoker <- lift $ authorization conn req
   case eiInvoker of
     Left _ -> do
@@ -49,7 +51,7 @@ withAuth ::
   Request ->
   ReaderT Environment IO Response
 withAuth isFunc endpointFunc req = do
-  conn <- asks dbConnection
+  conn <- askConnection
   auth <- lift $ authorization conn req
   case auth of
     Left err -> do
@@ -64,3 +66,9 @@ withAuth isFunc endpointFunc req = do
 
 intToLBS :: Int -> ByteString
 intToLBS = fromStrict . pack . show
+
+askConnection :: ReaderT Environment IO Connection
+askConnection = do
+  pool <- asks dbPool
+  (conn, _) <- lift $ takeResource pool
+  pure conn

@@ -83,6 +83,7 @@ library
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
+    , resource-pool >=0.3
     , text
     , time
     , wai
@@ -113,6 +114,7 @@ executable learning-server-exe
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
+    , resource-pool >=0.3
     , text
     , time
     , wai
@@ -149,6 +151,7 @@ test-suite learning-server-test
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
+    , resource-pool >=0.3
     , text
     , time
     , wai

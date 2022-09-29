@@ -1,6 +1,6 @@
 module Endpoints.CreateUser where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT, lift)
 import DatabaseQueries.User (findUserIdByLogin, writeUser)
 import Endpoints.Handlers.CreateUser (CreateUserResult (..), Handle (..), hCreateUser)
 import Log (addLog)
@@ -10,10 +10,11 @@ import qualified Types.API.User as API (CreateUserRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
+import Utils (askConnection)
 
 createUser :: DB.User -> API.CreateUserRequest -> ReaderT Environment IO Response
 createUser invoker req = do
-  conn <- asks dbConnection
+  conn <- askConnection
   res <- lift $ hCreateUser (handle conn) invoker req
   case res of
     NotAdmin -> do

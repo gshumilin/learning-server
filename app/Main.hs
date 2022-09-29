@@ -1,11 +1,12 @@
 module Main where
 
 import Control.Exception (IOException, catch)
-import Control.Monad.Reader (ReaderT, asks, lift, runReaderT)
+import Control.Monad.Reader (ReaderT, lift, runReaderT)
 import Data.Aeson (decodeStrict)
 import qualified Data.ByteString.Char8 as BS
+import Data.Pool
 import qualified Data.Text as T (pack)
-import Database.PostgreSQL.Simple (ConnectInfo (..), connect, withTransaction)
+import Database.PostgreSQL.Simple (ConnectInfo (..), close, connect, withTransaction)
 import Database.PostgreSQL.Simple.Migration (MigrationCommand (..), MigrationContext (..), runMigration)
 import Log (addLog, makeLogDesc)
 import Network.Wai.Handler.Warp (run)
@@ -13,6 +14,7 @@ import Routing (application)
 import System.Environment (getArgs)
 import Types.Domain.Environment (Config (..), DbConnectInfo (..), Environment (..))
 import Types.Domain.Log (LogLvl (..))
+import Utils (askConnection)
 
 main :: IO ()
 main = do
@@ -33,9 +35,16 @@ buildEnvironment :: Config -> IO Environment
 buildEnvironment Config {..} = do
   let DbConnectInfo {..} = dbConnectInfo
   let connectInfo = ConnectInfo dbConnectHost dbConnectPort dbConnectUser dbConnectPassword dbConnectDatabase
-  conn <- connect connectInfo
+  let poolConfig =
+        PoolConfig
+          { createResource = connect connectInfo,
+            freeResource = close,
+            poolCacheTTL = 0.5,
+            poolMaxResources = 3
+          }
+  pool <- newPool poolConfig
   logDescriptor <- makeLogDesc logDescType
-  pure $ Environment conn logLvl logDescriptor
+  pure $ Environment pool logLvl logDescriptor
 
 getConfig :: IO (Maybe Config)
 getConfig = do
@@ -56,7 +65,7 @@ argProcessing arg = addLog DEBUG $ "unknown flag : " <> T.pack (show arg)
 
 execMigrations :: ReaderT Environment IO ()
 execMigrations = do
-  conn <- asks dbConnection
+  conn <- askConnection
   schemaRes <-
     lift $
       withTransaction conn $
@@ -72,7 +81,7 @@ execMigrations = do
 
 execFixtures :: ReaderT Environment IO ()
 execFixtures = do
-  conn <- asks dbConnection
+  conn <- askConnection
   res <-
     lift $
       withTransaction conn $

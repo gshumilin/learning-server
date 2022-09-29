@@ -1,6 +1,6 @@
 module DatabaseQueries.News where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT, lift)
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as T (pack)
 import qualified Data.Text.Encoding as T (decodeUtf8)
@@ -19,11 +19,12 @@ import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 import qualified Types.Domain.News as Domain (News (..))
 import qualified Types.Domain.Picture as Domain (Picture (..))
+import Utils (askConnection)
 
 readNews :: Request -> ReaderT Environment IO [Domain.News]
 readNews req = do
   addLog DEBUG "----- Started readNews \n"
-  conn <- asks dbConnection
+  conn <- askConnection
   mbQuery <- lift $ makeReadNewsQuery conn req
   case mbQuery of
     Nothing -> pure []

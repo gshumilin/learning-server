@@ -1,6 +1,6 @@
 module Endpoints.GetCategories where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT, lift)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (parseCategoriesList, readCategoryWithParentsById)
@@ -9,10 +9,11 @@ import Network.Wai (Response, responseLBS)
 import qualified Types.DB.Category as DB (Category (..))
 import qualified Types.Domain.Category as Domain (Category (..))
 import Types.Domain.Environment (Environment (..))
+import Utils (askConnection)
 
 getCategories :: ReaderT Environment IO Response
 getCategories = do
-  conn <- asks dbConnection
+  conn <- askConnection
   dbCatList <- lift $ parseCategoriesList conn
   let jsonNewsList = encodePretty dbCatList
   pure $ responseLBS status200 [(hContentType, "application/json")] jsonNewsList

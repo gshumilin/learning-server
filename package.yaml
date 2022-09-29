@@ -35,6 +35,7 @@ dependencies:
 - cryptonite
 - hspec
 - postgresql-simple-migration
+- resource-pool >= 0.3
 
 default-extensions:
 - OverloadedStrings

@@ -1,6 +1,6 @@
 module Endpoints.EditCategory where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT, lift)
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, rewriteCategory)
 import Endpoints.Handlers.EditCategory (EditCategoryResult (..), Handle (..), hEditCategory)
@@ -11,10 +11,11 @@ import qualified Types.API.Category as API (EditCategoryRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
+import Utils (askConnection)
 
 editCategory :: DB.User -> API.EditCategoryRequest -> ReaderT Environment IO Response
 editCategory invoker editCategoryRequest = do
-  conn <- asks dbConnection
+  conn <- askConnection
   res <- lift $ hEditCategory (handle conn) invoker editCategoryRequest
   case res of
     NotAdmin -> do
