@@ -72,11 +72,11 @@ The logging function itself is implemented in the Log module.
 # SERVER API / Endpoint
 
 ## Category
-### /getCategories
+### /categories
 GET-request. Returns categories list.
   
-### /createCategory
-POST-request. Returns id of the created category or error message. Available to authorized admin-users.
+### /category
+POST-request. Creates Category. Returns id of the created category or error message. Available to authorized admin-users.
 
 Parameters:
 
@@ -84,7 +84,7 @@ Parameters:
 
 `parentCategoryId` - Int - Optional;
 
-### /editCategories
+### /editCategory
 POST-request. Available to authorized admin-users
 
 Parameters:
@@ -97,11 +97,11 @@ Parameters:
 
 ## User
 
-### /getUsers
+### /users
 GET-request. Returns users list.
 
-### /createUser
-POST-request. Available to authorized admin-users.
+### /user
+POST-request. Creates user. Available to authorized admin-users.
 
 Parameters:
 
@@ -117,7 +117,7 @@ Parameters:
 
 ## Picture
 
-### /getPicture
+### /picture
 GET-request. Returns picture.
 
 Parameters:
@@ -128,7 +128,7 @@ Example: "http://localhost:3000/getPicture?id=42"
 
 ## News
 
-### getNews
+### news
 GET request. Returns news list.
 
 Optional Text Parameters for filtering:
@@ -163,8 +163,8 @@ Other oprtional parameters:
     
   `number_of_pictures`
     
-### /createNews
-POST-request. Returns news id or error message. Available to able to create news users.
+### /news
+POST-request. Creates news. Returns news id or error message. Available to able to create news users.
 
 Parameters:
 
