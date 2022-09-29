@@ -7,6 +7,7 @@ import Test.Hspec (SpecWith, describe, it, shouldBe)
 import Types.API.News (CreateNewsRequest (..))
 import qualified Types.DB.Category as DB (Category (..))
 import qualified Types.DB.User as DB (User (..))
+import Types.Domain.Picture (Picture (..))
 
 sampleUser :: IO DB.User
 sampleUser = do
@@ -49,6 +50,12 @@ testHandle =
       hWriteNews = \_ _ -> pure 1
     }
 
+badPictures :: [Picture]
+badPictures =
+  [ Picture "image/pNg" "somePicData",
+    Picture "gif" "someGifData"
+  ]
+
 createNewsTest :: SpecWith ()
 createNewsTest =
   describe "createNewsTests" $ do
@@ -57,6 +64,11 @@ createNewsTest =
       let invoker = invoker' {DB.isAbleToCreateNews = False}
       let result = hCreateNews testHandle invoker createNewsRequest
       result `shouldBe` pure NotAbleToCreateNews
+    it "Shouldn't create news if pictures format is invalid" $ do
+      invoker <- sampleUser
+      let req = createNewsRequest {pictures = Just badPictures}
+      let result = hCreateNews testHandle invoker req
+      result `shouldBe` pure InvalidPictureFormat
     it "Shouldn't create news if there is no such category" $ do
       invoker <- sampleUser
       let req = createNewsRequest {categoryId = 42}

@@ -126,21 +126,6 @@ Parameters:
 
 Example: "http://localhost:3000/getPicture?id=42"
 
-### /putPicture
-POST-request. Returns picture id or error message
-
-Request body:
-```
-{
-  "image": 
-    { 
-     "mime: <Text. Image format. Example: "image/png">,
-     "data": <Text. Image encoded in base64>
-    }
-}
-
-```
-
 ## News
 
 ### getNews
@@ -189,7 +174,18 @@ Parameters:
 
 `textContent` - Text - Required;
 
-`pictures` - Array of pictures. See "/putPicture" section - Required;
+`pictures` - Array of pictures- Required;
+    Request body for picture:
+        ```
+        {
+        "image": 
+            { 
+            "mime: <Text. Image format. Example: "image/png">,
+            "data": <Text. Image encoded in base64>
+            }
+        }
+
+        ```
 
 ### /editNews
 POST-request. Available to author.
@@ -202,6 +198,6 @@ POST-request. Available to author.
 
 `newTextContent` - Text - Optional;
 
-`newPictures` - Array of pictures. See "/putPicture" section - Optional;
+`newPictures` - Array of pictures. See "picture" section in createNews endpoint - Optional;
 
 `newPublishStatus` - Bool - Optional;

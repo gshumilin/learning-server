@@ -22,9 +22,12 @@ createNews invoker req = do
     NotAbleToCreateNews -> do
       addLog DEBUG "createNews-error: NotAbleToCreateNews"
       pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
+    InvalidPictureFormat -> do
+      addLog DEBUG "createNews-error: InvalidPictureFormat"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: invalid picture format"
     CategoryNotExists -> do
       addLog DEBUG "createNews-error: CategoryNotExists"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such Id"
+      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: there is no category with such Id"
     CreateNewsSuccess resId -> do
       let reqRes = intToLBS resId
       addLog DEBUG "createNews: Success"

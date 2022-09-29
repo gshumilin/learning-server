@@ -1,22 +1,20 @@
 module Endpoints.Picture where
 
 import Control.Monad.Reader (ReaderT, asks, lift)
-import Data.Aeson (decodeStrict)
 import Data.ByteString.Base64 (decodeBase64)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as LBS
 import Data.List (find)
 import qualified Data.Text as T (pack, unpack)
 import qualified Data.Text.Encoding as T (encodeUtf8)
-import DatabaseQueries.Picture (readPicture, writePicture)
+import DatabaseQueries.Picture (readPicture)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status200, status400, status404)
-import Network.Wai (Request, Response, getRequestBodyChunk, queryString, responseLBS)
+import Network.Wai (Request, Response, queryString, responseLBS)
 import Text.Read (readMaybe)
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
 import qualified Types.Domain.Picture as Domain (Picture (..))
-import Utils (intToLBS)
 
 getPicture :: Request -> ReaderT Environment IO Response
 getPicture req = do
@@ -44,17 +42,3 @@ findPicId req =
         Nothing -> do
           Left "invalid 'id' parameter value"
         Just picId -> Right picId
-
-putPicture :: Request -> ReaderT Environment IO Response
-putPicture request = do
-  conn <- asks dbConnection
-  rawJSON <- lift $ getRequestBodyChunk request
-  let decodedReq = decodeStrict rawJSON :: Maybe Domain.Picture
-  case decodedReq of
-    Nothing -> do
-      addLog WARNING "Invalid JSON"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON\n"
-    Just newBase64 -> do
-      resId <- lift $ writePicture conn newBase64
-      let reqRes = intToLBS resId
-      pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
