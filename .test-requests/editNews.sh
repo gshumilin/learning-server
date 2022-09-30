@@ -1,5 +1,5 @@
 curl -H "Content-type: application/json"\
      -H "Authorization: T2xlZ18xOnBhc3N3b3JkXzE="\
-     -X POST\
+     -X PUT\
      -d @editNews.json\
-     localhost:3000/editNews
+     localhost:3000/news

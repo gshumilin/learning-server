@@ -1,5 +1,5 @@
 curl -H "Content-type: application/json"\
      -H "Authorization: YWRtaW46YWRtaW4="\
-     -X POST\
+     -X PUT\
      -d @editCategory.json\
-     localhost:3000/editCategory
+     localhost:3000/category
