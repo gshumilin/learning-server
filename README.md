@@ -71,51 +71,14 @@ The logging function itself is implemented in the Log module.
 
 # SERVER API / Endpoint
 
-## Category
+## GET - requests
+Responsible for getting entities.
+
 ### /categories
 GET-request. Returns categories list.
-  
-### /category
-POST-request. Creates Category. Returns id of the created category or error message. Available to authorized admin-users.
-
-Parameters:
-
-`title` - Text - Required;
-
-`parentCategoryId` - Int - Optional;
-
-### /editCategory
-POST-request. Available to authorized admin-users
-
-Parameters:
-
-`processedCategoryId` - Int - Required;
-
-`newTitle` - Text - Optional;
-      
-`newParentCategoryId` - Int - Optional - specify "0" to set a null parent category;
-
-## User
 
 ### /users
 GET-request. Returns users list.
-
-### /user
-POST-request. Creates user. Available to authorized admin-users.
-
-Parameters:
-
-`name` - Text - Required;
-
-`login` - Text - Required;
-
-`password` - Text - Required;
-
-`isAdmin` - Bool - Required;
-
-`isAbleToCreateNews` - Bool - Required;
-
-## Picture
 
 ### /picture
 GET-request. Returns picture.
@@ -126,9 +89,7 @@ Parameters:
 
 Example: "http://localhost:3000/getPicture?id=42"
 
-## News
-
-### news
+### /news
 GET request. Returns news list.
 
 Optional Text Parameters for filtering:
@@ -162,7 +123,35 @@ Other oprtional parameters:
   `create_date`
     
   `number_of_pictures`
-    
+  
+
+## POST - requests
+Responsible for creating entities.
+
+### /category
+POST-request. Creates Category. Returns id of the created category or error message. Available to authorized admin-users.
+
+Parameters:
+
+`title` - Text - Required;
+
+`parentCategoryId` - Int - Optional;
+
+### /user
+POST-request. Creates user. Available to authorized admin-users.
+
+Parameters:
+
+`name` - Text - Required;
+
+`login` - Text - Required;
+
+`password` - Text - Required;
+
+`isAdmin` - Bool - Required;
+
+`isAbleToCreateNews` - Bool - Required;
+
 ### /news
 POST-request. Creates news. Returns news id or error message. Available to able to create news users.
 
@@ -176,19 +165,33 @@ Parameters:
 
 `pictures` - Array of pictures- Required;
     Request body for picture:
-        ```
-        {
-        "image": 
-            { 
-            "mime: <Text. Image format. Example: "image/png">,
-            "data": <Text. Image encoded in base64>
-            }
-        }
+```
+{
+"image": 
+    { 
+    "mime: <Text. Image format. Example: "image/png">,
+    "data": <Text. Image encoded in base64>
+    }
+}
 
-        ```
+```
 
-### /editNews
-POST-request. Available to author.
+## PUT - requests
+Responsible for editing entities.
+
+### /category
+POST-request. Available to authorized admin-users
+
+Parameters:
+
+`processedCategoryId` - Int - Required;
+
+`newTitle` - Text - Optional;
+      
+`newParentCategoryId` - Int - Optional - specify "0" to set a null parent category;
+    
+### /news
+PUT-request. Edits news. Available to author.
 
 `newsId` - Int - Required;
 

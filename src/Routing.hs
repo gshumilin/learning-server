@@ -50,17 +50,22 @@ application req@Request {..} respond = do
         "/news" -> do
           res <- withAuthAndParsedRequest createNews req
           lift $ respond res
-        "/editNews" -> do
-          res <- withAuthAndParsedRequest editNews req
-          lift $ respond res
         "/category" -> do
           res <- withAuthAndParsedRequest createCategory req
           lift $ respond res
-        "/editCategory" -> do
-          res <- withAuthAndParsedRequest editCategory req
-          lift $ respond res
         "/picture" -> do
           res <- getPicture req
+          lift $ respond res
+        _ -> do
+          addLog WARNING "Unknown endpoint"
+          lift . respond $ responseLBS status404 [(hContentType, "text/plain")] "Unknown endpoint"
+    "PUT" ->
+      case rawPathInfo of
+        "/news" -> do
+          res <- withAuthAndParsedRequest editNews req
+          lift $ respond res
+        "/category" -> do
+          res <- withAuthAndParsedRequest editCategory req
           lift $ respond res
         _ -> do
           addLog WARNING "Unknown endpoint"
