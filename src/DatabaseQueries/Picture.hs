@@ -19,8 +19,8 @@ parsePicturesLinks newsId = do
   where
     makeLinks :: Only Int -> ReaderT Environment IO T.Text
     makeLinks (Only picId) = do
-      domenInfo <- asks domen
-      pure $ domenInfo <> "/picture?id=" <> (T.pack . show $ picId)
+      domainInfo <- asks domain
+      pure $ domainInfo <> "/picture?id=" <> (T.pack . show $ picId)
 
 readPicture :: Connection -> Int -> IO (Maybe Picture)
 readPicture conn pictureId = do

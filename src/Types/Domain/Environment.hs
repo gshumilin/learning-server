@@ -13,14 +13,14 @@ import Types.Domain.Log (LogDescType (..), LogLvl (..))
 
 data Environment = Environment
   { dbConnection :: Connection,
-    domen :: Text,
+    domain :: Text,
     logLvl :: LogLvl,
     logDesc :: Handle
   }
 
 data Config = Config
   { serverPort :: Int,
-    domen :: Text,
+    domain :: Text,
     dbConnectInfo :: DbConnectInfo,
     logLvl :: LogLvl,
     logDescType :: LogDescType
