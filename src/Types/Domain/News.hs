@@ -10,8 +10,6 @@ import GHC.Generics (Generic)
 import qualified Types.Domain.Category as Domain (Category (..))
 import qualified Types.Domain.User as Domain (User (..))
 
-newtype NewsList = NewsList [News] deriving (Generic, Show, ToJSON)
-
 data News = News
   { newsId :: Int,
     title :: T.Text,
