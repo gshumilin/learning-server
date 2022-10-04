@@ -7,8 +7,8 @@ import qualified Data.Text as T
 import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Auth (authentication)
 import Hash (passHashBS)
-import Network.HTTP.Types (hAuthorization, hContentType, status404)
-import Network.Wai (Request, Response, requestHeaders, responseLBS)
+import Network.HTTP.Types (hAuthorization)
+import Network.Wai (Request, requestHeaders)
 import qualified Types.DB.User as DB
 
 authorization :: Connection -> Request -> IO (Either T.Text DB.User)
