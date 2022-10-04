@@ -9,8 +9,6 @@ import qualified Data.Text as T
 import Database.PostgreSQL.Simple.FromRow (FromRow)
 import GHC.Generics (Generic)
 
-newtype Pictures = Pictures [Picture] deriving (Generic, Show, FromJSON, ToJSON)
-
 data Picture = Picture
   { mime :: T.Text,
     picData :: T.Text

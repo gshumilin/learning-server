@@ -8,8 +8,6 @@ import Data.Time.Clock (UTCTime)
 import Database.PostgreSQL.Simple.FromRow (FromRow)
 import GHC.Generics (Generic)
 
-newtype NewsList = NewsList [News]
-
 data News = News
   { newsId :: Int,
     title :: T.Text,

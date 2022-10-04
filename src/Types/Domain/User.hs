@@ -9,8 +9,6 @@ import Data.Time (UTCTime)
 import Database.PostgreSQL.Simple.FromRow (FromRow)
 import GHC.Generics (Generic)
 
-newtype UsersList = UsersList [User] deriving (Generic, Show, ToJSON)
-
 data User = User
   { name :: T.Text,
     login :: T.Text,
