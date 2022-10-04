@@ -11,9 +11,6 @@ import Network.HTTP.Types (hAuthorization, hContentType, status404)
 import Network.Wai (Request, Response, requestHeaders, responseLBS)
 import qualified Types.DB.User as DB
 
-authFailResponse :: Response
-authFailResponse = responseLBS status404 [(hContentType, "text/plain")] "Not found"
-
 authorization :: Connection -> Request -> IO (Either T.Text DB.User)
 authorization conn req = do
   case decodeAuthKey =<< findAuthKey req of
