@@ -32,13 +32,14 @@ readNews req = do
       addLog DEBUG $ "----- made this psql-request: \n\"" <> T.decodeUtf8 bsQ
       dbNews <- lift $ query_ conn q :: ReaderT Environment IO [DB.News]
       addLog DEBUG $ "----- got this psql News List: \"" <> T.pack (show dbNews)
-      lift $ mapM (fromDbNews conn) dbNews
+      mapM fromDbNews dbNews
 
-fromDbNews :: Connection -> DB.News -> IO Domain.News
-fromDbNews conn DB.News {..} = do
-  newsCategory <- getSpecificCategory conn categoryId
-  newsCreator <- findUser conn creatorId
-  newsPictures <- parsePicturesLinks conn newsId
+fromDbNews :: DB.News -> ReaderT Environment IO Domain.News
+fromDbNews DB.News {..} = do
+  conn <- asks dbConnection
+  newsCategory <- lift $ getSpecificCategory conn categoryId
+  newsCreator <- lift $ findUser conn creatorId
+  newsPictures <- parsePicturesLinks newsId
   pure $
     Domain.News
       { newsId = newsId,

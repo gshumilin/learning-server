@@ -35,7 +35,7 @@ buildEnvironment Config {..} = do
   let connectInfo = ConnectInfo dbConnectHost dbConnectPort dbConnectUser dbConnectPassword dbConnectDatabase
   conn <- connect connectInfo
   logDescriptor <- makeLogDesc logDescType
-  pure $ Environment conn logLvl logDescriptor
+  pure $ Environment conn domen logLvl logDescriptor
 
 getConfig :: IO (Maybe Config)
 getConfig = do
