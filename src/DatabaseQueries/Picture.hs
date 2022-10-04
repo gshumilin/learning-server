@@ -34,7 +34,7 @@ addPicturesToNews :: Connection -> Int -> [Picture] -> IO ()
 addPicturesToNews conn newsId picArr = do
   mapM_
     ( \Picture {..} -> do
-        let q = "INSERT INTO pictures (data,mime) values (?,?) pureING id"
+        let q = "INSERT INTO pictures (data,mime) values (?,?) RETURNING id"
         [Only picId] <- query conn q (picData, mime) :: IO [Only Int]
         let q' = "INSERT INTO news_pictures (news_id, picture_id) values (?,?)"
         execute conn q' (newsId, picId)
@@ -43,5 +43,5 @@ addPicturesToNews conn newsId picArr = do
 
 deleteNewsPictures :: Connection -> Int -> IO ()
 deleteNewsPictures conn newsId = do
-  picIdArray <- query conn "DELETE FROM news_pictures WHERE news_id=? pureING picture_id" (Only newsId) :: IO [Only Int]
+  picIdArray <- query conn "DELETE FROM news_pictures WHERE news_id=? RETURNING picture_id" (Only newsId) :: IO [Only Int]
   mapM_ (execute conn "DELETE FROM pictures WHERE id=?") picIdArray
