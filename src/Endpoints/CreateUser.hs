@@ -4,7 +4,7 @@ import Control.Monad.Reader (ReaderT, asks, lift)
 import DatabaseQueries.User (findUserIdByLogin, writeUser)
 import Endpoints.Handlers.CreateUser (CreateUserResult (..), Handle (..), hCreateUser)
 import Log (addLog)
-import Network.HTTP.Types (hContentType, status200, status400, status403)
+import Network.HTTP.Types (hContentType, status200, status400, status404)
 import Network.Wai (Response, responseLBS)
 import qualified Types.API.User as API (CreateUserRequest (..))
 import qualified Types.DB.User as DB (User (..))
@@ -18,7 +18,7 @@ createUser invoker req = do
   case res of
     NotAdmin -> do
       addLog DEBUG "createUser-error: NotAdmin"
-      pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
+      pure $ responseLBS status404 [(hContentType, "text/plain")] "Forbidden"
     LoginIsTaken -> do
       addLog DEBUG "createUser-error: LoginIsTaken"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Incorrect title"
