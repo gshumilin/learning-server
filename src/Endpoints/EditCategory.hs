@@ -5,7 +5,7 @@ import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, rewriteCategory)
 import Endpoints.Handlers.EditCategory (EditCategoryResult (..), Handle (..), hEditCategory)
 import Log (addLog)
-import Network.HTTP.Types (hContentType, status200, status400, status403)
+import Network.HTTP.Types (hContentType, status200, status400, status404)
 import Network.Wai (Response, responseLBS)
 import qualified Types.API.Category as API (EditCategoryRequest (..))
 import qualified Types.DB.User as DB (User (..))
@@ -19,7 +19,7 @@ editCategory invoker editCategoryRequest = do
   case res of
     NotAdmin -> do
       addLog DEBUG "editCategory-error: NotAdmin"
-      pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
+      pure $ responseLBS status404 [(hContentType, "text/plain")] "Forbidden"
     CategoryNotExists -> do
       addLog DEBUG "editCategory-error: CategoryNotExists"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: There is no category with such Id"
