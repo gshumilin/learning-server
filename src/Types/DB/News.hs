@@ -17,8 +17,7 @@ data News = News
     categoryId :: Int,
     categoryTitle :: T.Text,
     textContent :: T.Text,
-    isPublished :: Bool,
-    numbersOfPictures :: Int
+    isPublished :: Bool
   }
   deriving (Show, FromRow, Generic)
 
