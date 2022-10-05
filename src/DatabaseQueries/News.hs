@@ -37,7 +37,7 @@ readNews req = do
 
 fromDbNews :: DB.News -> ReaderT Environment IO Domain.News
 fromDbNews DB.News {..} = do
-  conn <- asks dbConnection
+  conn <- askConnection
   newsCategory <- lift $ getSpecificCategory conn categoryId
   newsCreator <- lift $ findUser conn creatorId
   newsPictures <- parsePicturesLinks newsId

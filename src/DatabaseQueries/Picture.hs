@@ -5,10 +5,11 @@ import qualified Data.Text as T
 import Database.PostgreSQL.Simple (Connection, Only (..), execute, query)
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Picture (Picture (..))
+import Utils (askConnection)
 
 parsePicturesLinks :: Int -> ReaderT Environment IO (Maybe [T.Text])
 parsePicturesLinks newsId = do
-  conn <- asks dbConnection
+  conn <- askConnection
   let q = "SELECT picture_id FROM news_pictures WHERE news_id = ?"
   res <- lift $ query conn q $ Only newsId :: ReaderT Environment IO [Only Int]
   if null res
