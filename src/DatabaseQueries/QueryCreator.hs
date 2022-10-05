@@ -21,7 +21,6 @@ import qualified Types.DB.User as DB (User (..))
 --      categories.title,
 --      news.text_content,
 --      news.is_published,
---      COUNT (news_pictures.picture_id) as number_of_pictures
 --     FROM news
 --     JOIN users on news.creator_id=users.id
 --     JOIN categories on news.category_id=categories.id
@@ -36,7 +35,7 @@ import qualified Types.DB.User as DB (User (..))
 --      categories.title,
 --      news.text_content,
 --      news.is_published
--- ORDER BY number_of_pictures"
+-- ORDER BY COUNT (news_pictures.picture_id)"
 
 makeReadNewsQuery :: Connection -> Request -> IO (Maybe Query)
 makeReadNewsQuery conn req = do
@@ -89,8 +88,7 @@ makeInitReadNewsQuery dbUser =
       <> "       news.category_id,\n"
       <> "       categories.title,\n"
       <> "       news.text_content,\n"
-      <> "       news.is_published,\n"
-      <> "       COUNT (news_pictures.picture_id) as number_of_pictures\n"
+      <> "       news.is_published\n"
       <> "    FROM news\n"
       <> "    JOIN users on news.creator_id=users.id\n"
       <> "    JOIN categories on news.category_id=categories.id\n"
@@ -125,7 +123,7 @@ makeSimpleQuery [("offset", Just val)] = Just $ Query $ " OFFSET " <> val
 makeSimpleQuery [("sort_by", Just "creator_login")] = Just $ Query " ORDER BY users.login\n"
 makeSimpleQuery [("sort_by", Just "category_title")] = Just $ Query " ORDER BY categories.title\n"
 makeSimpleQuery [("sort_by", Just "create_date")] = Just $ Query " ORDER BY create_date\n"
-makeSimpleQuery [("sort_by", Just "number_of_pictures")] = Just $ Query "ORDER BY number_of_pictures\n"
+makeSimpleQuery [("sort_by", Just "number_of_pictures")] = Just $ Query "ORDER BY COUNT (news_pictures.picture_id)\n"
 makeSimpleQuery [("sort_by", Just _)] = Nothing
 makeSimpleQuery [(_, Nothing)] = Nothing
 makeSimpleQuery [] = Nothing

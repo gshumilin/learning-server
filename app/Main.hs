@@ -44,7 +44,7 @@ buildEnvironment Config {..} = do
           }
   pool <- newPool poolConfig
   logDescriptor <- makeLogDesc logDescType
-  pure $ Environment pool logLvl logDescriptor
+  pure $ Environment pool domain logLvl logDescriptor
 
 getConfig :: IO (Maybe Config)
 getConfig = do
