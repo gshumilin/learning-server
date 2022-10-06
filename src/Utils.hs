@@ -5,7 +5,7 @@ import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson (FromJSON, decodeStrict)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (ByteString, fromStrict)
-import Data.Pool (takeResource)
+import Data.Pool (takeResource, withResource)
 import Database.PostgreSQL.Simple (Connection)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
@@ -42,3 +42,8 @@ askConnection = do
   pool <- asks dbPool
   (conn, _) <- lift $ takeResource pool
   pure conn
+
+withPool :: (Connection -> IO a) -> ReaderT Environment IO a
+withPool f = do
+  pool <- asks dbPool
+  lift $ withResource pool f
