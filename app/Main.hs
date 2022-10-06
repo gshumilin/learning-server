@@ -40,7 +40,7 @@ buildEnvironment Config {..} = do
           { createResource = connect connectInfo,
             freeResource = close,
             poolCacheTTL = 0.5,
-            poolMaxResources = 3
+            poolMaxResources = 10
           }
   pool <- newPool poolConfig
   logDescriptor <- makeLogDesc logDescType
