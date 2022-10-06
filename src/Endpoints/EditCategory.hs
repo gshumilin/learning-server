@@ -31,7 +31,7 @@ editCategory invoker editCategoryRequest = do
       addLog DEBUG "editCategory: Success"
       pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
   where
-    handle :: Handle IO
+    handle :: Handle (ReaderT Environment IO)
     handle =
       Handle
         { hReadCategoryById = readCategoryById,

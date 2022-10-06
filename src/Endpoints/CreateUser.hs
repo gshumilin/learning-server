@@ -25,6 +25,7 @@ createUser invoker req = do
       addLog DEBUG "createUser: CreateUserSuccess"
       pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
   where
+    handle :: Handle (ReaderT Environment IO)
     handle =
       Handle
         { hFindUserByLogin = findUserIdByLogin,

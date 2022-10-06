@@ -31,7 +31,7 @@ createNews invoker req = do
       addLog DEBUG "createNews: Success"
       pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
   where
-    handle :: Handle IO
+    handle :: Handle (ReaderT Environment IO)
     handle =
       Handle
         { hReadCategoryById = readCategoryById,

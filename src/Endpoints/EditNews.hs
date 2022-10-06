@@ -16,7 +16,7 @@ editNews invoker editNewsRequest = do
     NewsNotExistsForThisAuthor -> pure $ responseLBS status404 [(hContentType, "text/plain")] "Forbidden"
     EditNewsSuccess -> pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
   where
-    handle :: Handle IO
+    handle :: Handle (ReaderT Environment IO)
     handle =
       Handle
         { hReadSpecificNews = readSpecificNews (DB.userId invoker),

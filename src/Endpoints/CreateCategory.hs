@@ -31,7 +31,7 @@ createCategory invoker createCategoryRequest = do
       let reqRes = fromStrict . pack . show $ resId
       pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
   where
-    handle :: Handle IO
+    handle :: Handle (ReaderT Environment IO)
     handle =
       Handle
         { hReadCategoryById = readCategoryById,

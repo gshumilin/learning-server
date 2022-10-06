@@ -2,23 +2,21 @@
 
 module Endpoints.Handlers.EditCategory where
 
-import Control.Monad.Reader (ReaderT)
 import Data.Maybe (isJust, isNothing)
 import qualified Data.Text as T
 import qualified Types.API.Category as API (EditCategoryRequest (..))
 import qualified Types.DB.Category as DB (Category (..))
 import qualified Types.DB.User as DB (User (..))
-import Types.Domain.Environment (Environment (..))
 
 data EditCategoryResult = NotAdmin | CategoryNotExists | IncorrectParentId | IncorrectTitle | EditCategorySuccess deriving (Show, Eq)
 
 data Handle m = Handle
-  { hReadCategoryById :: Int -> ReaderT Environment m (Maybe DB.Category),
-    hReadCategoryByTitle :: T.Text -> ReaderT Environment m (Maybe DB.Category),
-    hRewriteCategory :: API.EditCategoryRequest -> ReaderT Environment m ()
+  { hReadCategoryById :: Int -> m (Maybe DB.Category),
+    hReadCategoryByTitle :: T.Text -> m (Maybe DB.Category),
+    hRewriteCategory :: API.EditCategoryRequest -> m ()
   }
 
-hEditCategory :: Monad m => Handle m -> DB.User -> API.EditCategoryRequest -> ReaderT Environment m EditCategoryResult
+hEditCategory :: Monad m => Handle m -> DB.User -> API.EditCategoryRequest -> m EditCategoryResult
 hEditCategory Handle {..} DB.User {..} req@API.EditCategoryRequest {..} = do
   isNotExist <- isNotExistCheck processedCategoryId
   isTitleBad <- isNewTitleBadCheck newTitle
