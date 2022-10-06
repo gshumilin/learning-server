@@ -1,13 +1,14 @@
 module DatabaseQueries.QueryCreator where
 
 import Auth (authorization)
+import Control.Monad.Reader (ReaderT)
 import qualified Data.ByteString.Char8 as BS
 import Data.Maybe (isJust)
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple.Internal (Connection)
 import Database.PostgreSQL.Simple.Types (Query (..))
 import Network.Wai (Request, queryString)
 import qualified Types.DB.User as DB (User (..))
+import Types.Domain.Environment (Environment (..))
 
 --Запрос формируется из секций init, filters, group, sorts, limit, offset. Их тип Maybe Query.
 --программа игнорирует пустые поля и поля с некорректными названиями фильтров и параметров сортировки в запросе.
@@ -37,9 +38,9 @@ import qualified Types.DB.User as DB (User (..))
 --      news.is_published
 -- ORDER BY COUNT (news_pictures.picture_id)"
 
-makeReadNewsQuery :: Connection -> Request -> IO (Maybe Query)
-makeReadNewsQuery conn req = do
-  clientUser <- authorization conn req
+makeReadNewsQuery :: Request -> ReaderT Environment IO (Maybe Query)
+makeReadNewsQuery req = do
+  clientUser <- authorization req
   let initQ = makeInitReadNewsQuery clientUser
   let filtersQuery =
         makeFiltersQuery

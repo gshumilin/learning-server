@@ -3,11 +3,11 @@ module DatabaseQueries.User where
 import Control.Monad (void)
 import Control.Monad.Reader (ReaderT)
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple (Connection, Only (..), execute, query, query_)
+import Database.PostgreSQL.Simple (Only (..), execute, query, query_)
 import qualified Types.API.User as API (CreateUserRequest (..))
 import Types.Domain.Environment (Environment (..))
 import qualified Types.Domain.User as Domain (User (..))
-import Utils (withPool)
+import Utils.Pool (withPool)
 
 readUsers :: ReaderT Environment IO [Domain.User]
 readUsers =
@@ -24,13 +24,13 @@ writeUser API.CreateUserRequest {..} = do
         \ VALUES (?,?,?,?,?)"
   void . withPool $ \conn -> execute conn q (reqName, reqLogin, reqPassword, reqIsAdmin, reqIsAbleToCreateNews)
 
-findUser :: Connection -> Int -> IO Domain.User
-findUser conn userId = do
+findUser :: Int -> ReaderT Environment IO Domain.User
+findUser userId = do
   let q =
         " SELECT name, login, password, create_date, is_admin, is_able_to_create_news \
         \ FROM users WHERE id = ?"
-  res <- query conn q $ Only userId
-  pure $ head res
+  (res : _) <- withPool $ \conn -> query conn q $ Only userId
+  pure res
 
 findUserIdByLogin :: T.Text -> ReaderT Environment IO (Maybe Int)
 findUserIdByLogin login = do

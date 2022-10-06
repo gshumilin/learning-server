@@ -5,7 +5,7 @@ import Control.Monad.Reader (ReaderT, asks, lift)
 import Data.Aeson (FromJSON, decodeStrict)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (ByteString, fromStrict)
-import Data.Pool (takeResource, withResource)
+import Data.Pool (takeResource)
 import Database.PostgreSQL.Simple (Connection)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
@@ -20,8 +20,7 @@ withAuthAndParsedRequest ::
   Request ->
   ReaderT Environment IO Response
 withAuthAndParsedRequest f req = do
-  conn <- askConnection
-  eiInvoker <- lift $ authorization conn req
+  eiInvoker <- authorization req
   case eiInvoker of
     Left _ -> do
       addLog WARNING "Authorization fail"
@@ -42,8 +41,3 @@ askConnection = do
   pool <- asks dbPool
   (conn, _) <- lift $ takeResource pool
   pure conn
-
-withPool :: (Connection -> IO a) -> ReaderT Environment IO a
-withPool f = do
-  pool <- asks dbPool
-  lift $ withResource pool f

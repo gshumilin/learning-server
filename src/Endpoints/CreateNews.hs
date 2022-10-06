@@ -1,7 +1,6 @@
 module Endpoints.CreateNews where
 
-import Control.Monad.Reader (ReaderT, lift)
-import Database.PostgreSQL.Simple (Connection)
+import Control.Monad.Reader (ReaderT)
 import DatabaseQueries.Category (readCategoryById)
 import DatabaseQueries.News (writeNews)
 import Endpoints.Handlers.CreateNews (CreateNewsResult (..), Handle (..), hCreateNews)
@@ -12,12 +11,11 @@ import qualified Types.API.News as API (CreateNewsRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
-import Utils (askConnection, intToLBS)
+import Utils (intToLBS)
 
 createNews :: DB.User -> API.CreateNewsRequest -> ReaderT Environment IO Response
 createNews invoker req = do
-  conn <- askConnection
-  res <- lift $ hCreateNews (handle conn) invoker req
+  res <- hCreateNews handle invoker req
   case res of
     NotAbleToCreateNews -> do
       addLog DEBUG "createNews-error: NotAbleToCreateNews"
@@ -33,9 +31,9 @@ createNews invoker req = do
       addLog DEBUG "createNews: Success"
       pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
   where
-    handle :: Connection -> Handle IO
-    handle conn =
+    handle :: Handle IO
+    handle =
       Handle
-        { hReadCategoryById = readCategoryById conn,
-          hWriteNews = writeNews conn
+        { hReadCategoryById = readCategoryById,
+          hWriteNews = writeNews
         }

@@ -1,20 +1,22 @@
 module Endpoints.Handlers.CreateNews where
 
+import Control.Monad.Reader (ReaderT)
 import Data.Maybe (isNothing)
 import qualified Data.Text as T
 import qualified Types.API.News as API (CreateNewsRequest (..))
 import qualified Types.DB.Category as DB (Category (..))
 import qualified Types.DB.User as DB (User (..))
+import Types.Domain.Environment (Environment (..))
 import Types.Domain.Picture (Picture (..))
 
 data CreateNewsResult = NotAbleToCreateNews | InvalidPictureFormat | CategoryNotExists | CreateNewsSuccess Int deriving (Show, Eq)
 
 data Handle m = Handle
-  { hReadCategoryById :: Int -> m (Maybe DB.Category),
-    hWriteNews :: Int -> API.CreateNewsRequest -> m Int
+  { hReadCategoryById :: Int -> ReaderT Environment m (Maybe DB.Category),
+    hWriteNews :: Int -> API.CreateNewsRequest -> ReaderT Environment m Int
   }
 
-hCreateNews :: Monad m => Handle m -> DB.User -> API.CreateNewsRequest -> m CreateNewsResult
+hCreateNews :: Monad m => Handle m -> DB.User -> API.CreateNewsRequest -> ReaderT Environment m CreateNewsResult
 hCreateNews Handle {..} invoker req = do
   if not (DB.isAbleToCreateNews invoker)
     then pure NotAbleToCreateNews

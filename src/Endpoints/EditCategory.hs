@@ -1,7 +1,6 @@
 module Endpoints.EditCategory where
 
-import Control.Monad.Reader (ReaderT, lift)
-import Database.PostgreSQL.Simple (Connection)
+import Control.Monad.Reader (ReaderT)
 import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, rewriteCategory)
 import Endpoints.Handlers.EditCategory (EditCategoryResult (..), Handle (..), hEditCategory)
 import Log (addLog)
@@ -11,12 +10,10 @@ import qualified Types.API.Category as API (EditCategoryRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
-import Utils (askConnection)
 
 editCategory :: DB.User -> API.EditCategoryRequest -> ReaderT Environment IO Response
 editCategory invoker editCategoryRequest = do
-  conn <- askConnection
-  res <- lift $ hEditCategory (handle conn) invoker editCategoryRequest
+  res <- hEditCategory handle invoker editCategoryRequest
   case res of
     NotAdmin -> do
       addLog DEBUG "editCategory-error: NotAdmin"
@@ -34,10 +31,10 @@ editCategory invoker editCategoryRequest = do
       addLog DEBUG "editCategory: Success"
       pure $ responseLBS status200 [(hContentType, "text/plain")] "all done"
   where
-    handle :: Connection -> Handle IO
-    handle conn =
+    handle :: Handle IO
+    handle =
       Handle
-        { hReadCategoryById = readCategoryById conn,
-          hReadCategoryByTitle = readCategoryByTitle conn,
-          hRewriteCategory = rewriteCategory conn
+        { hReadCategoryById = readCategoryById,
+          hReadCategoryByTitle = readCategoryByTitle,
+          hRewriteCategory = rewriteCategory
         }

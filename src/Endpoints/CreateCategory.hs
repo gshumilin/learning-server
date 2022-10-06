@@ -1,9 +1,8 @@
 module Endpoints.CreateCategory where
 
-import Control.Monad.Reader (ReaderT, lift)
+import Control.Monad.Reader (ReaderT)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (fromStrict)
-import Database.PostgreSQL.Simple (Connection)
 import DatabaseQueries.Category (readCategoryById, readCategoryByTitle, writeCategory)
 import Endpoints.Handlers.CreateCategory (CreateCategoryResult (..), Handle (..), hCreateCategory)
 import Log (addLog)
@@ -13,12 +12,10 @@ import qualified Types.API.Category as API (CreateCategoryRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
-import Utils (askConnection)
 
 createCategory :: DB.User -> API.CreateCategoryRequest -> ReaderT Environment IO Response
 createCategory invoker createCategoryRequest = do
-  conn <- askConnection
-  res <- lift $ hCreateCategory (handle conn) invoker createCategoryRequest
+  res <- hCreateCategory handle invoker createCategoryRequest
   case res of
     NotAdmin -> do
       addLog DEBUG "createCategory-error: NotAdmin"
@@ -34,10 +31,10 @@ createCategory invoker createCategoryRequest = do
       let reqRes = fromStrict . pack . show $ resId
       pure $ responseLBS status200 [(hContentType, "text/plain")] reqRes
   where
-    handle :: Connection -> Handle IO
-    handle conn =
+    handle :: Handle IO
+    handle =
       Handle
-        { hReadCategoryById = readCategoryById conn,
-          hReadCategoryByTitle = readCategoryByTitle conn,
-          hWriteCategory = writeCategory conn
+        { hReadCategoryById = readCategoryById,
+          hReadCategoryByTitle = readCategoryByTitle,
+          hWriteCategory = writeCategory
         }
