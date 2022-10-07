@@ -1,35 +1,38 @@
 module DatabaseQueries.Category where
 
+import Control.Monad.Reader (ReaderT)
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple (Connection, Only (..), execute, query, query_)
+import Database.PostgreSQL.Simple (Only (..), execute, query, query_)
 import qualified Types.API.Category as API (CreateCategoryRequest (..), EditCategoryRequest (..))
 import qualified Types.DB.Category as DB (Category (..))
+import Types.Domain.Environment (Environment (..))
+import Utils.Pool (withPool)
 
-parseCategoriesList :: Connection -> IO [DB.Category]
-parseCategoriesList conn = query_ conn "SELECT * FROM categories"
+parseCategoriesList :: ReaderT Environment IO [DB.Category]
+parseCategoriesList = withPool $ \conn -> query_ conn "SELECT * FROM categories"
 
-readCategoryById :: Connection -> Int -> IO (Maybe DB.Category)
-readCategoryById conn catId = do
+readCategoryById :: Int -> ReaderT Environment IO (Maybe DB.Category)
+readCategoryById catId = do
   let q =
         " SELECT * FROM categories \
         \ WHERE id=?"
-  res <- query conn q (Only catId)
+  res <- withPool $ \conn -> query conn q (Only catId)
   case res of
     [] -> pure Nothing
     (c : _) -> pure $ Just c
 
-readCategoryByTitle :: Connection -> T.Text -> IO (Maybe DB.Category)
-readCategoryByTitle conn title = do
+readCategoryByTitle :: T.Text -> ReaderT Environment IO (Maybe DB.Category)
+readCategoryByTitle title = do
   let q =
         " SELECT * FROM categories \
         \ WHERE title=?"
-  res <- query conn q (Only title)
+  res <- withPool $ \conn -> query conn q (Only title)
   case res of
     [] -> pure Nothing
     (c : _) -> pure $ Just c
 
-readCategoryWithParentsById :: Int -> Connection -> IO [DB.Category]
-readCategoryWithParentsById catId conn = do
+readCategoryWithParentsById :: Int -> ReaderT Environment IO [DB.Category]
+readCategoryWithParentsById catId = do
   let q =
         " WITH RECURSIVE records_list AS ( \
         \ SELECT n.id AS id,\
@@ -53,33 +56,33 @@ readCategoryWithParentsById catId conn = do
         \        records_list.title, \
         \        records_list.parent_category_id \
         \ FROM records_list ORDER BY depth;"
-  query conn q (Only catId)
+  withPool $ \conn -> query conn q (Only catId)
 
-writeCategory :: Connection -> API.CreateCategoryRequest -> IO Int
-writeCategory conn API.CreateCategoryRequest {..} = do
+writeCategory :: API.CreateCategoryRequest -> ReaderT Environment IO Int
+writeCategory API.CreateCategoryRequest {..} = do
   let q =
         " INSERT INTO categories \
         \ (title,parent_category_id) \
         \ VALUES (?,?) \
         \ RETURNING id"
-  (Only resId : _) <- query conn q (title, parentCategoryId)
+  (Only resId : _) <- withPool $ \conn -> query conn q (title, parentCategoryId)
   pure resId
 
-rewriteCategory :: Connection -> API.EditCategoryRequest -> IO ()
-rewriteCategory conn API.EditCategoryRequest {..} = do
+rewriteCategory :: API.EditCategoryRequest -> ReaderT Environment IO ()
+rewriteCategory API.EditCategoryRequest {..} = do
   _ <- execTitle newTitle
   _ <- execParent newParentCategoryId
   pure ()
   where
     execTitle (Just t) =
       let q = "UPDATE categories SET title = ? WHERE id = ?"
-       in execute conn q (t, processedCategoryId)
+       in withPool $ \conn -> execute conn q (t, processedCategoryId)
     execTitle Nothing = pure 0
 
     execParent (Just 0) =
       let q = "UPDATE categories SET parent_category_id = NULL WHERE id = ?"
-       in execute conn q (Only processedCategoryId)
+       in withPool $ \conn -> execute conn q (Only processedCategoryId)
     execParent (Just parId) =
       let q = "UPDATE categories SET parent_category_id = ? WHERE id = ?"
-       in execute conn q (parId, processedCategoryId)
+       in withPool $ \conn -> execute conn q (parId, processedCategoryId)
     execParent Nothing = pure 0

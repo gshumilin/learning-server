@@ -53,9 +53,6 @@ application req@Request {..} respond = do
         "/category" -> do
           res <- withAuthAndParsedRequest createCategory req
           lift $ respond res
-        "/picture" -> do
-          res <- getPicture req
-          lift $ respond res
         _ -> do
           addLog WARNING "Unknown endpoint"
           lift . respond $ responseLBS status404 [(hContentType, "text/plain")] "Unknown endpoint"

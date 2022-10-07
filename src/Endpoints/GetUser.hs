@@ -1,6 +1,6 @@
 module Endpoints.GetUser where
 
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import DatabaseQueries.User (readUsers)
 import Network.HTTP.Types (hContentType, status200)
@@ -9,7 +9,6 @@ import Types.Domain.Environment (Environment (..))
 
 getUsers :: ReaderT Environment IO Response
 getUsers = do
-  conn <- asks dbConnection
-  usersList <- lift $ readUsers conn
+  usersList <- readUsers
   let jsonUsersList = encodePretty usersList
   pure $ responseLBS status200 [(hContentType, "text/plain")] jsonUsersList

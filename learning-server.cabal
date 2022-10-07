@@ -62,6 +62,7 @@ library
       Types.Domain.Picture
       Types.Domain.User
       Utils
+      Utils.Pool
   other-modules:
       Paths_learning_server
   hs-source-dirs:
@@ -83,6 +84,7 @@ library
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
+    , resource-pool >=0.3
     , text
     , time
     , wai
@@ -113,6 +115,7 @@ executable learning-server-exe
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
+    , resource-pool >=0.3
     , text
     , time
     , wai
@@ -149,6 +152,7 @@ test-suite learning-server-test
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
+    , resource-pool >=0.3
     , text
     , time
     , wai
