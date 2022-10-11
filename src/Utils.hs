@@ -1,12 +1,10 @@
 module Utils where
 
 import Auth (authorization)
-import Control.Monad.Reader (ReaderT, asks, lift)
+import Control.Monad.Reader (ReaderT, lift)
 import Data.Aeson (FromJSON, decodeStrict)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (ByteString, fromStrict)
-import Data.Pool (takeResource)
-import Database.PostgreSQL.Simple (Connection)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
 import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
@@ -35,9 +33,3 @@ withAuthAndParsedRequest f req = do
 
 intToLBS :: Int -> ByteString
 intToLBS = fromStrict . pack . show
-
-askConnection :: ReaderT Environment IO Connection
-askConnection = do
-  pool <- asks dbPool
-  (conn, _) <- lift $ takeResource pool
-  pure conn

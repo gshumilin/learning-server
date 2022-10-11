@@ -1,7 +1,7 @@
 module Main where
 
 import Control.Exception (IOException, catch)
-import Control.Monad.Reader (ReaderT, lift, runReaderT)
+import Control.Monad.Reader (ReaderT, runReaderT)
 import Data.Aeson (decodeStrict)
 import qualified Data.ByteString.Char8 as BS
 import Data.Pool (PoolConfig (..), newPool)
@@ -14,7 +14,7 @@ import Routing (application)
 import System.Environment (getArgs)
 import Types.Domain.Environment (Config (..), DbConnectInfo (..), Environment (..))
 import Types.Domain.Log (LogLvl (..))
-import Utils (askConnection)
+import Utils.Pool (withPool)
 
 main :: IO ()
 main = do
@@ -65,15 +65,14 @@ argProcessing arg = addLog DEBUG $ "unknown flag : " <> T.pack (show arg)
 
 execMigrations :: ReaderT Environment IO ()
 execMigrations = do
-  conn <- askConnection
   schemaRes <-
-    lift $
+    withPool $ \conn ->
       withTransaction conn $
         runMigration $
           MigrationContext MigrationInitialization True conn
   addLog DEBUG $ "execSchemaMigrations : " <> T.pack (show schemaRes)
   res <-
-    lift $
+    withPool $ \conn ->
       withTransaction conn $
         runMigration $
           MigrationContext (MigrationDirectory "migrations") True conn
@@ -81,9 +80,8 @@ execMigrations = do
 
 execFixtures :: ReaderT Environment IO ()
 execFixtures = do
-  conn <- askConnection
   res <-
-    lift $
+    withPool $ \conn ->
       withTransaction conn $
         runMigration $
           MigrationContext (MigrationDirectory "fixtures") True conn
