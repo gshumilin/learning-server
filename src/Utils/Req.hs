@@ -1,10 +1,8 @@
-module Utils where
+module Utils.Req where
 
 import Auth (authorization)
 import Control.Monad.Reader (ReaderT, lift)
 import Data.Aeson (FromJSON, decodeStrict)
-import Data.ByteString.Char8 (pack)
-import Data.ByteString.Lazy (ByteString, fromStrict)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status400, status404)
 import Network.Wai (Request, Response, getRequestBodyChunk, responseLBS)
@@ -30,6 +28,3 @@ withAuthAndParsedRequest f req = do
           addLog WARNING "Invalid JSON"
           pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: Invalid JSON"
         Just parsedReq -> f invoker parsedReq
-
-intToLBS :: Int -> ByteString
-intToLBS = fromStrict . pack . show

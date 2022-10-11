@@ -17,7 +17,7 @@ import Network.Wai (Response, ResponseReceived, responseLBS)
 import Network.Wai.Internal (Request (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
-import Utils (withAuthAndParsedRequest)
+import Utils.Req (withAuthAndParsedRequest)
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
 application req@Request {..} respond = do

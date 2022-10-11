@@ -11,7 +11,7 @@ import qualified Types.API.News as API (CreateNewsRequest (..))
 import qualified Types.DB.User as DB (User (..))
 import Types.Domain.Environment (Environment (..))
 import Types.Domain.Log (LogLvl (..))
-import Utils (intToLBS)
+import Utils.TypeConverter (intToLBS)
 
 createNews :: DB.User -> API.CreateNewsRequest -> ReaderT Environment IO Response
 createNews invoker req = do
