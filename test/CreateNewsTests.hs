@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module CreateNewsTests where
 
 import Data.Functor.Identity (Identity)
@@ -43,8 +45,8 @@ createNewsRequest =
 testHandle :: Handle Identity
 testHandle =
   Handle
-    { hReadCategoryById = \cId ->
-        case cId of
+    { hReadCategoryById =
+        \case
           1 -> pure (Just sampleCategory)
           _ -> pure Nothing,
       hWriteNews = \_ _ -> pure 1

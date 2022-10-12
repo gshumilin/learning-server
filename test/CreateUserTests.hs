@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module CreateUserTests where
 
 import Data.Functor.Identity (Identity)
@@ -33,8 +35,8 @@ createUserRequest =
 testHandle :: Handle Identity
 testHandle =
   Handle
-    { hFindUserByLogin = \l ->
-        case l of
+    { hFindUserByLogin =
+        \case
           "takenLogin" -> pure (Just 2)
           _ -> pure Nothing,
       hWriteUser = \_ -> pure ()

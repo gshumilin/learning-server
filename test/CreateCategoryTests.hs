@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module CreateCategoryTests where
 
 import Data.Functor.Identity (Identity)
@@ -11,12 +13,14 @@ import qualified Types.DB.User as DB (User (..))
 testHandle :: Handle Identity
 testHandle =
   Handle
-    { hReadCategoryById = \catId -> case catId of
-        1 -> pure (Just sampleCategory)
-        42 -> pure Nothing,
-      hReadCategoryByTitle = \title -> case title of
-        "titleIsTaken" -> pure (Just sampleCategory)
-        _ -> pure Nothing,
+    { hReadCategoryById =
+        \case
+          1 -> pure (Just sampleCategory)
+          _ -> pure Nothing,
+      hReadCategoryByTitle =
+        \case
+          "titleIsTaken" -> pure (Just sampleCategory)
+          _ -> pure Nothing,
       hWriteCategory = \_ -> pure 1
     }
 
