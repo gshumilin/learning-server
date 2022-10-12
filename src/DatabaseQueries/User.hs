@@ -37,4 +37,4 @@ findUserIdByLogin login = do
   res <- withPool $ \conn -> query conn "SELECT id FROM users WHERE login = ?" $ Only login
   case res of
     [] -> pure Nothing
-    ((Only x) : _) -> pure $ Just ((x :: Int))
+    ((Only x) : _) -> pure $ Just (x :: Int)
