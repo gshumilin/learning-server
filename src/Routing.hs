@@ -1,6 +1,8 @@
 module Routing where
 
-import Control.Monad.Reader (ReaderT, lift)
+import Control.Exception (try)
+import Control.Exception.Base (SomeException)
+import Control.Monad.Reader (ReaderT, ask, lift, runReaderT)
 import qualified Data.Text as T (pack)
 import Endpoints.CreateCategory (createCategory)
 import Endpoints.CreateNews (createNews)
@@ -12,7 +14,7 @@ import Endpoints.GetNews (getNews)
 import Endpoints.GetUser (getUsers)
 import Endpoints.Picture (getPicture)
 import Log (addLog)
-import Network.HTTP.Types (hContentType, status404)
+import Network.HTTP.Types (hContentType, status404, status500)
 import Network.Wai (Response, ResponseReceived, responseLBS)
 import Network.Wai.Internal (Request (..))
 import Types.Domain.Environment (Environment (..))
@@ -20,7 +22,17 @@ import Types.Domain.Log (LogLvl (..))
 import Utils.Req (withAuthAndParsedRequest)
 
 application :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
-application req@Request {..} respond = do
+application req respond = do
+  env <- ask
+  tryRes <- lift $ try (runReaderT (routing req respond) env) :: ReaderT Environment IO (Either SomeException ResponseReceived)
+  case tryRes of
+    Left err -> do
+      addLog RELEASE $ "FATAL ERROR: " <> T.pack (show err)
+      lift . respond $ responseLBS status500 [(hContentType, "text/plain")] "500 Internal Server Error"
+    Right res -> pure res
+
+routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
+routing req@Request {..} respond = do
   addLog DEBUG ("----- got request:\n" <> T.pack (show req))
   addLog DEBUG ("----- method : " <> T.pack (show requestMethod))
   addLog DEBUG ("----- endpoint : " <> T.pack (show rawPathInfo))
