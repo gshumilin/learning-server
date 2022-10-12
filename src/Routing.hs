@@ -28,7 +28,7 @@ application req respond = do
   case tryRes of
     Left err -> do
       addLog RELEASE $ "FATAL ERROR: " <> T.pack (show err)
-      lift . respond $ responseLBS status500 [(hContentType, "text/plain")] "500 Internal Server Error"
+      lift . respond $ responseLBS status500 [(hContentType, "text/plain")] "500 Internal Server Error\n"
     Right res -> pure res
 
 routing :: Request -> (Response -> IO ResponseReceived) -> ReaderT Environment IO ResponseReceived
