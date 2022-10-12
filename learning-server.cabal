@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -61,8 +61,9 @@ library
       Types.Domain.News
       Types.Domain.Picture
       Types.Domain.User
-      Utils
       Utils.Pool
+      Utils.Req
+      Utils.TypeConverter
   other-modules:
       Paths_learning_server
   hs-source-dirs:
