@@ -2,7 +2,7 @@ module Endpoints.CreateNews where
 
 import Control.Monad.Reader (ReaderT)
 import DatabaseQueries.Category (readCategoryById)
-import DatabaseQueries.News (findNewsIdByTitle, writeNews)
+import DatabaseQueries.News (writeNews)
 import Endpoints.Handlers.CreateNews (CreateNewsResult (..), Handle (..), hCreateNews)
 import Log (addLog)
 import Network.HTTP.Types (hContentType, status200, status400, status403)
@@ -20,9 +20,6 @@ createNews invoker req = do
     NotAbleToCreateNews -> do
       addLog DEBUG "createNews-error: NotAbleToCreateNews"
       pure $ responseLBS status403 [(hContentType, "text/plain")] "Forbidden"
-    IncorrectTitle -> do
-      addLog DEBUG "createNews-error: IncorrectTitle"
-      pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: invalid title"
     InvalidPictureFormat -> do
       addLog DEBUG "createNews-error: InvalidPictureFormat"
       pure $ responseLBS status400 [(hContentType, "text/plain")] "Bad Request: invalid picture format"
@@ -38,6 +35,5 @@ createNews invoker req = do
     handle =
       Handle
         { hReadCategoryById = readCategoryById,
-          hFindNewsIdByTitle = findNewsIdByTitle,
           hWriteNews = writeNews
         }
