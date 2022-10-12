@@ -47,6 +47,10 @@ testHandle =
         case cId of
           1 -> pure (Just sampleCategory)
           _ -> pure Nothing,
+      hFindNewsIdByTitle = \t ->
+        case t of
+          "invalid" -> pure $ Just 42
+          _ -> pure Nothing,
       hWriteNews = \_ _ -> pure 1
     }
 
@@ -64,6 +68,11 @@ createNewsTest =
       let invoker = invoker' {DB.isAbleToCreateNews = False}
       let result = hCreateNews testHandle invoker createNewsRequest
       result `shouldBe` pure NotAbleToCreateNews
+    it "Shouldn't create news if title is invalid" $ do
+      invoker <- sampleUser
+      let req = createNewsRequest {title = "invalid"}
+      let result = hCreateNews testHandle invoker req
+      result `shouldBe` pure IncorrectTitle
     it "Shouldn't create news if pictures format is invalid" $ do
       invoker <- sampleUser
       let req = createNewsRequest {pictures = Just badPictures}

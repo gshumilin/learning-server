@@ -2,7 +2,7 @@ module DatabaseQueries.News where
 
 import Control.Monad.Reader (ReaderT, lift)
 import Data.Maybe (fromMaybe)
-import qualified Data.Text as T (pack)
+import qualified Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T (decodeUtf8)
 import Data.Time (getCurrentTime)
 import Database.PostgreSQL.Simple (Only (..), execute, query, query_)
@@ -107,3 +107,14 @@ rewriteNews editedNewsFields editNewsRequest = do
       deleteNewsPictures (API.newsId editNewsRequest)
       addPicturesToNews (API.newsId editNewsRequest) picArr
       pure ()
+
+findNewsIdByTitle :: T.Text -> ReaderT Environment IO (Maybe Int)
+findNewsIdByTitle title = do
+  let q =
+        " SELECT id\
+        \ FROM news WHERE title=?"
+  res <- withPool $ \conn -> query conn q (Only title) :: IO [Only Int]
+  case res of
+    [] -> pure Nothing
+    [Only i] -> pure $ Just i
+    (Only i : _) -> pure $ Just i
